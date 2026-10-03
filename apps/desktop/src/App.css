@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap');
+@import "tailwindcss";
+
+/* ─── Design tokens ──────────────────────────────────────────────────────── */
+@theme {
+  /* Colour palette */
+  --color-ink:           #1a0e00;
+  --color-ink-light:     #3a2010;
+  --color-red-ink:       #8b1a1a;
+  --color-gold:          #c8a84b;
+  --color-gold-dim:      #8b6020;
+  --color-parchment-light: #f4e8c0;
+  --color-parchment-mid:   #e8d490;
+  --color-parchment-dark:  #d4be78;
+  --color-leather:         #3d1c05;
+  --color-leather-light:   #5c3010;
+
+  /* Font families */
+  --font-cinzel:      'Cinzel', 'Palatino Linotype', serif;
+  --font-cinzel-deco: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-fell:        'IM Fell English', 'Palatino Linotype', Georgia, serif;
+  --font-fell-sc:     'IM Fell English SC', 'Palatino Linotype', serif;
+
+  /* Responsive font scale — clamp(floor, vw-preferred, ceiling) */
+  --text-deco:    clamp(0.65rem, 0.60vw, 0.90rem);
+  --text-badge:   clamp(0.72rem, 0.68vw, 1.00rem);
+  --text-caption: clamp(0.82rem, 0.80vw, 1.12rem);
+  --text-body:    clamp(0.90rem, 0.90vw, 1.25rem);
+  --text-subhead: clamp(1.05rem, 1.10vw, 1.50rem);
+  --text-heading: clamp(1.20rem, 1.40vw, 1.90rem);
+  --text-display: clamp(1.50rem, 1.90vw, 2.60rem);
+  --text-giant:   clamp(1.80rem, 2.50vw, 3.40rem);
+  --text-hero:    clamp(2.40rem, 3.80vw, 5.20rem);
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    @apply bg-[#0a0705] text-ink overflow-hidden select-none;
+    font-family: var(--font-fell);
+  }
+
+  /* Thin medieval scrollbars on parchment surfaces */
+  .parchment-scroll::-webkit-scrollbar       { width: 4px; }
+  .parchment-scroll::-webkit-scrollbar-track { background: transparent; }
+  .parchment-scroll::-webkit-scrollbar-thumb {
+    background: rgba(100,70,20,0.25);
+    border-radius: 2px;
+  }
+}
+
+/* ─── Reusable decorative patterns ──────────────────────────────────────── */
+@layer components {
+
+  /* Complex multi-layer backgrounds that can't be expressed as single utilities */
+
+  .bg-dungeon {
+    background:
+      radial-gradient(ellipse at 50% 40%, #1c1206 0%, #0d0905 50%, #060402 100%);
+  }
+  .bg-dungeon-dark {
+    background:
+      radial-gradient(ellipse at 50% 30%, #16120c 0%, #0a0805 60%, #050402 100%);
+  }
+  .bg-topbar {
+    background: linear-gradient(to bottom, #100a04, #0a0704);
+  }
+  .bg-parchment-card {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,240,180,0.5) 0%, transparent 70%),
+      linear-gradient(165deg, #f5eac4 0%, #ead894 35%, #f0e2ac 60%, #e6d088 100%);
+  }
+  .bg-parchment-sheet {
+    background:
+      radial-gradient(ellipse at 50% 0%,  rgba(255,240,180,0.45) 0%, transparent 65%),
+      linear-gradient(170deg, #f5eac4 0%, #ead894 30%, #f0e2ac 58%, #e8d48c 82%, #f2e6b8 100%);
+  }
+  .bg-parchment-footer {
+    background:
+      linear-gradient(165deg, #f0e6ba 0%, #e4d088 40%, #ecdea8 70%, #e0cc80 100%);
+  }
+  .bg-parchment-page-left {
+    background:
+      radial-gradient(ellipse at 90% 50%, rgba(150,120,60,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse at 10% 10%, rgba(200,170,90,0.09) 0%, transparent 40%),
+      linear-gradient(162deg, #f5eac4 0%, #ead894 28%, #f0e2ac 55%, #e8d48c 80%, #f2e6b8 100%);
+    box-shadow: inset -12px 0 20px rgba(90,60,10,0.13);
+  }
+  .bg-parchment-page-right {
+    background:
+      radial-gradient(ellipse at 10% 50%, rgba(150,120,60,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 10%, rgba(200,170,90,0.09) 0%, transparent 40%),
+      linear-gradient(198deg, #f5eac4 0%, #ead894 28%, #f0e2ac 55%, #e8d48c 80%, #f2e6b8 100%);
+    box-shadow: inset 12px 0 20px rgba(90,60,10,0.13);
+  }
+  .bg-leather-spine {
+    background:
+      linear-gradient(to right, #180e02 0%, #3a1a04 18%, #5a2e0e 50%, #3a1a04 82%, #180e02 100%);
+    box-shadow: inset 4px 0 6px rgba(0,0,0,0.45), inset -4px 0 6px rgba(0,0,0,0.45);
+  }
+
+  /* Shadows */
+  .shadow-book {
+    box-shadow:
+      0 28px 80px rgba(0,0,0,0.95),
+      0 10px 26px rgba(0,0,0,0.70),
+      0 3px  6px  rgba(0,0,0,0.50);
+  }
+  .shadow-card {
+    box-shadow:
+      0 0 0 1px #8b6a28,
+      0 0 0 3px #2e1e04,
+      0 8px 24px rgba(0,0,0,0.75),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .shadow-card-hover {
+    box-shadow:
+      0 0 0 1px #c8a84b,
+      0 0 0 3px #4a2e00,
+      0 16px 40px rgba(0,0,0,0.85),
+      0 0 28px rgba(200,168,75,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .shadow-sheet {
+    box-shadow:
+      0 0 0 1px #7a5a18,
+      0 0 0 3px #1e1004,
+      0 14px 45px rgba(0,0,0,0.85);
+  }
+  .shadow-footer {
+    box-shadow:
+      0 0 0 1px #7a5a18,
+      0 0 0 2px #1e1004,
+      0 5px 14px rgba(0,0,0,0.60);
+  }
+
+  /* Gradient divider lines */
+  .deco-rule {
+    height: 1px;
+    flex-shrink: 0;
+    background: linear-gradient(to right, transparent, #9b7020, #c8a040, #9b7020, transparent);
+  }
+  .deco-rule-subtle {
+    height: 1px;
+    flex-shrink: 0;
+    background: linear-gradient(to right, transparent, rgba(155,112,32,0.5), transparent);
+  }
+  .deco-vline {
+    width: 1px;
+    flex-shrink: 0;
+    background: linear-gradient(to bottom, transparent, rgba(100,70,20,0.3), transparent);
+  }
+
+  /* Animations */
+  .animate-fade-up  { animation: anim-fade-up 0.60s ease; }
+  .animate-fade-up-fast { animation: anim-fade-up 0.45s ease; }
+  .animate-fade-in  { animation: anim-fade-in  0.50s ease; }
+}
+
+@layer utilities {
+  @keyframes anim-fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes anim-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}

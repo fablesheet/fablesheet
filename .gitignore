@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+target/
+.vite/
+apps/desktop/src-tauri/gen/schemas/
+
+# Local data & env
+*.db
+*.local
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.sw?
+
+# Claude Code local settings
+.claude/settings.local.json

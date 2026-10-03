@@ -1,0 +1,20 @@
+{
+  "name": "fablesheet",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "workspaces": [
+    "apps/desktop",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run tauri dev -w @fablesheet/desktop",
+    "dev:web": "npm run dev -w @fablesheet/desktop",
+    "build": "npm run build -w @fablesheet/desktop",
+    "tauri": "npm run tauri -w @fablesheet/desktop --",
+    "typecheck": "npm run typecheck -w @fablesheet/desktop",
+    "server": "cargo run -p fablesheet-server"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
