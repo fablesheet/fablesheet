@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Character, AbilityName, SkillName, SkillEntry } from '@fablesheet/core'
 import {
   abilityModifier as mod,
@@ -9,27 +10,11 @@ import {
   spellSaveDC,
 } from '@fablesheet/core'
 import { createCharacter } from '../services/api'
+import { gameLabel } from '../i18n/game'
 
-// ─── Static D&D data ──────────────────────────────────────────────────────────
+// ─── Static rules data ──────────────────────────────────────────────────────────
 
 const ABILITY_NAMES: AbilityName[] = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
-const ABILITY_LABEL: Record<AbilityName, string> = {
-  strength: 'Strength',
-  dexterity: 'Dexterity',
-  constitution: 'Constitution',
-  intelligence: 'Intelligence',
-  wisdom: 'Wisdom',
-  charisma: 'Charisma',
-}
-const ABILITY_SHORT: Record<AbilityName, string> = {
-  strength: 'STR',
-  dexterity: 'DEX',
-  constitution: 'CON',
-  intelligence: 'INT',
-  wisdom: 'WIS',
-  charisma: 'CHA',
-}
-
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
 
 const SKILL_ABILITY: Record<SkillName, AbilityName> = {
@@ -51,27 +36,6 @@ const SKILL_ABILITY: Record<SkillName, AbilityName> = {
   sleightOfHand: 'dexterity',
   stealth: 'dexterity',
   survival: 'wisdom',
-}
-
-const SKILL_LABEL: Record<SkillName, string> = {
-  acrobatics: 'Acrobatics',
-  animalHandling: 'Animal Handling',
-  arcana: 'Arcana',
-  athletics: 'Athletics',
-  deception: 'Deception',
-  history: 'History',
-  insight: 'Insight',
-  intimidation: 'Intimidation',
-  investigation: 'Investigation',
-  medicine: 'Medicine',
-  nature: 'Nature',
-  perception: 'Perception',
-  performance: 'Performance',
-  persuasion: 'Persuasion',
-  religion: 'Religion',
-  sleightOfHand: 'Sleight of Hand',
-  stealth: 'Stealth',
-  survival: 'Survival',
 }
 
 interface RaceInfo {
@@ -334,9 +298,11 @@ interface BuilderState {
   flaws: string
 }
 
-const STEP_LABELS = ['Heritage', 'Calling', 'Gifts', 'Path', 'Destiny']
-
 export function CharacterBuilder({ onCreated, onCancel }: Props) {
+  const { t } = useTranslation()
+  const STEP_LABELS = t('builder.steps', { returnObjects: true }) as string[]
+  const abilityShort = (a: AbilityName) => gameLabel(t, 'abilityShort', a)
+  const skillLabel = (sk: SkillName) => gameLabel(t, 'skill', sk)
   const [step, setStep] = useState(0)
   const [s, setS] = useState<BuilderState>({
     name: '',
@@ -518,12 +484,12 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
         {/* Name */}
         <div>
           <label className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase block mb-1.5">
-            Character Name
+            {t('builder.characterName')}
           </label>
           <input
             value={s.name}
             onChange={e => setS(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Enter a name..."
+            placeholder={t('builder.namePlaceholder')}
             className="w-full px-3 py-2 bg-[rgba(255,240,180,0.4)] border border-[rgba(100,70,20,0.3)] rounded-sm font-fell text-body text-ink placeholder:text-[#a08050] outline-none focus:border-[rgba(100,70,20,0.6)] focus:bg-[rgba(255,240,180,0.6)] transition-colors"
           />
         </div>
@@ -532,7 +498,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
 
         {/* Race */}
         <div>
-          <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-2">Race</div>
+          <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-2">
+            {t('builder.race')}
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {RACES.map(r => (
               <button
@@ -546,8 +514,10 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                 ].join(' ')}
               >
                 <div className="text-[1.2rem] mb-0.5 leading-none">{r.symbol}</div>
-                <div>{r.name}</div>
-                {r.speed === 25 && <div className="font-cinzel text-deco text-[#8a6838] mt-0.5">25 ft</div>}
+                <div>{gameLabel(t, 'race', r.name)}</div>
+                {r.speed === 25 && (
+                  <div className="font-cinzel text-deco text-[#8a6838] mt-0.5">{t('builder.feet', { value: 25 })}</div>
+                )}
               </button>
             ))}
           </div>
@@ -557,7 +527,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
 
         {/* Alignment */}
         <div>
-          <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-2">Alignment</div>
+          <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-2">
+            {t('builder.alignment')}
+          </div>
           <div className="grid grid-cols-3 gap-1.5">
             {ALIGNMENTS.map(a => (
               <button
@@ -570,7 +542,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                     : 'bg-[rgba(255,240,180,0.25)] border-[rgba(100,70,20,0.2)] text-[#5a3010] hover:bg-[rgba(100,70,20,0.12)] hover:border-[rgba(100,70,20,0.4)]',
                 ].join(' ')}
               >
-                {a}
+                {gameLabel(t, 'alignment', a)}
               </button>
             ))}
           </div>
@@ -582,7 +554,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
   function renderCalling() {
     return (
       <div>
-        <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-3">Choose your Class</div>
+        <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-3">
+          {t('builder.chooseClass')}
+        </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {CLASSES.map(c => (
             <button
@@ -596,9 +570,11 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
               ].join(' ')}
             >
               <div className="text-[1.4rem] leading-none mb-1">{c.symbol}</div>
-              <div className="font-fell-sc text-caption">{c.name}</div>
+              <div className="font-fell-sc text-caption">{gameLabel(t, 'class', c.name)}</div>
               <div className="font-cinzel text-deco text-[#8a6838] mt-0.5">d{c.hitDie}</div>
-              {c.spellcastingAbility && <div className="font-cinzel text-deco text-gold-dim mt-0.5">✦ Caster</div>}
+              {c.spellcastingAbility && (
+                <div className="font-cinzel text-deco text-gold-dim mt-0.5">{t('builder.caster')}</div>
+              )}
             </button>
           ))}
         </div>
@@ -607,11 +583,12 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
           <>
             {divider}
             <div className="font-fell text-body text-[#4a2e08] leading-relaxed">
-              <span className="font-fell-sc">Saving Throws:</span>{' '}
-              {cls.savingThrows.map(a => ABILITY_SHORT[a]).join(', ')}
+              <span className="font-fell-sc">{t('builder.savingThrows')}</span>{' '}
+              {cls.savingThrows.map(abilityShort).join(', ')}
               {cls.spellcastingAbility && (
                 <span className="ml-3 font-fell-sc">
-                  Spellcasting: <span className="text-gold-dim">{ABILITY_SHORT[cls.spellcastingAbility]}</span>
+                  {t('builder.spellcasting')}{' '}
+                  <span className="text-gold-dim">{abilityShort(cls.spellcastingAbility)}</span>
                 </span>
               )}
             </div>
@@ -624,10 +601,10 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
   function renderGifts() {
     return (
       <div>
-        <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-1">Standard Array</div>
-        <div className="font-fell text-caption text-[#6b4a20] mb-3 italic">
-          Click a score, then click an ability to assign it.
+        <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-1">
+          {t('builder.standardArray')}
         </div>
+        <div className="font-fell text-caption text-[#6b4a20] mb-3 italic">{t('builder.standardArrayHint')}</div>
 
         {/* Score chips */}
         <div className="flex gap-2 flex-wrap mb-4">
@@ -676,9 +653,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                 ].join(' ')}
               >
                 <span className="font-cinzel text-caption tracking-widest text-[#8a6838] w-8">
-                  {ABILITY_SHORT[ability]}
+                  {abilityShort(ability)}
                 </span>
-                <span className="font-fell-sc text-body text-ink w-[100px]">{ABILITY_LABEL[ability]}</span>
+                <span className="font-fell-sc text-body text-ink w-[100px]">{gameLabel(t, 'ability', ability)}</span>
 
                 <span className="font-fell-sc text-body text-red-ink w-6 text-center">{hasBase ? base : '—'}</span>
 
@@ -709,7 +686,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       <div className="flex flex-col gap-5">
         {/* Background */}
         <div>
-          <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-2">Background</div>
+          <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-2">
+            {t('builder.background')}
+          </div>
           <div className="grid grid-cols-3 gap-1.5">
             {BACKGROUNDS.map(b => (
               <button
@@ -722,9 +701,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                     : 'bg-[rgba(255,240,180,0.25)] border-[rgba(100,70,20,0.2)] text-[#5a3010] hover:bg-[rgba(100,70,20,0.12)] hover:border-[rgba(100,70,20,0.4)]',
                 ].join(' ')}
               >
-                <div>{b.name}</div>
+                <div>{gameLabel(t, 'background', b.name)}</div>
                 <div className="font-cinzel text-deco text-[#8a6838] mt-0.5">
-                  {b.skills.map(sk => SKILL_LABEL[sk]).join(' · ')}
+                  {b.skills.map(skillLabel).join(' · ')}
                 </div>
               </button>
             ))}
@@ -737,15 +716,15 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
         {cls && (
           <div>
             <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase mb-1">
-              Class Skills
+              {t('builder.classSkills')}
               <span className="ml-2 font-fell text-[#8a6838] normal-case">
-                ({s.chosenSkills.length}/{cls.skillCount} chosen)
+                {t('builder.chosen', { count: s.chosenSkills.length, total: cls.skillCount })}
               </span>
             </div>
 
             {bg && bgSkills.length > 0 && (
               <div className="font-fell text-caption text-[#6b4a20] italic mb-2">
-                Background grants: {bgSkills.map(sk => SKILL_LABEL[sk]).join(', ')}
+                {t('builder.backgroundGrants', { skills: bgSkills.map(skillLabel).join(', ') })}
               </div>
             )}
 
@@ -770,8 +749,8 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                     <span className="w-3 h-3 border border-[rgba(100,70,20,0.5)] rounded-sm flex items-center justify-center shrink-0">
                       {chosen && <span className="text-[8px] text-gold-dim leading-none">✦</span>}
                     </span>
-                    {SKILL_LABEL[skill]}
-                    <span className="text-[#8a6838] ml-auto">{ABILITY_SHORT[SKILL_ABILITY[skill]]}</span>
+                    {skillLabel(skill)}
+                    <span className="text-[#8a6838] ml-auto">{abilityShort(SKILL_ABILITY[skill])}</span>
                   </button>
                 )
               })}
@@ -790,16 +769,20 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
           <div className="font-cinzel-deco text-heading text-gold text-center mb-2">{s.name || '—'}</div>
           <div className="grid grid-cols-2 gap-x-6 gap-y-1 font-fell-sc text-caption text-ink">
             <div>
-              <span className="text-[#8a6838]">Race:</span> {s.race || '—'}
+              <span className="text-[#8a6838]">{t('builder.summaryRace')}</span>{' '}
+              {s.race ? gameLabel(t, 'race', s.race) : '—'}
             </div>
             <div>
-              <span className="text-[#8a6838]">Class:</span> {s.className || '—'}
+              <span className="text-[#8a6838]">{t('builder.summaryClass')}</span>{' '}
+              {s.className ? gameLabel(t, 'class', s.className) : '—'}
             </div>
             <div>
-              <span className="text-[#8a6838]">Background:</span> {s.background || '—'}
+              <span className="text-[#8a6838]">{t('builder.summaryBackground')}</span>{' '}
+              {s.background ? gameLabel(t, 'background', s.background) : '—'}
             </div>
             <div>
-              <span className="text-[#8a6838]">Alignment:</span> {s.alignment || '—'}
+              <span className="text-[#8a6838]">{t('builder.summaryAlignment')}</span>{' '}
+              {s.alignment ? gameLabel(t, 'alignment', s.alignment) : '—'}
             </div>
           </div>
 
@@ -809,7 +792,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             <div className="grid grid-cols-3 gap-1 font-fell-sc text-caption">
               {ABILITY_NAMES.map(a => (
                 <div key={a} className="text-center">
-                  <div className="text-[#8a6838]">{ABILITY_SHORT[a]}</div>
+                  <div className="text-[#8a6838]">{abilityShort(a)}</div>
                   <div className="text-red-ink font-bold text-body">{finalScores[a]}</div>
                   <div className="text-ink-light">{fmtMod(mod(finalScores[a]))}</div>
                 </div>
@@ -822,16 +805,16 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
               {divider}
               <div className="grid grid-cols-3 gap-1 font-cinzel text-deco text-center">
                 <div>
-                  <div className="text-[#8a6838]">HP</div>
+                  <div className="text-[#8a6838]">{t('builder.hp')}</div>
                   <div className="text-red-ink text-caption">{cls.hitDie + mod(finalScores.constitution)}</div>
                 </div>
                 <div>
-                  <div className="text-[#8a6838]">AC</div>
+                  <div className="text-[#8a6838]">{t('builder.ac')}</div>
                   <div className="text-ink text-caption">{10 + mod(finalScores.dexterity)}</div>
                 </div>
                 <div>
-                  <div className="text-[#8a6838]">Speed</div>
-                  <div className="text-ink text-caption">{race.speed} ft</div>
+                  <div className="text-[#8a6838]">{t('builder.speed')}</div>
+                  <div className="text-ink text-caption">{t('builder.feet', { value: race.speed })}</div>
                 </div>
               </div>
             </>
@@ -842,14 +825,15 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
 
         {/* Personality (optional) */}
         <div className="font-cinzel text-caption tracking-widest text-[#5a3010] uppercase">
-          Personality <span className="font-fell normal-case text-[#8a6838]">(optional)</span>
+          {t('builder.personality')}{' '}
+          <span className="font-fell normal-case text-[#8a6838]">{t('builder.optional')}</span>
         </div>
 
         {[
-          ['personalityTraits', 'Personality Traits'] as const,
-          ['ideals', 'Ideals'] as const,
-          ['bonds', 'Bonds'] as const,
-          ['flaws', 'Flaws'] as const,
+          ['personalityTraits', t('builder.personalityTraits')] as const,
+          ['ideals', t('builder.ideals')] as const,
+          ['bonds', t('builder.bonds')] as const,
+          ['flaws', t('builder.flaws')] as const,
         ].map(([key, label]) => (
           <div key={key}>
             <label className="font-fell-sc text-caption text-[#5a3010] block mb-1">{label}</label>
@@ -857,7 +841,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
               value={s[key]}
               onChange={e => setS(prev => ({ ...prev, [key]: e.target.value }))}
               rows={2}
-              placeholder={`Enter ${label.toLowerCase()}...`}
+              placeholder={t('builder.enterField', { field: label })}
               className="w-full px-3 py-2 bg-[rgba(255,240,180,0.4)] border border-[rgba(100,70,20,0.3)] rounded-sm font-fell text-caption text-ink placeholder:text-[#a08050] outline-none focus:border-[rgba(100,70,20,0.6)] transition-colors resize-none"
             />
           </div>
@@ -933,7 +917,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             onClick={step === 0 ? onCancel : () => setStep(s => s - 1)}
             className="font-cinzel text-caption tracking-widest text-[#6b4a20] hover:text-ink transition-colors uppercase px-3 py-1.5 border border-[rgba(100,70,20,0.3)] rounded-sm hover:border-[rgba(100,70,20,0.6)] hover:bg-[rgba(100,70,20,0.08)]"
           >
-            {step === 0 ? 'Cancel' : '← Back'}
+            {step === 0 ? t('builder.cancel') : t('builder.back')}
           </button>
 
           {step < STEP_LABELS.length - 1 ? (
@@ -947,7 +931,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                   : 'text-[#6b4a20] border-[rgba(100,70,20,0.2)] opacity-40 cursor-not-allowed',
               ].join(' ')}
             >
-              Continue →
+              {t('builder.continue')}
             </button>
           ) : (
             <button
@@ -960,7 +944,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                   : 'text-[#6b4a20] border-[rgba(100,70,20,0.2)] opacity-40 cursor-not-allowed',
               ].join(' ')}
             >
-              {creating ? 'Creating...' : '✦ Create Character'}
+              {creating ? t('builder.creating') : t('builder.create')}
             </button>
           )}
         </div>

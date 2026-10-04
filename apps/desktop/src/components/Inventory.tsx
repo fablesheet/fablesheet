@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import type { Character, Item, ItemCategory, ItemRarity } from '@fablesheet/core'
 import { carryingLimits } from '@fablesheet/core'
 import { saveJsonFile } from '../services/files'
 import { ITEM_CATALOG } from '@fablesheet/srd-data'
+import { gameLabel } from '../i18n/game'
 
 interface Props {
   character: Character
@@ -70,6 +72,7 @@ function blankItem(): Omit<Item, 'id'> {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function Inventory({ character, onBack, onUpdate }: Props) {
+  const { t } = useTranslation()
   const items = character.items ?? []
 
   const [selectedId, setSelectedId] = useState<string | 'new' | null>(null)
@@ -175,7 +178,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
           .filter((x: unknown) => typeof x === 'object' && x !== null && 'name' in (x as object))
           .map((x: Record<string, unknown>) => ({
             id: typeof x.id === 'string' ? x.id : crypto.randomUUID(),
-            name: String(x.name ?? '').trim() || 'Unnamed Item',
+            name: String(x.name ?? '').trim() || t('inventory.unnamedItem'),
             category: (CATEGORIES.includes(x.category as ItemCategory) ? x.category : 'Other') as ItemCategory,
             description: String(x.description ?? ''),
             quantity: Math.max(1, Number(x.quantity) || 1),
@@ -189,7 +192,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
           }))
 
         if (imported.length === 0) {
-          setImportError('No valid items found in file.')
+          setImportError(t('inventory.noValidItems'))
           return
         }
 
@@ -197,10 +200,10 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
         const existingIds = new Set(items.map(i => i.id))
         const fresh = imported.filter(i => !existingIds.has(i.id))
         saveItems([...items, ...fresh])
-        setImportSuccess(`Imported ${fresh.length} item${fresh.length !== 1 ? 's' : ''}.`)
+        setImportSuccess(t('inventory.imported', { count: fresh.length }))
         setTimeout(() => setImportSuccess(null), 3000)
       } catch {
-        setImportError('Invalid JSON file.')
+        setImportError(t('inventory.invalidJson'))
       }
     }
     reader.readAsText(file)
@@ -211,7 +214,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
 
   function handleExport() {
     saveJsonFile(`${character.name.replace(/\s+/g, '_')}-inventory.json`, items).catch(e =>
-      setImportError(`Export failed: ${String(e)}`),
+      setImportError(t('inventory.exportFailed', { error: String(e) })),
     )
   }
 
@@ -236,15 +239,19 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
           onClick={onBack}
           className="font-cinzel text-caption tracking-[0.12em] text-[#8a7040] bg-transparent border border-[#2e2010] px-[clamp(12px,1.4vw,22px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm transition-colors hover:text-gold hover:border-[#5a4020] whitespace-nowrap"
         >
-          ← Return
+          {t('common.return')}
         </button>
 
         <div className="text-center">
           <span className="block font-cinzel text-heading text-gold tracking-[0.05em]">
-            Inventory of <em className="not-italic text-[#e8ca60]">{character.name}</em>
+            <Trans
+              i18nKey="inventory.title"
+              values={{ name: character.name }}
+              components={{ name: <em className="not-italic text-[#e8ca60]" /> }}
+            />
           </span>
           <span className="block font-fell-sc text-badge text-[#5a4a28] tracking-[0.12em] mt-0.5">
-            {items.length} item{items.length !== 1 ? 's' : ''} · {totalWeight.toFixed(1)} lb carried
+            {t('inventory.subtitle', { count: items.length, weight: totalWeight.toFixed(1) })}
           </span>
         </div>
 
@@ -254,14 +261,14 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
               onClick={handleExport}
               className="font-cinzel text-caption tracking-[0.1em] text-[#8a7040] border border-[#2e2010] px-[clamp(10px,1.2vw,18px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm transition-colors hover:text-gold hover:border-[#5a4020] whitespace-nowrap"
             >
-              ↓ Export
+              {t('inventory.export')}
             </button>
           )}
           <button
             onClick={() => fileInputRef.current?.click()}
             className="font-cinzel text-caption tracking-[0.1em] text-[#8a7040] border border-[#2e2010] px-[clamp(10px,1.2vw,18px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm transition-colors hover:text-gold hover:border-[#5a4020] whitespace-nowrap"
           >
-            ↑ Import
+            {t('inventory.import')}
           </button>
           <button
             onClick={openCatalog}
@@ -272,7 +279,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
                 : 'text-[#8a7040] border-[#2e2010] hover:text-gold hover:border-[#5a4020]',
             ].join(' ')}
           >
-            ◈ Browse Catalog
+            {t('inventory.browseCatalog')}
           </button>
           <button
             onClick={startNew}
@@ -282,7 +289,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
               boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}
           >
-            + Add Item
+            {t('inventory.addItem')}
           </button>
         </div>
       </div>
@@ -317,7 +324,9 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
           {/* Carrying capacity bar */}
           <div className="px-4 pt-3 pb-2 shrink-0 border-b border-[rgba(100,70,20,0.18)]">
             <div className="flex justify-between items-center mb-1">
-              <span className="font-cinzel text-deco text-red-ink tracking-[0.18em] uppercase">Carrying</span>
+              <span className="font-cinzel text-deco text-red-ink tracking-[0.18em] uppercase">
+                {t('inventory.carrying')}
+              </span>
               <span className="font-cinzel text-deco text-ink">
                 {totalWeight.toFixed(1)} / {carryCapacity} lb
               </span>
@@ -330,7 +339,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
             </div>
             {totalWeight > encumberedAt && (
               <div className="font-fell-sc text-deco mt-0.5" style={{ color: weightColor }}>
-                {totalWeight > heavyAt ? '⚠ Heavily Encumbered' : '⚠ Encumbered'}
+                {totalWeight > heavyAt ? t('inventory.heavilyEncumbered') : t('inventory.encumbered')}
               </div>
             )}
           </div>
@@ -341,16 +350,16 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
               <div className="flex flex-col items-center justify-center h-full gap-3 text-[#9a8050] py-10">
                 <div className="text-[2.5rem] opacity-30">⚔</div>
                 <p className="font-fell italic text-body text-center px-4 leading-[1.5]">
-                  Your pack is empty.
+                  {t('inventory.empty')}
                   <br />
-                  Add items or import a list.
+                  {t('inventory.emptyHint')}
                 </p>
               </div>
             ) : (
               CATEGORIES.filter(cat => grouped[cat].length > 0).map(cat => (
                 <div key={cat}>
                   <div className="px-4 pt-3 pb-0.5 font-cinzel text-deco text-red-ink tracking-[0.22em] uppercase border-b border-[rgba(100,70,20,0.18)]">
-                    {CATEGORY_SYMBOL[cat]} {cat}
+                    {CATEGORY_SYMBOL[cat]} {gameLabel(t, 'itemCategory', cat)}
                     <span className="ml-1.5 text-[rgba(100,70,20,0.5)] font-fell-sc normal-case tracking-normal">
                       ({grouped[cat].length})
                     </span>
@@ -369,7 +378,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
                       {/* Equipped dot */}
                       <span
                         onClick={e => toggleEquipped(item, e)}
-                        title={item.equipped ? 'Equipped — click to unequip' : 'Unequipped — click to equip'}
+                        title={item.equipped ? t('inventory.equippedToggle') : t('inventory.unequippedToggle')}
                         className={`shrink-0 text-body cursor-pointer transition-colors ${item.equipped ? 'text-[#3a7a3a]' : 'text-[rgba(100,70,20,0.28)]'}`}
                       >
                         ◉
@@ -438,9 +447,12 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-[#9a8050]">
               <div className="text-[clamp(2.5rem,4vw,4rem)] opacity-20">⚔</div>
               <p className="font-fell italic text-body text-center leading-[1.6] px-6">
-                Select an item to view details,
+                {t('inventory.selectHint')}
                 <br />
-                or click <strong className="not-italic font-fell-sc text-[#8a7040]">+ Add Item</strong> to create one.
+                <Trans
+                  i18nKey="inventory.selectHint2"
+                  components={{ strong: <strong className="not-italic font-fell-sc text-[#8a7040]" /> }}
+                />
               </p>
             </div>
           )}
@@ -482,6 +494,7 @@ function CatalogBrowser({
   onAddItem,
   inputCls,
 }: CatalogBrowserProps) {
+  const { t } = useTranslation()
   const filtered = ITEM_CATALOG.filter(item => {
     if (catalogCategory !== 'all' && item.category !== catalogCategory) return false
     if (catalogSearch.trim()) {
@@ -504,8 +517,10 @@ function CatalogBrowser({
       {/* Header */}
       <div className="px-[clamp(14px,1.6vw,24px)] pt-[clamp(12px,1.6vh,20px)] pb-2 shrink-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-cinzel-deco text-heading text-ink">Item Catalog</span>
-          <span className="font-fell-sc text-deco text-[#9a8050]">{filtered.length} items</span>
+          <span className="font-cinzel-deco text-heading text-ink">{t('inventory.catalog')}</span>
+          <span className="font-fell-sc text-deco text-[#9a8050]">
+            {t('inventory.catalogCount', { count: filtered.length })}
+          </span>
         </div>
         <div className="deco-rule-subtle" />
       </div>
@@ -514,7 +529,7 @@ function CatalogBrowser({
       <div className="px-[clamp(14px,1.6vw,24px)] pb-2 shrink-0 flex flex-col gap-2">
         <input
           type="text"
-          placeholder="Search items…"
+          placeholder={t('inventory.searchItems')}
           value={catalogSearch}
           onChange={e => setCatalogSearch(e.target.value)}
           className={inputCls}
@@ -522,7 +537,7 @@ function CatalogBrowser({
         <div className="flex flex-wrap gap-1">
           {CATALOG_CATEGORIES.map(cat => (
             <button key={cat} className={catBtnCls(catalogCategory === cat)} onClick={() => setCatalogCategory(cat)}>
-              {cat === 'all' ? 'All' : cat}
+              {cat === 'all' ? t('common.all') : gameLabel(t, 'itemCategory', cat)}
             </button>
           ))}
         </div>
@@ -533,7 +548,9 @@ function CatalogBrowser({
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-[#9a8050] py-10">
             <div className="text-[2rem] opacity-30">◈</div>
-            <p className="font-fell italic text-body text-center px-4 leading-[1.5]">No items match your search.</p>
+            <p className="font-fell italic text-body text-center px-4 leading-[1.5]">
+              {t('inventory.noCatalogMatches')}
+            </p>
           </div>
         ) : (
           <div className="flex flex-col gap-0.5">
@@ -551,7 +568,9 @@ function CatalogBrowser({
                   {item.weight > 0 ? `${item.weight}lb` : '—'}
                 </span>
                 <span className="font-cinzel text-deco text-[#8a7040] shrink-0 text-[0.65rem] min-w-[3.5rem] text-right">
-                  {item.value >= 1 ? `${item.value}gp` : `${Math.round(item.value * 100)}cp`}
+                  {item.value >= 1
+                    ? `${item.value} ${gameLabel(t, 'currency', 'gp')}`
+                    : `${Math.round(item.value * 100)} ${gameLabel(t, 'currency', 'cp')}`}
                 </span>
                 <span className="font-cinzel text-deco text-[#4a7028] shrink-0 text-[0.6rem] opacity-70">+</span>
               </button>
@@ -563,7 +582,7 @@ function CatalogBrowser({
       {/* Footer hint */}
       <div className="shrink-0 px-[clamp(14px,1.6vw,24px)] py-2 border-t border-[rgba(100,70,20,0.2)]">
         <p className="font-fell italic text-deco text-[#9a8050] text-center leading-[1.4]">
-          Click any item to add it to your inventory
+          {t('inventory.catalogHint')}
         </p>
       </div>
     </div>
@@ -597,6 +616,7 @@ function ItemForm({
   inputCls,
   labelCls,
 }: FormProps) {
+  const { t } = useTranslation()
   const f =
     <K extends keyof Omit<Item, 'id'>>(key: K) =>
     (val: Omit<Item, 'id'>[K]) =>
@@ -610,11 +630,11 @@ function ItemForm({
       <div className="px-[clamp(14px,1.6vw,24px)] pt-[clamp(12px,1.6vh,20px)] pb-2 shrink-0">
         <div className="flex items-center justify-between mb-1">
           <span className="font-cinzel-deco text-heading text-ink">
-            {isNew ? 'New Item' : form.name || 'Edit Item'}
+            {isNew ? t('inventory.newItem') : form.name || t('inventory.editItem')}
           </span>
           {form.rarity && (
             <span className="font-cinzel text-badge tracking-[0.15em]" style={{ color: RARITY_COLOR[form.rarity] }}>
-              {form.rarity}
+              {gameLabel(t, 'rarity', form.rarity)}
             </span>
           )}
         </div>
@@ -626,12 +646,12 @@ function ItemForm({
         <div className="flex flex-col gap-[clamp(10px,1.4vh,18px)]">
           {/* Name */}
           <div>
-            <label className={labelCls}>Name</label>
+            <label className={labelCls}>{t('inventory.name')}</label>
             <input
               className={inputCls}
               value={form.name}
               onChange={e => f('name')(e.target.value)}
-              placeholder="Item name"
+              placeholder={t('inventory.namePlaceholder')}
               maxLength={80}
               autoFocus={isNew}
             />
@@ -640,7 +660,7 @@ function ItemForm({
           {/* Category + Qty row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Category</label>
+              <label className={labelCls}>{t('inventory.category')}</label>
               <select
                 className={inputCls}
                 value={form.category}
@@ -648,13 +668,13 @@ function ItemForm({
               >
                 {CATEGORIES.map(c => (
                   <option key={c} value={c}>
-                    {c}
+                    {gameLabel(t, 'itemCategory', c)}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className={labelCls}>Quantity</label>
+              <label className={labelCls}>{t('inventory.quantity')}</label>
               <input
                 className={inputCls}
                 type="number"
@@ -668,7 +688,7 @@ function ItemForm({
           {/* Weight + Value row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Weight (lb/unit)</label>
+              <label className={labelCls}>{t('inventory.weight')}</label>
               <input
                 className={inputCls}
                 type="number"
@@ -679,7 +699,7 @@ function ItemForm({
               />
             </div>
             <div>
-              <label className={labelCls}>Value (gp)</label>
+              <label className={labelCls}>{t('inventory.value')}</label>
               <input
                 className={inputCls}
                 type="number"
@@ -702,25 +722,25 @@ function ItemForm({
                   : 'text-[#8a7040] border-[rgba(100,70,20,0.3)] bg-transparent hover:border-[rgba(100,70,20,0.5)]',
               ].join(' ')}
             >
-              {form.equipped ? '◉ Equipped' : '○ Unequipped'}
+              {form.equipped ? t('inventory.equipped') : t('inventory.unequipped')}
             </button>
           </div>
 
           {/* Description */}
           <div>
-            <label className={labelCls}>Description</label>
+            <label className={labelCls}>{t('inventory.description')}</label>
             <textarea
               className={`${inputCls} resize-none`}
               rows={3}
               value={form.description}
               onChange={e => f('description')(e.target.value)}
-              placeholder="Item description…"
+              placeholder={t('inventory.descriptionPlaceholder')}
             />
           </div>
 
           {/* ── Magic section ── */}
           <div>
-            <label className={labelCls}>Rarity</label>
+            <label className={labelCls}>{t('inventory.rarity')}</label>
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => {
@@ -730,7 +750,7 @@ function ItemForm({
                 }}
                 className={`font-cinzel text-deco px-2 py-1 border rounded-sm cursor-pointer transition-colors ${form.rarity === null ? 'text-[#8a7040] border-[rgba(100,70,20,0.5)] bg-[rgba(90,60,10,0.12)]' : 'text-[rgba(100,70,20,0.45)] border-[rgba(100,70,20,0.2)] hover:border-[rgba(100,70,20,0.4)]'}`}
               >
-                None
+                {t('common.none')}
               </button>
               {RARITIES.map(r => (
                 <button
@@ -739,7 +759,7 @@ function ItemForm({
                   className={`font-cinzel text-deco px-2 py-1 border rounded-sm cursor-pointer transition-colors ${form.rarity === r ? 'border-current bg-[rgba(0,0,0,0.06)]' : 'border-[rgba(100,70,20,0.2)] hover:border-[rgba(100,70,20,0.4)]'}`}
                   style={{ color: RARITY_COLOR[r] }}
                 >
-                  {r}
+                  {gameLabel(t, 'rarity', r)}
                 </button>
               ))}
             </div>
@@ -754,14 +774,14 @@ function ItemForm({
                 }}
                 className={`font-cinzel text-badge tracking-[0.12em] px-3 py-1 border rounded-sm cursor-pointer transition-colors ${form.requiresAttunement ? 'text-[#6a3a9a] border-[rgba(106,58,154,0.4)] bg-[rgba(106,58,154,0.08)]' : 'text-[#8a7040] border-[rgba(100,70,20,0.28)] hover:border-[rgba(100,70,20,0.45)]'}`}
               >
-                {form.requiresAttunement ? '◆ Requires Attunement' : '◇ No Attunement'}
+                {form.requiresAttunement ? t('inventory.requiresAttunement') : t('inventory.noAttunement')}
               </button>
               {form.requiresAttunement && (
                 <button
                   onClick={() => f('isAttuned')(!form.isAttuned)}
                   className={`font-cinzel text-badge tracking-[0.12em] px-3 py-1 border rounded-sm cursor-pointer transition-colors ${form.isAttuned ? 'text-[#3a5a9a] border-[rgba(58,90,154,0.4)] bg-[rgba(58,90,154,0.08)]' : 'text-[#8a7040] border-[rgba(100,70,20,0.28)] hover:border-[rgba(100,70,20,0.45)]'}`}
                 >
-                  {form.isAttuned ? '✦ Attuned' : '○ Not Attuned'}
+                  {form.isAttuned ? t('inventory.attuned') : t('inventory.notAttuned')}
                 </button>
               )}
             </div>
@@ -769,13 +789,13 @@ function ItemForm({
 
           {/* Notes */}
           <div>
-            <label className={labelCls}>Notes</label>
+            <label className={labelCls}>{t('inventory.notes')}</label>
             <textarea
               className={`${inputCls} resize-none`}
               rows={2}
               value={form.notes}
               onChange={e => f('notes')(e.target.value)}
-              placeholder="Extra notes…"
+              placeholder={t('inventory.notesPlaceholder')}
             />
           </div>
         </div>
@@ -789,7 +809,7 @@ function ItemForm({
           className="w-full font-cinzel text-caption tracking-[0.12em] text-[#e8d090] border border-[rgba(100,70,20,0.5)] py-[clamp(6px,0.8vh,10px)] rounded-sm cursor-pointer transition-colors hover:border-[rgba(200,168,75,0.6)] hover:text-gold disabled:opacity-40 disabled:cursor-default mb-2"
           style={{ background: 'linear-gradient(160deg, #3a2208 0%, #2a1606 100%)' }}
         >
-          {isNew ? 'Add to Inventory' : 'Save Changes'}
+          {isNew ? t('inventory.addToInventory') : t('common.saveChanges')}
         </button>
 
         {!isNew &&
@@ -800,14 +820,14 @@ function ItemForm({
                 className="flex-1 font-cinzel text-deco text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-1.5 rounded-sm cursor-pointer hover:border-[rgba(100,70,20,0.5)]"
                 style={{ background: 'rgba(90,60,10,0.06)' }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onDelete}
                 className="flex-[2] font-cinzel text-deco text-[#eec0a8] border border-[rgba(139,26,26,0.45)] py-1.5 rounded-sm cursor-pointer hover:border-[rgba(139,26,26,0.65)]"
                 style={{ background: 'linear-gradient(160deg, #4a0808 0%, #360606 100%)' }}
               >
-                Yes, Remove
+                {t('inventory.removeYes')}
               </button>
             </div>
           ) : (
@@ -815,7 +835,7 @@ function ItemForm({
               onClick={onConfirmDelete}
               className="w-full font-cinzel text-deco text-red-ink border border-[rgba(139,26,26,0.22)] py-1.5 rounded-sm cursor-pointer transition-colors hover:border-[rgba(139,26,26,0.45)] hover:bg-[rgba(139,26,26,0.05)]"
             >
-              Remove from Inventory
+              {t('inventory.remove')}
             </button>
           ))}
       </div>

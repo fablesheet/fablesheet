@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Character } from '@fablesheet/core'
 import { CharacterMigrationError, importCharacter } from '@fablesheet/core'
 import { createCharacter, getCharacters } from '../services/api'
 import { openJsonFile } from '../services/files'
+import { LANGUAGES, setLanguage } from '../i18n'
+import { gameLabel } from '../i18n/game'
 import { CharacterEditModal } from './CharacterEditModal'
 
 interface Props {
@@ -25,19 +28,8 @@ const CLASS_SYMBOL: Record<string, string> = {
   Warlock: '◆',
 }
 
-const ALIGNMENT_SHORT: Record<string, string> = {
-  'Lawful Good': 'LG',
-  'Neutral Good': 'NG',
-  'Chaotic Good': 'CG',
-  'Lawful Neutral': 'LN',
-  'True Neutral': 'TN',
-  'Chaotic Neutral': 'CN',
-  'Lawful Evil': 'LE',
-  'Neutral Evil': 'NE',
-  'Chaotic Evil': 'CE',
-}
-
 export function CharacterSelect({ onSelect, onCreateNew }: Props) {
+  const { t, i18n } = useTranslation()
   const [savedChars, setSavedChars] = useState<Character[]>([])
   const [loading, setLoading] = useState(true)
   const [editingChar, setEditingChar] = useState<Character | null>(null)
@@ -59,8 +51,8 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
       setSavedChars(prev => [...prev, created])
     } catch (e) {
       if (e instanceof CharacterMigrationError) setImportError(e.message)
-      else if (e instanceof SyntaxError) setImportError('The file is not valid JSON.')
-      else setImportError(`Import failed: ${String(e)}`)
+      else if (e instanceof SyntaxError) setImportError(t('select.importNotJson'))
+      else setImportError(t('select.importFailed', { error: String(e) }))
     }
   }
 
@@ -86,14 +78,14 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
           Fablesheet
         </h1>
         <p className="font-fell-sc text-[#7a6035] text-caption tracking-[0.35em] uppercase mt-[clamp(6px,1vh,14px)]">
-          Choose your adventurer
+          {t('select.subtitle')}
         </p>
       </header>
 
       {/* ── Cards ── */}
       <div className="flex gap-[clamp(14px,1.8vw,36px)] flex-wrap justify-center max-w-[90vw]">
         {loading ? (
-          <div className="font-fell text-[#4a3818] text-body animate-pulse">Loading characters…</div>
+          <div className="font-fell text-[#4a3818] text-body animate-pulse">{t('select.loading')}</div>
         ) : (
           <>
             {savedChars.map(char => (
@@ -109,7 +101,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
                 +
               </div>
               <div className="font-cinzel text-caption tracking-widest text-[#5a3818] group-hover:text-gold transition-colors uppercase">
-                New Character
+                {t('select.newCharacter')}
               </div>
             </button>
 
@@ -122,7 +114,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
                 ↑
               </div>
               <div className="font-cinzel text-caption tracking-widest text-[#5a3818] group-hover:text-gold transition-colors uppercase">
-                Import Character
+                {t('select.importCharacter')}
               </div>
             </button>
           </>
@@ -138,7 +130,21 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
           className="w-[72px] h-px"
           style={{ background: 'linear-gradient(to right, transparent, #4a3018, transparent)' }}
         />
-        <span>✦</span>
+        <div className="flex gap-2" role="group" aria-label={t('common.language')}>
+          {LANGUAGES.map(lang => (
+            <button
+              key={lang.code}
+              onClick={() => setLanguage(lang.code)}
+              aria-pressed={i18n.resolvedLanguage === lang.code}
+              className={[
+                'font-cinzel text-deco tracking-[0.15em] uppercase bg-transparent border-none cursor-pointer transition-colors',
+                i18n.resolvedLanguage === lang.code ? 'text-gold-dim' : 'text-[#4a3818] hover:text-[#8a7040]',
+              ].join(' ')}
+            >
+              {lang.label}
+            </button>
+          ))}
+        </div>
         <span
           className="w-[72px] h-px"
           style={{ background: 'linear-gradient(to right, transparent, #4a3018, transparent)' }}
@@ -168,6 +174,7 @@ interface CardProps {
 }
 
 function CharacterCard({ char, onSelect, onEdit }: CardProps) {
+  const { t } = useTranslation()
   return (
     <div className="group relative w-[clamp(160px,14vw,240px)]">
       {/* Main card — click to open sheet */}
@@ -196,7 +203,9 @@ function CharacterCard({ char, onSelect, onEdit }: CardProps) {
         </div>
 
         <div className="font-fell-sc text-subhead font-semibold text-ink leading-[1.2] mb-1">{char.name}</div>
-        <div className="font-fell-sc text-caption text-[#6b4a20] tracking-[0.06em]">{char.race}</div>
+        <div className="font-fell-sc text-caption text-[#6b4a20] tracking-[0.06em]">
+          {gameLabel(t, 'race', char.race)}
+        </div>
 
         <div
           className="h-px my-[clamp(5px,0.8vh,12px)] mx-1"
@@ -204,10 +213,12 @@ function CharacterCard({ char, onSelect, onEdit }: CardProps) {
         />
 
         <div className="font-fell-sc text-caption text-red-ink italic leading-[1.3]">
-          {char.className}
+          {gameLabel(t, 'class', char.className)}
           {char.subclass ? ` · ${char.subclass}` : ''}
         </div>
-        <div className="font-cinzel text-badge text-[#7a5820] tracking-[0.15em] uppercase mt-1">Level {char.level}</div>
+        <div className="font-cinzel text-badge text-[#7a5820] tracking-[0.15em] uppercase mt-1">
+          {t('common.level', { level: char.level })}
+        </div>
 
         <div
           className="h-px my-[clamp(5px,0.8vh,12px)] mx-1"
@@ -216,26 +227,30 @@ function CharacterCard({ char, onSelect, onEdit }: CardProps) {
 
         <div className="flex items-center justify-center gap-2">
           <div className="flex flex-col items-center gap-0.5">
-            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">HP</span>
+            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">{t('select.hp')}</span>
             <span className="font-fell-sc text-caption text-red-ink">
               {char.hp.current}/{char.hp.max}
             </span>
           </div>
           <span className="font-fell-sc text-caption text-[#9a8050] mt-1.5">·</span>
           <div className="flex flex-col items-center gap-0.5">
-            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">AC</span>
+            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">{t('select.ac')}</span>
             <span className="font-fell-sc text-caption text-[#2a4a28]">{char.ac}</span>
           </div>
           <span className="font-fell-sc text-caption text-[#9a8050] mt-1.5">·</span>
           <div className="flex flex-col items-center gap-0.5">
-            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">Align</span>
-            <span className="font-fell-sc text-caption text-ink-light">{ALIGNMENT_SHORT[char.alignment] ?? '—'}</span>
+            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">
+              {t('select.alignmentShort')}
+            </span>
+            <span className="font-fell-sc text-caption text-ink-light">
+              {char.alignment ? gameLabel(t, 'alignmentShort', char.alignment) : '—'}
+            </span>
           </div>
         </div>
 
         {char.spellcastingAbility && (
           <div className="mt-[clamp(5px,0.8vh,10px)] font-cinzel text-deco tracking-[0.1em] text-gold-dim uppercase">
-            ✦ {char.spellcastingAbility} caster
+            {t('select.caster', { ability: gameLabel(t, 'abilityShort', char.spellcastingAbility) })}
           </div>
         )}
       </button>
@@ -246,8 +261,9 @@ function CharacterCard({ char, onSelect, onEdit }: CardProps) {
           e.stopPropagation()
           onEdit(char)
         }}
-        className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-sm text-deco text-[#8a7040] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border border-transparent hover:border-[rgba(100,70,20,0.35)] hover:text-gold hover:bg-[rgba(90,60,10,0.12)]"
-        title="Edit character"
+        className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-sm text-deco text-[#8a7040] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer border border-transparent hover:border-[rgba(100,70,20,0.35)] hover:text-gold hover:bg-[rgba(90,60,10,0.12)]"
+        title={t('select.editCharacter')}
+        aria-label={t('select.editCharacter')}
       >
         ✎
       </button>
