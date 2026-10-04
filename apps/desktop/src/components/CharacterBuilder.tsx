@@ -3,6 +3,7 @@ import type { Character, AbilityName, SkillName, SkillEntry } from '@fablesheet/
 import {
   abilityModifier as mod,
   formatModifier as fmtMod,
+  CHARACTER_SCHEMA_VERSION,
   proficiencyBonusForLevel,
   spellAttackBonus,
   spellSaveDC,
@@ -452,6 +453,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
     }))
 
     const character: Omit<Character, 'id'> = {
+      schemaVersion: CHARACTER_SCHEMA_VERSION,
       name: s.name.trim(),
       race: s.race,
       className: s.className,

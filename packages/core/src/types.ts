@@ -132,6 +132,8 @@ export interface Currency {
 }
 
 export interface Character {
+  /** Version of the stored document format, see migrations.ts */
+  schemaVersion: number
   id: string
   name: string
   race: string
