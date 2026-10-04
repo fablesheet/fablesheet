@@ -33,7 +33,8 @@ jobs:
           - platform: ubuntu-22.04
             bundles: appimage,deb,rpm
           - platform: macos-latest
-            bundles: dmg
+            # "app" produces the .app.tar.gz that the updater downloads on macOS
+            bundles: app,dmg
             # One .dmg for Apple Silicon and Intel Macs
             target: universal-apple-darwin
           - platform: windows-latest
