@@ -1,6 +1,7 @@
 // Routes to backend (online) or local storage (offline / disabled).
 // Components import only from here — they never touch local.ts or backend.ts directly.
 import type { Character } from '@fablesheet/core'
+import { migrateCharacter } from '@fablesheet/core'
 import * as local from './local'
 import * as backend from './backend'
 
@@ -38,11 +39,20 @@ export async function createCharacter(character: Omit<Character, 'id'>): Promise
 }
 
 export async function getCharacters(): Promise<Character[]> {
-  return shouldUseRemote() ? backend.backendGetAll() : local.localGetAll()
+  const raw = shouldUseRemote() ? await backend.backendGetAll() : await local.localGetAll()
+  // One unreadable document must not hide all other characters
+  return raw.flatMap(doc => {
+    try {
+      return [migrateCharacter(doc)]
+    } catch (e) {
+      console.error('Skipping unreadable character', e)
+      return []
+    }
+  })
 }
 
 export async function getCharacter(id: string): Promise<Character> {
-  return shouldUseRemote() ? backend.backendGetOne(id) : local.localGetOne(id)
+  return migrateCharacter(shouldUseRemote() ? await backend.backendGetOne(id) : await local.localGetOne(id))
 }
 
 export async function updateCharacter(id: string, character: Character): Promise<Character> {
