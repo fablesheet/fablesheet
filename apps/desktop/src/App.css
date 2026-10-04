@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap');
 @import 'tailwindcss';
+@import './styles/theme.css';
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
 @theme {

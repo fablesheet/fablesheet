@@ -454,5 +454,13 @@
     "doubleClickToEdit": "Double-click to edit",
     "empty": "Nothing written yet.",
     "markdownHint": "Backstory and notes support Markdown: # headings, **bold**, *italic*, lists, - [ ] checklists, tables and links."
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "done": "Done"
   }
 }

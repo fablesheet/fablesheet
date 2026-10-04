@@ -1,0 +1,124 @@
+/*
+ * Fablesheet design tokens ("Arcane Tavern").
+ * Semantic colors are CSS variables that switch with [data-theme] on <html>;
+ * Tailwind utilities are generated from them (bg-fs-card, text-fs-ink, ...).
+ */
+
+@theme inline {
+  --color-fs-bg: var(--fs-bg);
+  --color-fs-bar: var(--fs-bar);
+  --color-fs-bar-line: var(--fs-bar-line);
+  --color-fs-bar-text: var(--fs-bar-text);
+  --color-fs-bar-muted: var(--fs-bar-muted);
+  --color-fs-table: var(--fs-table);
+  --color-fs-table-line: var(--fs-table-line);
+  --color-fs-card: var(--fs-card);
+  --color-fs-card-line: var(--fs-card-line);
+  --color-fs-tile: var(--fs-tile);
+  --color-fs-ink: var(--fs-ink);
+  --color-fs-ink-muted: var(--fs-ink-muted);
+  --color-fs-accent: var(--fs-accent);
+  --color-fs-accent-hover: var(--fs-accent-hover);
+  --color-fs-on-accent: var(--fs-on-accent);
+  --color-fs-brass: var(--fs-brass);
+  --color-fs-good: var(--fs-good);
+  --color-fs-danger: var(--fs-danger);
+  --color-fs-danger-bg: var(--fs-danger-bg);
+  --color-fs-track: var(--fs-track);
+  --color-fs-leather: var(--fs-leather);
+  --color-fs-leather-dark: var(--fs-leather-dark);
+  --color-fs-hover: var(--fs-hover);
+
+  --font-display: 'Cinzel', 'Palatino Linotype', serif;
+  --font-ui: 'Inter Variable', 'Inter', system-ui, sans-serif;
+
+  --radius-fs: 10px;
+}
+
+/* Dark is the default; light applies via data-theme or the system setting */
+:root {
+  color-scheme: dark;
+  --fs-bg: #14110e;
+  --fs-bar: #211813;
+  --fs-bar-line: #3a2a1f;
+  --fs-bar-text: #efe4cc;
+  --fs-bar-muted: #a48f70;
+  --fs-table: #241a14;
+  --fs-table-line: #3a2a1f;
+  --fs-card: #eadcbc;
+  --fs-card-line: #c9b48a;
+  --fs-tile: #ddcca4;
+  --fs-ink: #2a1d12;
+  --fs-ink-muted: #7a6246;
+  --fs-accent: #c99a4f;
+  --fs-accent-hover: #d8ab60;
+  --fs-on-accent: #1a120c;
+  --fs-brass: #9a6a2e;
+  --fs-good: #4f7a3a;
+  --fs-danger: #8e2b2b;
+  --fs-danger-bg: #e7c7b4;
+  --fs-track: #d3bf93;
+  --fs-leather: #5a2f22;
+  --fs-leather-dark: #4a2419;
+  --fs-hover: rgba(42, 29, 18, 0.07);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --fs-bg: #ece5d6;
+  --fs-bar: #f8f3e8;
+  --fs-bar-line: #d8cbb0;
+  --fs-bar-text: #2a1d12;
+  --fs-bar-muted: #7a6246;
+  --fs-table: #e0d3b8;
+  --fs-table-line: #cdbb98;
+  --fs-card: #fffaf0;
+  --fs-card-line: #dccaa3;
+  --fs-tile: #f4ead4;
+  --fs-ink: #2a1d12;
+  --fs-ink-muted: #7a6246;
+  --fs-accent: #9a6b2c;
+  --fs-accent-hover: #87591f;
+  --fs-on-accent: #fffaf0;
+  --fs-brass: #9a6b2c;
+  --fs-good: #3f7a3a;
+  --fs-danger: #9e2b25;
+  --fs-danger-bg: #f3d9cc;
+  --fs-track: #eadfc6;
+  --fs-leather: #6b3a28;
+  --fs-leather-dark: #55291c;
+  --fs-hover: rgba(42, 29, 18, 0.05);
+}
+
+@layer components {
+  /* Section heading: ◆ LABEL ──────── */
+  .fs-section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fs-brass);
+  }
+  .fs-section-label::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    transform: rotate(45deg);
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  .fs-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--fs-card-line);
+  }
+
+  .fs-focus:focus-visible {
+    outline: 2px solid var(--fs-accent);
+    outline-offset: 2px;
+  }
+}
