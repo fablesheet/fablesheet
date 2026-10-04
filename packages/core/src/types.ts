@@ -165,6 +165,8 @@ export interface Character {
   spellAttackBonus: number | null
   knownSpells: string[]
   preparedSpells: string[]
+  /** Expended spell slots per spell level (index 0 = 1st level); maximums come from class and level */
+  spellSlotsUsed: number[]
 
   features: CharacterFeature[]
   currency: Currency
