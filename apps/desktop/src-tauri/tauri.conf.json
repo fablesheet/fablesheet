@@ -32,7 +32,7 @@
     "shortDescription": "Offline-first character manager for 5th edition tabletop RPGs",
     "longDescription": "Fablesheet is a free, open-source, offline-first character manager for 5th edition tabletop roleplaying games. Create characters, track hit points, spells and inventory - all stored locally on your device.",
     "publisher": "Fablesheet contributors",
-    "copyright": "Copyright \u00a9 2026 Fablesheet contributors. Licensed under GPL-3.0-or-later.",
+    "copyright": "Copyright © 2026 Fablesheet contributors. Licensed under GPL-3.0-or-later.",
     "linux": {},
     "macOS": {
       "minimumSystemVersion": "10.13"
@@ -42,6 +42,16 @@
         "type": "embedBootstrapper"
       }
     },
-    "license": "GPL-3.0-or-later"
+    "license": "GPL-3.0-or-later",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFCOTI2NUEwNUNGNzk1OEEKUldTS2xmZGNvR1dTcXdSUWM4NlpxN2UrVzVTSXBoWDhwU3NTRFQ4eVpla0xMRVcrRzRKdGxXUlgK",
+      "endpoints": ["https://github.com/fablesheet/fablesheet/releases/latest/download/latest.json"],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

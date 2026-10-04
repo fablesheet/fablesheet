@@ -353,5 +353,12 @@
       "gp": "gp",
       "pp": "pp"
     }
+  },
+  "update": {
+    "available": "Version {{version}} is available.",
+    "install": "Install and restart",
+    "installing": "Installing… {{percent}}%",
+    "later": "Later",
+    "failed": "Update failed: {{error}}"
   }
 }

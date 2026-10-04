@@ -7,10 +7,11 @@ import { CharacterBuilder } from './components/CharacterBuilder'
 import { SpellBook } from './components/SpellBook'
 import { Inventory } from './components/Inventory'
 import { updateCharacter } from './services/api'
+import { UpdateBanner } from './components/UpdateBanner'
 
 type View = 'select' | 'builder' | 'sheet' | 'spellbook' | 'inventory'
 
-export default function App() {
+function Screens() {
   const [character, setCharacter] = useState<Character | null>(null)
   const [view, setView] = useState<View>('select')
 
@@ -66,5 +67,14 @@ export default function App() {
       onInventory={() => setView('inventory')}
       onUpdate={handleUpdate}
     />
+  )
+}
+
+export default function App() {
+  return (
+    <>
+      <Screens />
+      <UpdateBanner />
+    </>
   )
 }

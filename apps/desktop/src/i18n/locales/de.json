@@ -353,5 +353,12 @@
       "gp": "GM",
       "pp": "PM"
     }
+  },
+  "update": {
+    "available": "Version {{version}} ist verfügbar.",
+    "install": "Installieren und neu starten",
+    "installing": "Wird installiert… {{percent}}%",
+    "later": "Später",
+    "failed": "Update fehlgeschlagen: {{error}}"
   }
 }
