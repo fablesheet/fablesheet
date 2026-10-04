@@ -1,6 +1,6 @@
 [package]
 name = "fablesheet"
-version = "0.0.0"
+version = "0.1.0"
 description = "Offline-first character manager for 5th edition tabletop RPGs"
 authors = ["Fablesheet contributors"]
 license = "GPL-3.0-or-later"
