@@ -4,7 +4,7 @@ import type { Character } from '@fablesheet/core'
 import { armorClass, CharacterMigrationError, importCharacter } from '@fablesheet/core'
 import { createCharacter, getCharacters } from '../services/api'
 import { openJsonFile } from '../services/files'
-import { LANGUAGES, setLanguage } from '../i18n'
+import { SettingsDialog } from './SettingsDialog'
 import { gameLabel } from '../i18n/game'
 import { CharacterEditModal } from './CharacterEditModal'
 
@@ -29,7 +29,8 @@ const CLASS_SYMBOL: Record<string, string> = {
 }
 
 export function CharacterSelect({ onSelect, onCreateNew }: Props) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [savedChars, setSavedChars] = useState<Character[]>([])
   const [loading, setLoading] = useState(true)
   const [editingChar, setEditingChar] = useState<Character | null>(null)
@@ -130,27 +131,20 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
           className="w-[72px] h-px"
           style={{ background: 'linear-gradient(to right, transparent, #4a3018, transparent)' }}
         />
-        <div className="flex gap-2" role="group" aria-label={t('common.language')}>
-          {LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              onClick={() => setLanguage(lang.code)}
-              aria-pressed={i18n.resolvedLanguage === lang.code}
-              className={[
-                'font-cinzel text-deco tracking-[0.15em] uppercase bg-transparent border-none cursor-pointer transition-colors',
-                i18n.resolvedLanguage === lang.code ? 'text-gold-dim' : 'text-[#4a3818] hover:text-[#8a7040]',
-              ].join(' ')}
-            >
-              {lang.label}
-            </button>
-          ))}
-        </div>
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="fs-focus font-ui text-sm text-[#8a7040] bg-transparent border-none cursor-pointer transition-colors hover:text-gold-dim px-2 py-1"
+        >
+          ⚙ {t('settings.title')}
+        </button>
         <span
           className="w-[72px] h-px"
           style={{ background: 'linear-gradient(to right, transparent, #4a3018, transparent)' }}
         />
         <span>✦</span>
       </footer>
+
+      {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
 
       {/* ── Edit modal ── */}
       {editingChar && (

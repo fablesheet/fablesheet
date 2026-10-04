@@ -454,5 +454,13 @@
     "doubleClickToEdit": "Doppelklick zum Bearbeiten",
     "empty": "Noch nichts geschrieben.",
     "markdownHint": "Hintergrundgeschichte und Notizen unterstützen Markdown: # Überschriften, **fett**, *kursiv*, Listen, - [ ] Checklisten, Tabellen und Links."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "appearance": "Darstellung",
+    "themeSystem": "System",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel",
+    "done": "Fertig"
   }
 }
