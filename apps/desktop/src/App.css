@@ -189,8 +189,8 @@
 /* ── Rendered Markdown (notes) ─────────────────────────────────────────────── */
 @layer components {
   .markdown {
-    font-family: var(--font-fell);
-    color: #2a1a08;
+    font-family: var(--font-ui);
+    color: var(--fs-ink);
     line-height: 1.6;
   }
   .markdown > * + * {
@@ -200,8 +200,9 @@
   .markdown h2,
   .markdown h3,
   .markdown h4 {
-    font-family: var(--font-cinzel, serif);
-    color: #6a1a10;
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--fs-ink);
     line-height: 1.25;
     margin-top: 1em;
   }
@@ -224,7 +225,7 @@
   }
   .markdown li > input[type='checkbox'] {
     margin-right: 0.4em;
-    accent-color: #6a4820;
+    accent-color: var(--fs-brass);
   }
   .markdown ul:has(> li > input[type='checkbox']) {
     list-style: none;
@@ -236,20 +237,20 @@
     cursor: pointer;
   }
   .markdown blockquote {
-    border-left: 3px solid rgba(100, 70, 20, 0.35);
+    border-left: 3px solid var(--fs-card-line);
     padding-left: 0.8em;
     font-style: italic;
-    color: #5a4020;
+    color: var(--fs-ink-muted);
   }
   .markdown code {
     font-family: ui-monospace, monospace;
     font-size: 0.9em;
-    background: rgba(100, 70, 20, 0.1);
+    background: var(--fs-hover);
     padding: 0.05em 0.3em;
     border-radius: 2px;
   }
   .markdown pre {
-    background: rgba(100, 70, 20, 0.08);
+    background: var(--fs-hover);
     padding: 0.6em 0.8em;
     border-radius: 2px;
     overflow-x: auto;
@@ -268,11 +269,11 @@
   }
   .markdown th,
   .markdown td {
-    border: 1px solid rgba(100, 70, 20, 0.25);
+    border: 1px solid var(--fs-card-line);
     padding: 0.25em 0.6em;
     text-align: left;
   }
   .markdown th {
-    background: rgba(100, 70, 20, 0.08);
+    background: var(--fs-hover);
   }
 }

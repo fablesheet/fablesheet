@@ -37,7 +37,8 @@
 
 /* Dark is the default; light applies via data-theme or the system setting */
 :root {
-  color-scheme: dark;
+  /* Content sits on light parchment in both themes, so native controls stay light */
+  color-scheme: light;
   --fs-bg: #14110e;
   --fs-bar: #211813;
   --fs-bar-line: #3a2a1f;
@@ -148,5 +149,29 @@
   .animate-page-next,
   .animate-page-prev {
     animation: none;
+  }
+}
+
+@keyframes fs-drawer-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+.animate-drawer-in {
+  animation: fs-drawer-in 180ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-drawer-in {
+    animation: none;
+  }
+}
+
+@layer base {
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: var(--fs-brass);
+    width: 1rem;
+    height: 1rem;
   }
 }

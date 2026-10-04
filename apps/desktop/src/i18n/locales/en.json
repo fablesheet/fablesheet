@@ -8,7 +8,8 @@
     "level": "Level {{level}}",
     "none": "None",
     "all": "All",
-    "language": "Language"
+    "language": "Language",
+    "close": "Close"
   },
   "select": {
     "subtitle": "Choose your adventurer",
@@ -248,7 +249,13 @@
     "acRule_shield": "+{{ac}} AC",
     "strengthRequired": "Str {{value}} required",
     "stealthDisadvantage": "Disadvantage on Stealth",
-    "acHint": "Equipped armor and shields set your armor class."
+    "acHint": "Equipped armor and shields set your armor class.",
+    "onBody": "On your body",
+    "inBackpack": "In the backpack",
+    "nothingEquipped": "Nothing equipped. Tap ◉ on an item to wear or wield it.",
+    "equippedLabel": "Equipped (worn or wielded)",
+    "requiresAttunementLabel": "Requires attunement",
+    "attunedLabel": "Attuned"
   },
   "game": {
     "ability": {
