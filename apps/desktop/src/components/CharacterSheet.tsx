@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { Fragment, useState, useEffect, useRef } from 'react'
 import type { Character, AbilityName } from '@fablesheet/core'
 import { abilityModifier, formatModifier, savingThrowBonus, skillBonus } from '@fablesheet/core'
 import { CharacterEditModal } from './CharacterEditModal'
@@ -399,16 +399,16 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
           <div className="flex items-center justify-center">
             {[
               { val: String(character.ac), key: 'AC' },
-              { val: (character.initiativeBonus >= 0 ? '+' : '') + character.initiativeBonus, key: 'Initiative' },
+              { val: formatModifier(character.initiativeBonus), key: 'Initiative' },
               { val: String(character.speed), key: 'Speed' },
             ].map(({ val, key }, i) => (
-              <>
-                {i > 0 && <div key={`sep-${i}`} className="deco-vline h-[clamp(30px,4vh,50px)] mx-2" />}
-                <div key={key} className="flex flex-col items-center flex-1">
+              <Fragment key={key}>
+                {i > 0 && <div className="deco-vline h-[clamp(30px,4vh,50px)] mx-2" />}
+                <div className="flex flex-col items-center flex-1">
                   <span className="font-cinzel-deco text-display text-ink leading-none">{val}</span>
                   <span className="font-cinzel text-deco text-red-ink tracking-[0.18em] uppercase mt-0.5">{key}</span>
                 </div>
-              </>
+              </Fragment>
             ))}
           </div>
 
