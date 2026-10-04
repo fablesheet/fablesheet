@@ -12,6 +12,7 @@ import { TableView, type TableObject } from './components/table/TableView'
 import { SpellbookView } from './components/spellbook/SpellbookView'
 import { BackpackView } from './components/backpack/BackpackView'
 import { JournalView } from './components/journal/JournalView'
+import { DiceView } from './components/dice/DiceView'
 import { UpdateBanner } from './components/UpdateBanner'
 import { useCharacterSaver } from './hooks/useCharacterSaver'
 
@@ -84,6 +85,8 @@ function Screens() {
         <BackpackView character={character} onUpdate={handleUpdate} />
       ) : view === 'notes' ? (
         <JournalView character={character} onUpdate={handleUpdate} />
+      ) : view === 'dice' ? (
+        <DiceView character={character} />
       ) : (
         <SheetView character={character} onUpdate={handleUpdate} />
       )}

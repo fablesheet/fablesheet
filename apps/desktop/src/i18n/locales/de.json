@@ -500,6 +500,31 @@
     "tempHp": "Temp. TP",
     "amount": "Wert",
     "damage": "Schaden",
-    "heal": "Heilen"
+    "heal": "Heilen",
+    "dice": "Würfel",
+    "diceHint": "W4 bis W100"
+  },
+  "dice": {
+    "die": "W",
+    "empty": "Wähle unten Würfel oder würfle direkt für deinen Charakter.",
+    "roll": "Würfeln",
+    "addDie": "W{{sides}} hinzufügen",
+    "modifier": "Bonus",
+    "minus": "Bonus verringern",
+    "plus": "Bonus erhöhen",
+    "mode": "Vorteil",
+    "normal": "Normal",
+    "advantage": "Vorteil",
+    "disadvantage": "Nachteil",
+    "modeHint": "Vorteil und Nachteil gelten für einzelne W20-Würfe.",
+    "clear": "Leeren",
+    "rollButton": "Würfeln",
+    "custom": "Würfelausdruck",
+    "invalid": "Schreib Würfel wie 2W6 + 3 oder W20 - 1.",
+    "fromCharacter": "Für deinen Charakter",
+    "history": "Verlauf",
+    "noHistory": "Noch nicht gewürfelt.",
+    "natural20": "Natürliche 20!",
+    "natural1": "Natürliche 1"
   }
 }
