@@ -995,7 +995,7 @@ dependencies = [
 
 [[package]]
 name = "fablesheet"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "rusqlite",
  "serde",
@@ -1008,7 +1008,7 @@ dependencies = [
 
 [[package]]
 name = "fablesheet-server"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "axum",
  "rusqlite",

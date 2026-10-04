@@ -1,0 +1,10 @@
+node_modules/
+dist/
+target/
+package-lock.json
+Cargo.lock
+apps/desktop/src-tauri/gen/
+# Hand-aligned data tables
+packages/srd-data/src/spells.ts
+packages/srd-data/src/items.ts
+apps/desktop/src/data/mockData.ts

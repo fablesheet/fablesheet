@@ -2,20 +2,30 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      draft:
-        description: 'Create as draft release'
-        type: boolean
-        default: true
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
+  # Opens/updates the release PR on every push to main. Merging that PR creates
+  # the tag and GitHub release, which triggers the build job below.
+  release-please:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v5
+        id: release
+
   build:
+    needs: release-please
+    # Run for a new release, or manually (test build uploaded as workflow artifacts)
+    if: always() && (needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch')
     strategy:
       fail-fast: false
       matrix:
@@ -43,8 +53,6 @@ jobs:
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
-        with:
-          workspaces: '. -> target'
 
       - name: Install Linux system dependencies
         if: matrix.platform == 'ubuntu-22.04'
@@ -59,36 +67,15 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build and release
+      - name: Build and upload
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WEBKIT_DISABLE_COMPOSITING_MODE: ${{ matrix.platform == 'ubuntu-22.04' && '1' || '' }}
         with:
           projectPath: apps/desktop
-          tagName: ${{ github.ref_name }}
-          releaseName: 'Fablesheet ${{ github.ref_name }}'
-          releaseBody: |
-            ## Fablesheet ${{ github.ref_name }}
-
-            Offline-first character manager for 5th edition tabletop RPGs.
-
-            See [CHANGELOG.md](https://github.com/fablesheet/fablesheet/blob/main/CHANGELOG.md) for what changed.
-
-            ### Installation
-
-            **Windows** — download the `.msi` or `.exe` installer.
-            > SmartScreen may warn "Windows protected your PC" — click **More info → Run anyway**.
-            > The installer will set up WebView2 automatically if it is not already present.
-
-            **macOS** — download the `.dmg`, open it, and drag the app to Applications.
-            > Gatekeeper may block an unsigned app. If you see _"cannot be opened"_, right-click the app and choose **Open**, then confirm. Alternatively run in a terminal: `xattr -d com.apple.quarantine /Applications/Fablesheet.app`
-
-            **Linux**
-            - `.AppImage` — runs on most distros. Make it executable first: `chmod +x Fablesheet_*.AppImage && ./Fablesheet_*.AppImage`
-              - **Arch / EndeavourOS / Manjaro**: AppImages need FUSE 2 — run `sudo pacman -S fuse2` once, then launch normally. Alternatively: `APPIMAGE_EXTRACT_AND_RUN=1 ./Fablesheet_*.AppImage`
-            - `.deb` — Debian / Ubuntu: `sudo dpkg -i Fablesheet_*.deb`
-            - `.rpm` — Fedora / openSUSE: `sudo rpm -i Fablesheet_*.rpm`
-          releaseDraft: ${{ github.event.inputs.draft || 'true' }}
-          prerelease: false
+          # Empty tag on manual runs → build only, no release upload
+          tagName: ${{ needs.release-please.outputs.tag_name }}
+          releaseDraft: false
+          uploadWorkflowArtifacts: ${{ github.event_name == 'workflow_dispatch' }}
           args: --bundles ${{ matrix.bundles }}

@@ -19,12 +19,16 @@ See the [Development section in the README](README.md#development).
 2. Make your change. Keep pull requests focused — one topic per PR.
 3. Make sure these pass locally:
    ```bash
+   npm run format:check
+   npm run lint
    npm run typecheck
-   npm run build
+   npm test
    cargo fmt --all --check
+   cargo clippy --workspace --all-targets -- -D warnings
    cargo test --workspace
    ```
-4. Open a pull request against `main` and fill in the template.
+4. Open a pull request against `main` and fill in the template. CI runs the same checks.
+5. Pull requests are squash-merged, so the **PR title** becomes the commit message on `main` and must follow Conventional Commits (see below).
 
 ### Commit messages
 
@@ -37,6 +41,8 @@ docs: explain SRD data layout
 ```
 
 Common types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`.
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please): `feat` and `fix` commits on `main` end up in the changelog and determine the next version, so there is no need to edit `CHANGELOG.md` by hand.
 
 ## Game content rules
 

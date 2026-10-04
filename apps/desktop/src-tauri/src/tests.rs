@@ -10,12 +10,11 @@ use crate::models::{
         race::Race,
         spell_slots::{SpellSlotLevel, SpellSlots},
     },
-    condition::Condition,
     currency::Currency,
-    damage::{DamageRoll, DamageType},
-    dice::{DiceRoll, DiceType},
+    damage::DamageType,
+    dice::DiceType,
     item::{
-        item::{Item, ItemDetails, MagicData},
+        item::{Item, ItemDetails},
         stats::weapon::{
             Damage, Handedness, Mastery, WeaponCategory, WeaponProperty, WeaponStats, WeaponType,
         },
@@ -25,7 +24,7 @@ use crate::models::{
     speed::Speed,
 };
 
-/// Builds the example High Elf Wizard 1 / Acolyte from the starter character sheet.
+/// Builds an example High Elf Wizard 1 / Acolyte used as a test fixture.
 fn build_elf_wizard() -> Character {
     let race = Race {
         name: "High Elf".into(),
@@ -180,7 +179,7 @@ fn build_elf_wizard() -> Character {
     };
 
     Character {
-        id: "elf_wizard_starter".into(),
+        id: "elf_wizard_example".into(),
         name: "Elfenmagier".into(),
         race,
         classes: vec![class],
@@ -318,7 +317,7 @@ fn build_elf_wizard() -> Character {
              that could support my research."
             .into()],
         appearance: "High Elf with the grace typical of their kind.".into(),
-        backstory: "A devotee of Oghma, god of knowledge, who has dedicated their life to \
+        backstory: "A devotee of the god of knowledge who has dedicated their life to \
             scholarship and the pursuit of arcane mastery."
             .into(),
         notes: String::new(),
