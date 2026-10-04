@@ -163,7 +163,17 @@
     "preparedBadge": "✦ Prepared",
     "prepareButton": "○ Prepare",
     "selectSpell": "Select a spell to read its incantation.",
-    "contentNote": "Spell texts are from the SRD 5.1 and are only available in English."
+    "contentNote": "Spell texts are from the SRD 5.1 and are only available in English.",
+    "library": "Library",
+    "castDone": "Level {{level}} spell slot used.",
+    "cantripHint": "Cantrips don't use spell slots.",
+    "noSlotsAtLevel": "No spell slots of this level yet.",
+    "school": "School",
+    "allSchools": "All schools",
+    "cast": "Cast",
+    "castAt": "Level {{level}} slot",
+    "slotLevel": "Spell slot level",
+    "noSlotsLeft": "No spell slots left — take a rest."
   },
   "inventory": {
     "title": "Inventory of <name>{{name}}</name>",

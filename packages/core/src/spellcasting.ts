@@ -104,3 +104,27 @@ export function spellSlotMaximums(className: string, level: number): number[] {
 export function clampUsedSlots(used: readonly number[], maximums: readonly number[]): number[] {
   return maximums.map((max, i) => Math.min(max, Math.max(0, used[i] ?? 0)))
 }
+
+/** Spell levels (1–9) at which a spell of `spellLevel` can be cast right now, lowest first. */
+export function availableSlotLevels(
+  character: { className: string; level: number; spellSlotsUsed: readonly number[] },
+  spellLevel: number,
+): number[] {
+  if (spellLevel < 1) return []
+  const maximums = spellSlotMaximums(character.className, character.level)
+  return maximums
+    .map((max, i) => ({ level: i + 1, free: max - (character.spellSlotsUsed[i] ?? 0) }))
+    .filter(s => s.level >= spellLevel && s.free > 0)
+    .map(s => s.level)
+}
+
+/** Expends one spell slot of the given level (1–9). Returns the character unchanged if none is left. */
+export function expendSlot<T extends { className: string; level: number; spellSlotsUsed: number[] }>(
+  character: T,
+  slotLevel: number,
+): T {
+  const maximums = spellSlotMaximums(character.className, character.level)
+  const i = slotLevel - 1
+  if (i < 0 || i >= SPELL_LEVELS || (character.spellSlotsUsed[i] ?? 0) >= maximums[i]) return character
+  return { ...character, spellSlotsUsed: character.spellSlotsUsed.map((used, j) => (j === i ? used + 1 : used)) }
+}
