@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { Character } from '@fablesheet/core'
-import { getCharacters } from '../services/api'
+import { CharacterMigrationError, importCharacter } from '@fablesheet/core'
+import { createCharacter, getCharacters } from '../services/api'
+import { openJsonFile } from '../services/files'
 import { CharacterEditModal } from './CharacterEditModal'
 
 interface Props {
@@ -39,6 +41,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
   const [savedChars, setSavedChars] = useState<Character[]>([])
   const [loading, setLoading] = useState(true)
   const [editingChar, setEditingChar] = useState<Character | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
 
   useEffect(() => {
     getCharacters()
@@ -46,6 +49,20 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
       .catch(() => setSavedChars([]))
       .finally(() => setLoading(false))
   }, [])
+
+  async function handleImport() {
+    setImportError(null)
+    try {
+      const file = await openJsonFile()
+      if (file === null) return
+      const created = await createCharacter(importCharacter(file))
+      setSavedChars(prev => [...prev, created])
+    } catch (e) {
+      if (e instanceof CharacterMigrationError) setImportError(e.message)
+      else if (e instanceof SyntaxError) setImportError('The file is not valid JSON.')
+      else setImportError(`Import failed: ${String(e)}`)
+    }
+  }
 
   function handleSaved(updated: Character) {
     setSavedChars(prev => prev.map(c => (c.id === updated.id ? updated : c)))
@@ -66,7 +83,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
           className="font-cinzel-deco text-hero text-gold tracking-[0.1em] leading-[1.1]"
           style={{ textShadow: '0 0 40px rgba(200,168,75,0.35), 0 2px 6px rgba(0,0,0,0.8)' }}
         >
-          Open D&amp;D
+          Fablesheet
         </h1>
         <p className="font-fell-sc text-[#7a6035] text-caption tracking-[0.35em] uppercase mt-[clamp(6px,1vh,14px)]">
           Choose your adventurer
@@ -95,9 +112,24 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
                 New Character
               </div>
             </button>
+
+            {/* Import character button */}
+            <button
+              onClick={handleImport}
+              className="group relative w-[clamp(160px,14vw,240px)] px-[clamp(12px,1.2vw,20px)] py-[clamp(16px,2vh,28px)] border-2 border-dashed border-[rgba(100,70,20,0.3)] rounded-sm cursor-pointer text-center transition-all duration-200 hover:border-[rgba(200,168,75,0.5)] hover:bg-[rgba(100,70,20,0.06)] hover:-translate-y-1"
+            >
+              <div className="text-[clamp(1.6rem,2.4vw,3rem)] text-[#4a3818] group-hover:text-gold transition-colors mb-2 leading-none">
+                ↑
+              </div>
+              <div className="font-cinzel text-caption tracking-widest text-[#5a3818] group-hover:text-gold transition-colors uppercase">
+                Import Character
+              </div>
+            </button>
           </>
         )}
       </div>
+
+      {importError && <p className="font-fell text-caption text-red-ink italic">{importError}</p>}
 
       {/* ── Footer ── */}
       <footer className="flex items-center gap-3 text-[#3a2810] font-fell-sc text-caption">

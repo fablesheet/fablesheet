@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { Character } from '@fablesheet/core'
+import { characterFileName, exportCharacter } from '@fablesheet/core'
 import { updateCharacter, deleteCharacter } from '../services/api'
+import { saveJsonFile } from '../services/files'
 
 const ALIGNMENTS = [
   'Lawful Good',
@@ -33,6 +35,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [exported, setExported] = useState(false)
 
   async function handleSave() {
     if (!name.trim()) return
@@ -53,6 +56,15 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
     } catch (e) {
       setError(String(e))
       setSaving(false)
+    }
+  }
+
+  async function handleExport() {
+    setError(null)
+    try {
+      if (await saveJsonFile(characterFileName(character), exportCharacter(character))) setExported(true)
+    } catch (e) {
+      setError(`Export failed: ${String(e)}`)
     }
   }
 
@@ -188,6 +200,17 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>
+        </div>
+
+        {/* Export */}
+        <div className="px-6 pb-[clamp(10px,1.4vh,18px)]">
+          <button
+            onClick={handleExport}
+            className="w-full font-cinzel text-caption tracking-[0.15em] text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-[clamp(5px,0.6vh,9px)] rounded-sm cursor-pointer transition-colors hover:border-[rgba(100,70,20,0.5)] hover:text-[#5a4020]"
+            style={{ background: 'rgba(90,60,10,0.06)' }}
+          >
+            {exported ? '✓ Exported' : '↓ Export Character'}
+          </button>
         </div>
 
         {/* Divider before danger zone */}

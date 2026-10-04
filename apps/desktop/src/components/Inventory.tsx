@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import type { Character, Item, ItemCategory, ItemRarity } from '@fablesheet/core'
 import { carryingLimits } from '@fablesheet/core'
+import { saveJsonFile } from '../services/files'
 import { ITEM_CATALOG } from '@fablesheet/srd-data'
 
 interface Props {
@@ -209,13 +210,9 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
   // ── Export ────────────────────────────────────────────────────────────────────
 
   function handleExport() {
-    const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${character.name.replace(/\s+/g, '_')}-inventory.json`
-    a.click()
-    URL.revokeObjectURL(url)
+    saveJsonFile(`${character.name.replace(/\s+/g, '_')}-inventory.json`, items).catch(e =>
+      setImportError(`Export failed: ${String(e)}`),
+    )
   }
 
   // ── Shared style helpers ───────────────────────────────────────────────────────
