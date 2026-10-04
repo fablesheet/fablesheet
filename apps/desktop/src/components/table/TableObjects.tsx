@@ -56,3 +56,22 @@ export function JournalArt({ label }: { label: string }) {
     </div>
   )
 }
+
+export function DiceArt() {
+  return (
+    <div className="relative size-26 mt-6 rounded-full bg-[#1f2d24] border-4 border-fs-leather shadow-lg flex items-center justify-center">
+      <div
+        className="size-11 bg-fs-accent flex items-center justify-center font-display text-sm text-fs-on-accent rotate-6"
+        style={{ clipPath: 'polygon(50% 1%, 95% 26%, 95% 74%, 50% 99%, 5% 74%, 5% 26%)' }}
+      >
+        20
+      </div>
+      <div
+        className="absolute right-4 bottom-5 size-6 bg-fs-card -rotate-12 flex items-center justify-center font-display text-[0.6rem] text-fs-ink"
+        style={{ clipPath: 'polygon(10% 10%, 90% 10%, 90% 90%, 10% 90%)' }}
+      >
+        6
+      </div>
+    </div>
+  )
+}

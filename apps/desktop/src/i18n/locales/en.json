@@ -500,6 +500,31 @@
     "tempHp": "Temp HP",
     "amount": "Amount",
     "damage": "Damage",
-    "heal": "Heal"
+    "heal": "Heal",
+    "dice": "Dice",
+    "diceHint": "d4 to d100"
+  },
+  "dice": {
+    "die": "d",
+    "empty": "Pick dice below or roll something from your character.",
+    "roll": "Roll",
+    "addDie": "Add a d{{sides}}",
+    "modifier": "Modifier",
+    "minus": "Lower modifier",
+    "plus": "Raise modifier",
+    "mode": "Advantage",
+    "normal": "Normal",
+    "advantage": "Advantage",
+    "disadvantage": "Disadvantage",
+    "modeHint": "Advantage and disadvantage apply to single d20 rolls.",
+    "clear": "Clear",
+    "rollButton": "Roll",
+    "custom": "Dice expression",
+    "invalid": "Use dice like 2d6 + 3 or d20 - 1.",
+    "fromCharacter": "From your character",
+    "history": "History",
+    "noHistory": "No rolls yet.",
+    "natural20": "Natural 20!",
+    "natural1": "Natural 1"
   }
 }
