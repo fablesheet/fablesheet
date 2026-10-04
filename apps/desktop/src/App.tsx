@@ -1,78 +1,115 @@
-import { useState, useCallback } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import './App.css'
 import type { Character } from '@fablesheet/core'
 import { CharacterSelect } from './components/CharacterSelect'
-import { CharacterSheet } from './components/CharacterSheet'
 import { CharacterBuilder } from './components/CharacterBuilder'
+import { CharacterEditModal } from './components/CharacterEditModal'
+import { CharacterHeader } from './components/CharacterHeader'
+import { RestDialog } from './components/RestDialog'
+import { SheetView } from './components/sheet/SheetView'
+import { TableView, type TableObject } from './components/table/TableView'
 import { SpellBook } from './components/SpellBook'
 import { Inventory } from './components/Inventory'
 import { NotesPage } from './components/NotesPage'
-import { updateCharacter } from './services/api'
 import { UpdateBanner } from './components/UpdateBanner'
+import { useCharacterSaver } from './hooks/useCharacterSaver'
 
-type View = 'select' | 'builder' | 'sheet' | 'spellbook' | 'inventory' | 'notes'
+type View = 'select' | 'builder' | 'table' | TableObject
+
+/** Page frame for the redesigned screens: header on top, content below */
+function Frame({ header, children }: { header: ReactNode; children: ReactNode }) {
+  return (
+    <div className="w-screen h-dvh flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
+      {header}
+      {children}
+    </div>
+  )
+}
 
 function Screens() {
+  const { t } = useTranslation()
   const [character, setCharacter] = useState<Character | null>(null)
   const [view, setView] = useState<View>('select')
+  const [editing, setEditing] = useState(false)
+  const [resting, setResting] = useState(false)
+  const saver = useCharacterSaver()
 
-  const handleUpdate = useCallback(async (updated: Character) => {
-    setCharacter(updated)
-    try {
-      await updateCharacter(updated.id, updated)
-    } catch (err) {
-      console.error('Failed to save character:', err)
-    }
-  }, [])
+  // Single source of truth: update in memory right away, persist shortly after
+  const handleUpdate = useCallback(
+    (updated: Character) => {
+      setCharacter(updated)
+      saver.schedule(updated)
+    },
+    [saver],
+  )
+
+  const open = (c: Character) => {
+    setCharacter(c)
+    setView('table')
+  }
+
+  const toList = () => {
+    saver.flush()
+    setCharacter(null)
+    setView('select')
+  }
 
   if (view === 'builder') {
-    return (
-      <CharacterBuilder
-        onCreated={c => {
-          setCharacter(c)
-          setView('sheet')
-        }}
-        onCancel={() => setView('select')}
-      />
-    )
+    return <CharacterBuilder onCreated={open} onCancel={() => setView('select')} />
   }
 
   if (view === 'select' || !character) {
-    return (
-      <CharacterSelect
-        onSelect={c => {
-          setCharacter(c)
-          setView('sheet')
-        }}
-        onCreateNew={() => setView('builder')}
-      />
-    )
+    return <CharacterSelect onSelect={open} onCreateNew={() => setView('builder')} />
   }
 
+  // Objects that still use their own full-screen layout
   if (view === 'spellbook') {
-    return <SpellBook character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
+    return <SpellBook character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
   }
-
-  if (view === 'notes') {
-    return <NotesPage character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
-  }
-
   if (view === 'inventory') {
-    return <Inventory character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
+    return <Inventory character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
+  }
+  if (view === 'notes') {
+    return <NotesPage character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
   }
 
+  const onTable = view === 'table'
   return (
-    <CharacterSheet
-      character={character}
-      onBack={() => {
-        setCharacter(null)
-        setView('select')
-      }}
-      onSpellbook={() => setView('spellbook')}
-      onInventory={() => setView('inventory')}
-      onNotes={() => setView('notes')}
-      onUpdate={handleUpdate}
-    />
+    <Frame
+      header={
+        <CharacterHeader
+          character={character}
+          backLabel={onTable ? t('table.allCharacters') : t('table.backToTable')}
+          onBack={onTable ? toList : () => setView('table')}
+          onEdit={() => setEditing(true)}
+          onRest={() => setResting(true)}
+        />
+      }
+    >
+      {onTable ? (
+        <TableView character={character} onOpen={setView} />
+      ) : (
+        <SheetView character={character} onUpdate={handleUpdate} />
+      )}
+
+      {editing && (
+        <CharacterEditModal
+          character={character}
+          onSaved={updated => {
+            setCharacter(updated)
+            setEditing(false)
+          }}
+          onDeleted={() => {
+            setEditing(false)
+            setCharacter(null)
+            setView('select')
+          }}
+          onClose={() => setEditing(false)}
+        />
+      )}
+      {resting && <RestDialog character={character} onRest={handleUpdate} onClose={() => setResting(false)} />}
+    </Frame>
   )
 }
 

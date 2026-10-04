@@ -462,5 +462,27 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "done": "Done"
+  },
+  "table": {
+    "rest": "Rest",
+    "shortRest": "Short rest",
+    "longRest": "Long rest",
+    "restNow": "Rest",
+    "allCharacters": "All characters",
+    "backToTable": "Table",
+    "sheet": "Character sheet",
+    "sheetHint": "Stats and combat",
+    "spellbook": "Spellbook",
+    "spellCount_one": "{{count}} spell",
+    "spellCount_other": "{{count}} spells",
+    "backpack": "Backpack",
+    "journal": "Journal",
+    "journalHint": "Notes and story",
+    "abilitiesAndSaves": "Abilities and saving throws",
+    "save": "Save",
+    "tempHp": "Temp HP",
+    "amount": "Amount",
+    "damage": "Damage",
+    "heal": "Heal"
   }
 }
