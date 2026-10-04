@@ -591,6 +591,10 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
         <CharacterEditModal
           character={character}
           onSaved={updated => {
+            // Level changes adjust HP and hit dice, so refresh the locally edited values
+            setHp(updated.hp.current)
+            setTempHp(updated.hp.temp)
+            setHitDiceUsed(updated.hitDice.used)
             onUpdate(updated)
             setEditModalOpen(false)
           }}

@@ -1,4 +1,4 @@
-import type { ProficiencyLevel } from './types'
+import type { Character, ProficiencyLevel } from './types'
 
 // ── Ability scores ────────────────────────────────────────────────────────────
 
@@ -68,5 +68,50 @@ export function carryingLimits(strength: number): CarryingLimits {
     capacity: strength * 15,
     encumberedAt: strength * 5,
     heavilyEncumberedAt: strength * 10,
+  }
+}
+
+// ── Hit dice & levelling ──────────────────────────────────────────────────────
+
+/** Number of sides of a hit die string such as "d8" (defaults to 8 if unreadable). */
+export function hitDieSize(die: string): number {
+  const sides = Number(/d(\d+)/i.exec(die)?.[1])
+  return Number.isFinite(sides) && sides > 0 ? sides : 8
+}
+
+/** Fixed hit point gain per level (the "take the average" option): half the die + 1. */
+export function averageHitPointsPerLevel(dieSize: number): number {
+  return dieSize / 2 + 1
+}
+
+/**
+ * Returns the character at a new level: proficiency bonus, hit dice, maximum hit
+ * points (average per level + Constitution modifier, at least 1 per level) and
+ * spellcasting numbers are recalculated. Current HP changes by the same amount.
+ */
+export function changeLevel(character: Character, newLevel: number): Character {
+  const level = Math.min(20, Math.max(1, Math.floor(newLevel)))
+  const delta = level - character.level
+  if (delta === 0) return character
+
+  const perLevel = Math.max(
+    1,
+    averageHitPointsPerLevel(hitDieSize(character.hitDice.die)) + abilityModifier(character.scores.constitution),
+  )
+  const max = Math.max(1, character.hp.max + perLevel * delta)
+  const current = Math.min(max, Math.max(0, character.hp.current + perLevel * delta))
+  const proficiencyBonus = proficiencyBonusForLevel(level)
+  const casting = character.spellcastingAbility as keyof Character['scores'] | null
+  const castingScore = casting ? character.scores[casting] : undefined
+
+  return {
+    ...character,
+    level,
+    proficiencyBonus,
+    hp: { ...character.hp, max, current },
+    hitDice: { ...character.hitDice, total: level, used: Math.min(character.hitDice.used, level) },
+    spellSaveDC: castingScore !== undefined ? spellSaveDC(castingScore, proficiencyBonus) : character.spellSaveDC,
+    spellAttackBonus:
+      castingScore !== undefined ? spellAttackBonus(castingScore, proficiencyBonus) : character.spellAttackBonus,
   }
 }
