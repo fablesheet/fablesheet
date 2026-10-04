@@ -26,7 +26,7 @@ async fn main() {
             get(list_characters).post(create_character),
         )
         .route(
-            "/api/characters/:id",
+            "/api/characters/{id}",
             get(get_character)
                 .put(update_character)
                 .delete(delete_character),
