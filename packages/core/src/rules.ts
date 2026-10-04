@@ -1,4 +1,5 @@
 import type { Character, ProficiencyLevel } from './types'
+import { clampUsedSlots, spellSlotMaximums } from './spellcasting'
 
 // ── Ability scores ────────────────────────────────────────────────────────────
 
@@ -110,6 +111,7 @@ export function changeLevel(character: Character, newLevel: number): Character {
     proficiencyBonus,
     hp: { ...character.hp, max, current },
     hitDice: { ...character.hitDice, total: level, used: Math.min(character.hitDice.used, level) },
+    spellSlotsUsed: clampUsedSlots(character.spellSlotsUsed, spellSlotMaximums(character.className, level)),
     spellSaveDC: castingScore !== undefined ? spellSaveDC(castingScore, proficiencyBonus) : character.spellSaveDC,
     spellAttackBonus:
       castingScore !== undefined ? spellAttackBonus(castingScore, proficiencyBonus) : character.spellAttackBonus,

@@ -1,7 +1,15 @@
 import { Fragment, useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character, AbilityName } from '@fablesheet/core'
-import { abilityModifier, formatModifier, savingThrowBonus, skillBonus } from '@fablesheet/core'
+import {
+  abilityModifier,
+  formatModifier,
+  longRest,
+  savingThrowBonus,
+  shortRest,
+  skillBonus,
+  spellSlotMaximums,
+} from '@fablesheet/core'
 import { CharacterEditModal } from './CharacterEditModal'
 import { gameLabel } from '../i18n/game'
 
@@ -81,6 +89,8 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
   const [hitDiceUsed, setHitDiceUsed] = useState(character.hitDice.used)
   const [inspiration, setInspiration] = useState(character.inspiration)
   const [editModalOpen, setEditModalOpen] = useState(false)
+  const [slotsUsed, setSlotsUsed] = useState<number[]>(character.spellSlotsUsed)
+  const [confirmRest, setConfirmRest] = useState<'short' | 'long' | null>(null)
 
   // Stable refs so the debounced save never captures stale closures
   const characterRef = useRef(character)
@@ -103,12 +113,60 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
         deathSaves,
         hitDice: { ...c.hitDice, used: hitDiceUsed },
         inspiration,
+        spellSlotsUsed: slotsUsed,
       })
     }, 600)
     return () => clearTimeout(timer)
-  }, [hp, tempHp, conditions, deathSaves, hitDiceUsed, inspiration])
+  }, [hp, tempHp, conditions, deathSaves, hitDiceUsed, inspiration, slotsUsed])
+
+  // Rest confirmation resets itself if not confirmed
+  useEffect(() => {
+    if (!confirmRest) return
+    const timer = setTimeout(() => setConfirmRest(null), 4000)
+    return () => clearTimeout(timer)
+  }, [confirmRest])
 
   const isCaster = character.spellcastingAbility !== null
+  const slotMaximums = spellSlotMaximums(character.className, character.level)
+  const hasSlots = slotMaximums.some(n => n > 0)
+
+  function toggleSlot(levelIndex: number, pip: number) {
+    setSlotsUsed(prev => prev.map((used, i) => (i === levelIndex ? (pip + 1 === used ? pip : pip + 1) : used)))
+  }
+
+  /** Applies locally edited values to a character snapshot */
+  function withLocalState(c: Character): Character {
+    return {
+      ...c,
+      hp: { ...c.hp, current: hp, temp: tempHp },
+      conditions,
+      deathSaves,
+      hitDice: { ...c.hitDice, used: hitDiceUsed },
+      inspiration,
+      spellSlotsUsed: slotsUsed,
+    }
+  }
+
+  function syncLocalState(c: Character) {
+    setHp(c.hp.current)
+    setTempHp(c.hp.temp)
+    setConditions(c.conditions)
+    setDeathSaves(c.deathSaves)
+    setHitDiceUsed(c.hitDice.used)
+    setSlotsUsed(c.spellSlotsUsed)
+  }
+
+  function handleRest(kind: 'short' | 'long') {
+    if (confirmRest !== kind) {
+      setConfirmRest(kind)
+      return
+    }
+    setConfirmRest(null)
+    const current = withLocalState(character)
+    const rested = kind === 'long' ? longRest(current) : shortRest(current)
+    syncLocalState(rested)
+    onUpdate(rested)
+  }
   const hpPercent = Math.max(0, Math.min(100, (hp / character.hp.max) * 100))
   const hpColor = hpPercent > 60 ? '#3a7a3a' : hpPercent > 30 ? '#8a7020' : '#8b1a1a'
 
@@ -167,6 +225,23 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
         </div>
 
         <div className="flex items-center gap-2">
+          {(['short', 'long'] as const).map(kind => (
+            <button
+              key={kind}
+              onClick={() => handleRest(kind)}
+              title={t(kind === 'short' ? 'sheet.shortRestHint' : 'sheet.longRestHint')}
+              className={[
+                'font-cinzel text-caption tracking-[0.1em] border px-[clamp(10px,1.2vw,18px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm whitespace-nowrap transition-colors',
+                confirmRest === kind
+                  ? 'text-gold border-gold-dim bg-[rgba(90,60,10,0.25)]'
+                  : 'text-[#8a7040] border-[#2e2010] bg-transparent hover:text-gold hover:border-[#5a4020]',
+              ].join(' ')}
+            >
+              {confirmRest === kind
+                ? t('sheet.confirmRest')
+                : t(kind === 'short' ? 'sheet.shortRest' : 'sheet.longRest')}
+            </button>
+          ))}
           <button
             onClick={() => setEditModalOpen(true)}
             title={t('select.editCharacter')}
@@ -256,6 +331,41 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
                     <span className="font-cinzel text-caption text-ink">{v}</span>
                   </div>
                 ))}
+              </div>
+            </>
+          )}
+
+          {hasSlots && (
+            <>
+              <Rule />
+              <SectionLabel>{t('sheet.spellSlots')}</SectionLabel>
+              <div className="flex flex-col gap-[clamp(2px,0.4vh,5px)]">
+                {slotMaximums.map((max, i) =>
+                  max === 0 ? null : (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="font-fell-sc text-caption text-[#7a5030]">
+                        {t('sheet.slotLevel', { level: i + 1 })}
+                      </span>
+                      <div className="flex gap-[clamp(3px,0.4vw,6px)]">
+                        {Array.from({ length: max }, (_, pip) => {
+                          const used = pip < (slotsUsed[i] ?? 0)
+                          return (
+                            <button
+                              key={pip}
+                              onClick={() => toggleSlot(i, pip)}
+                              title={used ? t('sheet.restoreSlot') : t('sheet.useSlot')}
+                              aria-label={used ? t('sheet.restoreSlot') : t('sheet.useSlot')}
+                              aria-pressed={used}
+                              className={`text-caption leading-none cursor-pointer bg-transparent border-none p-0 transition-opacity hover:opacity-70 ${used ? 'text-[rgba(100,70,20,0.3)]' : 'text-gold-dim'}`}
+                            >
+                              {used ? '◇' : '◆'}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ),
+                )}
               </div>
             </>
           )}
@@ -591,10 +701,8 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
         <CharacterEditModal
           character={character}
           onSaved={updated => {
-            // Level changes adjust HP and hit dice, so refresh the locally edited values
-            setHp(updated.hp.current)
-            setTempHp(updated.hp.temp)
-            setHitDiceUsed(updated.hitDice.used)
+            // Level changes adjust HP, hit dice and slots, so refresh the locally edited values
+            syncLocalState(updated)
             onUpdate(updated)
             setEditModalOpen(false)
           }}

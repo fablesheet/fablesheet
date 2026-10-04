@@ -112,7 +112,16 @@
     "skills": "Fertigkeiten",
     "languages": "Sprachen",
     "currency": "Währung",
-    "features": "Merkmale"
+    "features": "Merkmale",
+    "spellSlots": "Zauberplätze",
+    "slotLevel": "Grad {{level}}",
+    "useSlot": "Zauberplatz verbrauchen",
+    "restoreSlot": "Zauberplatz zurückerhalten",
+    "shortRest": "☾ Kurze Rast",
+    "longRest": "☀ Lange Rast",
+    "confirmRest": "Zum Rasten erneut klicken",
+    "shortRestHint": "Kurze Rast: Paktmagie-Plätze und Merkmale mit kurzer Rast werden wiederhergestellt. Trefferwürfel über „Nutzen“ ausgeben.",
+    "longRestHint": "Lange Rast: volle TP, die Hälfte der Trefferwürfel, alle Zauberplätze und Merkmale, eine Stufe Erschöpfung weniger."
   },
   "spellbook": {
     "title": "Zauberbuch von <name>{{name}}</name>",

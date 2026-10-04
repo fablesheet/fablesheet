@@ -112,7 +112,16 @@
     "skills": "Skills",
     "languages": "Languages",
     "currency": "Currency",
-    "features": "Features"
+    "features": "Features",
+    "spellSlots": "Spell Slots",
+    "slotLevel": "Level {{level}}",
+    "useSlot": "Use spell slot",
+    "restoreSlot": "Restore spell slot",
+    "shortRest": "☾ Short Rest",
+    "longRest": "☀ Long Rest",
+    "confirmRest": "Click again to rest",
+    "shortRestHint": "Short rest: Warlock pact slots and short-rest features recover. Spend hit dice with “Use”.",
+    "longRestHint": "Long rest: full HP, half your hit dice, all spell slots and features, one level of exhaustion removed."
   },
   "spellbook": {
     "title": "Spellbook of <name>{{name}}</name>",
