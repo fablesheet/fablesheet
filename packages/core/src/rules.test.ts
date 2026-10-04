@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   abilityModifier,
   carryingLimits,
+  changeLevel,
   formatModifier,
+  hitDieSize,
   proficiencyBonusForLevel,
   proficiencyContribution,
   savingThrowBonus,
@@ -10,6 +12,7 @@ import {
   spellAttackBonus,
   spellSaveDC,
 } from './rules'
+import { migrateCharacter } from './migrations'
 
 describe('abilityModifier', () => {
   it.each([
@@ -89,5 +92,54 @@ describe('spellcasting', () => {
 describe('carryingLimits', () => {
   it('scales with Strength', () => {
     expect(carryingLimits(10)).toEqual({ capacity: 150, encumberedAt: 50, heavilyEncumberedAt: 100 })
+  })
+})
+
+describe('changeLevel', () => {
+  const wizard = migrateCharacter({
+    id: 'w',
+    name: 'Wizard',
+    level: 1,
+    proficiencyBonus: 2,
+    scores: { strength: 8, dexterity: 14, constitution: 14, intelligence: 16, wisdom: 12, charisma: 10 },
+    hp: { current: 8, max: 8, temp: 0 },
+    hitDice: { die: 'd6', total: 1, used: 1 },
+    spellcastingAbility: 'intelligence',
+    spellSaveDC: 13,
+    spellAttackBonus: 5,
+  })
+
+  it('recalculates level-dependent values when levelling up', () => {
+    const lvl5 = changeLevel(wizard, 5)
+    expect(lvl5.level).toBe(5)
+    expect(lvl5.proficiencyBonus).toBe(3)
+    expect(lvl5.hitDice).toEqual({ die: 'd6', total: 5, used: 1 })
+    // d6 average 4 + CON +2 = 6 per level, 4 levels
+    expect(lvl5.hp).toEqual({ current: 32, max: 32, temp: 0 })
+    expect(lvl5.spellSaveDC).toBe(14)
+    expect(lvl5.spellAttackBonus).toBe(6)
+  })
+
+  it('reverses cleanly when levelling down', () => {
+    expect(changeLevel(changeLevel(wizard, 5), 1)).toEqual(wizard)
+  })
+
+  it('clamps the level and keeps used hit dice within the total', () => {
+    expect(changeLevel(wizard, 30).level).toBe(20)
+    const used = { ...wizard, level: 3, hitDice: { die: 'd6', total: 3, used: 3 } }
+    expect(changeLevel(used, 2).hitDice.used).toBe(2)
+  })
+
+  it('gains at least 1 HP per level with a low Constitution', () => {
+    const frail = { ...wizard, scores: { ...wizard.scores, constitution: 1 } }
+    expect(changeLevel(frail, 2).hp.max).toBe(9)
+  })
+})
+
+describe('hitDieSize', () => {
+  it('parses hit die strings', () => {
+    expect(hitDieSize('d12')).toBe(12)
+    expect(hitDieSize('D6')).toBe(6)
+    expect(hitDieSize('??')).toBe(8)
   })
 })

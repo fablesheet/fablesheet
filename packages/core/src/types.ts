@@ -171,4 +171,16 @@ export interface Character {
   languages: string[]
   otherProficiencies: string[]
   items: Item[]
+
+  personality: Personality
+  backstory: string
+  /** Free-form notes, Markdown */
+  notes: string
+}
+
+export interface Personality {
+  traits: string
+  ideals: string
+  bonds: string
+  flaws: string
 }

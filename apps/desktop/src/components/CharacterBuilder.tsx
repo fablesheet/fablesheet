@@ -457,6 +457,14 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       languages: [...race.languages],
       otherProficiencies: [],
       items: [],
+      personality: {
+        traits: s.personalityTraits.trim(),
+        ideals: s.ideals.trim(),
+        bonds: s.bonds.trim(),
+        flaws: s.flaws.trim(),
+      },
+      backstory: '',
+      notes: '',
     }
 
     try {
