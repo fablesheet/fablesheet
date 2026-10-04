@@ -123,7 +123,10 @@
     "shortRestHint": "Short rest: Warlock pact slots and short-rest features recover. Spend hit dice with “Use”.",
     "longRestHint": "Long rest: full HP, half your hit dice, all spell slots and features, one level of exhaustion removed.",
     "notes": "❧ Notes",
-    "editCurrency": "Edit currency"
+    "editCurrency": "Edit currency",
+    "attacks": "Attacks",
+    "noAttacks": "Equip a weapon in the inventory to see its attack here.",
+    "notProficient": "not proficient — no proficiency bonus"
   },
   "spellbook": {
     "title": "Spellbook of <name>{{name}}</name>",
@@ -212,7 +215,30 @@
     "notesPlaceholder": "Extra notes…",
     "addToInventory": "Add to Inventory",
     "removeYes": "Yes, Remove",
-    "remove": "Remove from Inventory"
+    "remove": "Remove from Inventory",
+    "weaponStats": "Weapon",
+    "armorStats": "Armor",
+    "damage": "Damage",
+    "damageType": "Damage Type",
+    "versatile": "Versatile",
+    "kind": "Type",
+    "melee": "Melee",
+    "ranged": "Ranged",
+    "simple": "Simple",
+    "martial": "Martial",
+    "range": "Range",
+    "properties": "Properties",
+    "finesse": "Finesse",
+    "armorType": "Armor Type",
+    "baseAc": "Base AC",
+    "shieldBonus": "AC Bonus",
+    "acRule_light": "AC {{ac}} + Dex modifier",
+    "acRule_medium": "AC {{ac}} + Dex modifier (max 2)",
+    "acRule_heavy": "AC {{ac}}",
+    "acRule_shield": "+{{ac}} AC",
+    "strengthRequired": "Str {{value}} required",
+    "stealthDisadvantage": "Disadvantage on Stealth",
+    "acHint": "Equipped armor and shields set your armor class."
   },
   "game": {
     "ability": {
@@ -370,6 +396,39 @@
       "ep": "Electrum",
       "gp": "Gold",
       "pp": "Platinum"
+    },
+    "damageType": {
+      "acid": "Acid",
+      "bludgeoning": "Bludgeoning",
+      "cold": "Cold",
+      "fire": "Fire",
+      "force": "Force",
+      "lightning": "Lightning",
+      "necrotic": "Necrotic",
+      "piercing": "Piercing",
+      "poison": "Poison",
+      "psychic": "Psychic",
+      "radiant": "Radiant",
+      "slashing": "Slashing",
+      "thunder": "Thunder"
+    },
+    "weaponProperty": {
+      "ammunition": "Ammunition",
+      "finesse": "Finesse",
+      "heavy": "Heavy",
+      "light": "Light",
+      "loading": "Loading",
+      "reach": "Reach",
+      "special": "Special",
+      "thrown": "Thrown",
+      "two-handed": "Two-handed",
+      "versatile": "Versatile"
+    },
+    "armorType": {
+      "light": "Light armor",
+      "medium": "Medium armor",
+      "heavy": "Heavy armor",
+      "shield": "Shield"
     }
   },
   "update": {

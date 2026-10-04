@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character } from '@fablesheet/core'
-import { CharacterMigrationError, importCharacter } from '@fablesheet/core'
+import { armorClass, CharacterMigrationError, importCharacter } from '@fablesheet/core'
 import { createCharacter, getCharacters } from '../services/api'
 import { openJsonFile } from '../services/files'
 import { LANGUAGES, setLanguage } from '../i18n'
@@ -235,7 +235,7 @@ function CharacterCard({ char, onSelect, onEdit }: CardProps) {
           <span className="font-fell-sc text-caption text-[#9a8050] mt-1.5">·</span>
           <div className="flex flex-col items-center gap-0.5">
             <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">{t('select.ac')}</span>
-            <span className="font-fell-sc text-caption text-[#2a4a28]">{char.ac}</span>
+            <span className="font-fell-sc text-caption text-[#2a4a28]">{armorClass(char)}</span>
           </div>
           <span className="font-fell-sc text-caption text-[#9a8050] mt-1.5">·</span>
           <div className="flex flex-col items-center gap-0.5">

@@ -1,4 +1,5 @@
 import type { Item, ItemCategory } from '@fablesheet/core'
+import { parseArmor, parseWeapon } from './parse'
 
 type CatalogItem = Omit<Item, 'id'>
 
@@ -13,6 +14,8 @@ function entry(
     name, category, description, quantity: 1,
     weight, value, equipped: false,
     rarity: null, requiresAttunement: false, isAttuned: false, notes: '',
+    weapon: category === 'Weapon' ? parseWeapon(description) : null,
+    armor: category === 'Armor' ? parseArmor(description) : null,
   }
 }
 
@@ -182,3 +185,13 @@ export const ITEM_CATALOG: CatalogItem[] = [
   entry('Crossbow Bolts (20)',  'Ammunition', '20 bolts for light, hand, or heavy crossbows.',          1.5, 1),
   entry('Sling Bullets (20)',   'Ammunition', '20 lead bullets for a sling.',                           1.5, 0.04),
 ]
+
+/**
+ * Adds weapon/armor stats from the catalog to an item that has none, matched by
+ * name and category (e.g. items added before stats existed). Other items are returned as-is.
+ */
+export function withCatalogStats<T extends Item>(item: T): T {
+  if (item.weapon || item.armor) return item
+  const match = ITEM_CATALOG.find(c => c.name === item.name && c.category === item.category)
+  return match && (match.weapon || match.armor) ? { ...item, weapon: match.weapon, armor: match.armor } : item
+}

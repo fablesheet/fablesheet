@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import type { Character, AbilityName } from '@fablesheet/core'
 import {
   abilityModifier,
+  armorClass,
+  equippedAttacks,
   formatModifier,
   longRest,
   savingThrowBonus,
@@ -130,6 +132,7 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
   }, [confirmRest])
 
   const isCaster = character.spellcastingAbility !== null
+  const attacks = equippedAttacks(character)
   const slotMaximums = spellSlotMaximums(character.className, character.level)
   const hasSlots = slotMaximums.some(n => n > 0)
 
@@ -491,7 +494,7 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
           {/* Combat row */}
           <div className="flex items-center justify-center">
             {[
-              { val: String(character.ac), key: 'ac' },
+              { val: String(armorClass(character)), key: 'ac' },
               { val: formatModifier(character.initiativeBonus), key: 'initiative' },
               { val: String(character.speed), key: 'speed' },
             ].map(({ val, key }, i) => (
@@ -506,6 +509,41 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
               </Fragment>
             ))}
           </div>
+
+          <Rule />
+
+          {/* Attacks from equipped weapons */}
+          <SectionLabel>{t('sheet.attacks')}</SectionLabel>
+          {attacks.length === 0 ? (
+            <p className="font-fell italic text-caption text-[#9a8050] mb-1">{t('sheet.noAttacks')}</p>
+          ) : (
+            <div className="flex flex-col gap-[clamp(3px,0.5vh,7px)] mb-1">
+              {attacks.map(a => (
+                <div key={a.itemId} className="flex items-baseline gap-[clamp(6px,0.8vw,12px)]">
+                  <span className="font-fell-sc text-caption text-ink flex-1 min-w-0 truncate" title={a.name}>
+                    {a.name}
+                    {!a.proficient && (
+                      <span className="text-[#9a8050]" title={t('sheet.notProficient')}>
+                        {' '}
+                        *
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-cinzel text-caption text-ink w-[clamp(28px,2.6vw,40px)] text-right shrink-0">
+                    {formatModifier(a.attackBonus)}
+                  </span>
+                  <span className="font-fell-sc text-caption text-[#5a3a18] w-[clamp(110px,11vw,170px)] shrink-0">
+                    {a.damage ?? '—'}
+                    {a.versatileDamage && <span className="text-[#9a8050]"> ({a.versatileDamage})</span>}{' '}
+                    {a.damageType && gameLabel(t, 'damageType', a.damageType)}
+                  </span>
+                </div>
+              ))}
+              {attacks.some(a => !a.proficient) && (
+                <p className="font-fell italic text-deco text-[#9a8050]">* {t('sheet.notProficient')}</p>
+              )}
+            </div>
+          )}
 
           <Rule />
 

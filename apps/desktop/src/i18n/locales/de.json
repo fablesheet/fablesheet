@@ -123,7 +123,10 @@
     "shortRestHint": "Kurze Rast: Paktmagie-Plätze und Merkmale mit kurzer Rast werden wiederhergestellt. Trefferwürfel über „Nutzen“ ausgeben.",
     "longRestHint": "Lange Rast: volle TP, die Hälfte der Trefferwürfel, alle Zauberplätze und Merkmale, eine Stufe Erschöpfung weniger.",
     "notes": "❧ Notizen",
-    "editCurrency": "Währung bearbeiten"
+    "editCurrency": "Währung bearbeiten",
+    "attacks": "Angriffe",
+    "noAttacks": "Rüste im Inventar eine Waffe aus, um hier ihren Angriff zu sehen.",
+    "notProficient": "nicht geübt – kein Übungsbonus"
   },
   "spellbook": {
     "title": "Zauberbuch von <name>{{name}}</name>",
@@ -212,7 +215,30 @@
     "notesPlaceholder": "Weitere Notizen…",
     "addToInventory": "Zum Inventar hinzufügen",
     "removeYes": "Ja, entfernen",
-    "remove": "Aus dem Inventar entfernen"
+    "remove": "Aus dem Inventar entfernen",
+    "weaponStats": "Waffe",
+    "armorStats": "Rüstung",
+    "damage": "Schaden",
+    "damageType": "Schadensart",
+    "versatile": "Vielseitig",
+    "kind": "Art",
+    "melee": "Nahkampf",
+    "ranged": "Fernkampf",
+    "simple": "Einfach",
+    "martial": "Kriegswaffe",
+    "range": "Reichweite",
+    "properties": "Eigenschaften",
+    "finesse": "Finesse",
+    "armorType": "Rüstungsart",
+    "baseAc": "Basis-RK",
+    "shieldBonus": "RK-Bonus",
+    "acRule_light": "RK {{ac}} + GES-Modifikator",
+    "acRule_medium": "RK {{ac}} + GES-Modifikator (max. 2)",
+    "acRule_heavy": "RK {{ac}}",
+    "acRule_shield": "+{{ac}} RK",
+    "strengthRequired": "STÄ {{value}} benötigt",
+    "stealthDisadvantage": "Nachteil auf Heimlichkeit",
+    "acHint": "Ausgerüstete Rüstungen und Schilde bestimmen deine RK."
   },
   "game": {
     "ability": {
@@ -370,6 +396,39 @@
       "ep": "Elektrum",
       "gp": "Gold",
       "pp": "Platin"
+    },
+    "damageType": {
+      "acid": "Säure",
+      "bludgeoning": "Wucht",
+      "cold": "Kälte",
+      "fire": "Feuer",
+      "force": "Energie",
+      "lightning": "Blitz",
+      "necrotic": "Nekrotisch",
+      "piercing": "Stich",
+      "poison": "Gift",
+      "psychic": "Psychisch",
+      "radiant": "Gleißend",
+      "slashing": "Hieb",
+      "thunder": "Schall"
+    },
+    "weaponProperty": {
+      "ammunition": "Munition",
+      "finesse": "Finesse",
+      "heavy": "Schwer",
+      "light": "Leicht",
+      "loading": "Laden",
+      "reach": "Reichweite",
+      "special": "Speziell",
+      "thrown": "Wurfwaffe",
+      "two-handed": "Zweihändig",
+      "versatile": "Vielseitig"
+    },
+    "armorType": {
+      "light": "Leichte Rüstung",
+      "medium": "Mittelschwere Rüstung",
+      "heavy": "Schwere Rüstung",
+      "shield": "Schild"
     }
   },
   "update": {

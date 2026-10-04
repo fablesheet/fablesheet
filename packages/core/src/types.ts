@@ -28,6 +28,52 @@ export interface Item {
   requiresAttunement: boolean
   isAttuned: boolean
   notes: string
+  /** Combat stats for weapons (absent for other items) */
+  weapon?: WeaponStats | null
+  /** Armor class stats for armor and shields (absent for other items) */
+  armor?: ArmorStats | null
+}
+
+export type DamageType =
+  | 'acid'
+  | 'bludgeoning'
+  | 'cold'
+  | 'fire'
+  | 'force'
+  | 'lightning'
+  | 'necrotic'
+  | 'piercing'
+  | 'poison'
+  | 'psychic'
+  | 'radiant'
+  | 'slashing'
+  | 'thunder'
+
+export type WeaponProperty =
+  'ammunition' | 'finesse' | 'heavy' | 'light' | 'loading' | 'reach' | 'special' | 'thrown' | 'two-handed' | 'versatile'
+
+export interface WeaponStats {
+  category: 'simple' | 'martial'
+  kind: 'melee' | 'ranged'
+  /** Damage dice such as "1d8" or a flat value such as "1"; null for weapons without damage (net) */
+  damage: string | null
+  damageType: DamageType | null
+  /** Two-handed damage of versatile weapons */
+  versatileDamage: string | null
+  properties: WeaponProperty[]
+  /** Normal/long range in feet, e.g. "80/320" */
+  range: string | null
+}
+
+export interface ArmorStats {
+  type: 'light' | 'medium' | 'heavy' | 'shield'
+  /** Base AC, or the bonus for shields */
+  baseAc: number
+  /** Maximum Dexterity bonus; null = unlimited (light armor). Ignored if addDex is false */
+  dexCap: number | null
+  addDex: boolean
+  strengthRequired: number | null
+  stealthDisadvantage: boolean
 }
 
 // ── Spells ────────────────────────────────────────────────────────────────────

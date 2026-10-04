@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import type { Character, Item, ItemCategory, ItemRarity } from '@fablesheet/core'
-import { carryingLimits } from '@fablesheet/core'
+import { armorClass, carryingLimits } from '@fablesheet/core'
 import { saveJsonFile } from '../services/files'
-import { ITEM_CATALOG } from '@fablesheet/srd-data'
+import { ITEM_CATALOG, withCatalogStats } from '@fablesheet/srd-data'
 import { gameLabel } from '../i18n/game'
+import { ArmorFields, DEFAULT_ARMOR, DEFAULT_WEAPON, WeaponFields } from './ItemStatsFields'
 
 interface Props {
   character: Character
@@ -107,7 +108,8 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
   // ── Helpers ───────────────────────────────────────────────────────────────────
 
   function saveItems(updated: Item[]) {
-    onUpdate({ ...character, items: updated })
+    // Equipped armor and shields determine the armor class
+    onUpdate({ ...character, items: updated, ac: armorClass({ ...character, items: updated }) })
   }
 
   function selectItem(item: Item) {
@@ -138,12 +140,19 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
 
   function handleSave() {
     if (!form.name.trim()) return
+    // Stats only belong to their category; the form shows defaults until edited
+    const normalized: Omit<Item, 'id'> = {
+      ...form,
+      name: form.name.trim(),
+      weapon: form.category === 'Weapon' ? (form.weapon ?? DEFAULT_WEAPON) : null,
+      armor: form.category === 'Armor' ? (form.armor ?? DEFAULT_ARMOR) : null,
+    }
     if (selectedId === 'new') {
-      const newItem: Item = { ...form, name: form.name.trim(), id: crypto.randomUUID() }
+      const newItem: Item = { ...normalized, id: crypto.randomUUID() }
       saveItems([...items, newItem])
       setSelectedId(newItem.id)
     } else if (selectedId) {
-      saveItems(items.map(i => (i.id === selectedId ? { ...form, name: form.name.trim(), id: selectedId } : i)))
+      saveItems(items.map(i => (i.id === selectedId ? { ...normalized, id: selectedId } : i)))
     }
   }
 
@@ -190,6 +199,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
             isAttuned: Boolean(x.isAttuned),
             notes: String(x.notes ?? ''),
           }))
+          .map(withCatalogStats)
 
         if (imported.length === 0) {
           setImportError(t('inventory.noValidItems'))
@@ -710,6 +720,23 @@ function ItemForm({
               />
             </div>
           </div>
+
+          {form.category === 'Weapon' && (
+            <WeaponFields
+              weapon={form.weapon ?? DEFAULT_WEAPON}
+              onChange={w => f('weapon')(w)}
+              inputCls={inputCls}
+              labelCls={labelCls}
+            />
+          )}
+          {form.category === 'Armor' && (
+            <ArmorFields
+              armor={form.armor ?? DEFAULT_ARMOR}
+              onChange={a => f('armor')(a)}
+              inputCls={inputCls}
+              labelCls={labelCls}
+            />
+          )}
 
           {/* Equipped toggle */}
           <div className="flex items-center gap-3">
