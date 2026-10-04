@@ -4,6 +4,7 @@ import type { Character, AbilityName, SkillName, SkillEntry } from '@fablesheet/
 import {
   abilityModifier as mod,
   formatModifier as fmtMod,
+  armorClass,
   CHARACTER_SCHEMA_VERSION,
   proficiencyBonusForLevel,
   spellAttackBonus,
@@ -437,7 +438,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
         charisma: scores.charisma,
       },
       hp: { current: hpMax, max: hpMax, temp: 0 },
-      ac: 10 + dexMod,
+      ac: armorClass({ className: s.className, scores, items: [] }),
       initiativeBonus: dexMod,
       speed: race.speed,
       proficiencyBonus: pb,
@@ -819,7 +820,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                 </div>
                 <div>
                   <div className="text-[#8a6838]">{t('builder.ac')}</div>
-                  <div className="text-ink text-caption">{10 + mod(finalScores.dexterity)}</div>
+                  <div className="text-ink text-caption">
+                    {armorClass({ className: cls.name, scores: finalScores, items: [] })}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[#8a6838]">{t('builder.speed')}</div>

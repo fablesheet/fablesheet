@@ -15,6 +15,9 @@ type GameGroup =
   | 'school'
   | 'currency'
   | 'currencyName'
+  | 'damageType'
+  | 'weaponProperty'
+  | 'armorType'
 
 /**
  * Display label for a game term. Characters store terms in English (e.g. "Lawful Good"),

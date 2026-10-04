@@ -2,6 +2,7 @@
 // Components import only from here — they never touch local.ts or backend.ts directly.
 import type { Character } from '@fablesheet/core'
 import { migrateCharacter } from '@fablesheet/core'
+import { withCatalogStats } from '@fablesheet/srd-data'
 import * as local from './local'
 import * as backend from './backend'
 
@@ -38,12 +39,18 @@ export async function createCharacter(character: Omit<Character, 'id'>): Promise
   return shouldUseRemote() ? backend.backendCreate(character) : local.localCreate(character)
 }
 
+/** Upgrades a stored character and fills in weapon/armor stats for catalog items saved without them. */
+function load(doc: unknown): Character {
+  const character = migrateCharacter(doc)
+  return { ...character, items: character.items.map(withCatalogStats) }
+}
+
 export async function getCharacters(): Promise<Character[]> {
   const raw = shouldUseRemote() ? await backend.backendGetAll() : await local.localGetAll()
   // One unreadable document must not hide all other characters
   return raw.flatMap(doc => {
     try {
-      return [migrateCharacter(doc)]
+      return [load(doc)]
     } catch (e) {
       console.error('Skipping unreadable character', e)
       return []
@@ -52,7 +59,7 @@ export async function getCharacters(): Promise<Character[]> {
 }
 
 export async function getCharacter(id: string): Promise<Character> {
-  return migrateCharacter(shouldUseRemote() ? await backend.backendGetOne(id) : await local.localGetOne(id))
+  return load(shouldUseRemote() ? await backend.backendGetOne(id) : await local.localGetOne(id))
 }
 
 export async function updateCharacter(id: string, character: Character): Promise<Character> {
