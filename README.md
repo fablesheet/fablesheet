@@ -18,6 +18,7 @@ Create characters, track hit points, conditions, spells and inventory — everyt
 - **Inventory** — add items manually or from the SRD equipment catalog, carrying capacity, JSON import/export
 - **Offline-first** — local SQLite database on desktop, works without a connection
 - **Cross-platform** — Linux, Windows and macOS
+- **Multilingual** — English and German (game texts from the SRD are English only)
 
 ## Installation
 

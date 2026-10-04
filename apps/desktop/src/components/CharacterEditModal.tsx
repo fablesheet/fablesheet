@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Character } from '@fablesheet/core'
 import { characterFileName, exportCharacter } from '@fablesheet/core'
 import { updateCharacter, deleteCharacter } from '../services/api'
 import { saveJsonFile } from '../services/files'
+import { gameLabel } from '../i18n/game'
 
 const ALIGNMENTS = [
   'Lawful Good',
@@ -24,6 +26,7 @@ interface Props {
 }
 
 export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: Props) {
+  const { t } = useTranslation()
   const [name, setName] = useState(character.name)
   const [level, setLevel] = useState(character.level)
   const [xp, setXp] = useState(character.experiencePoints)
@@ -64,7 +67,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
     try {
       if (await saveJsonFile(characterFileName(character), exportCharacter(character))) setExported(true)
     } catch (e) {
-      setError(`Export failed: ${String(e)}`)
+      setError(t('edit.exportFailed', { error: String(e) }))
     }
   }
 
@@ -109,7 +112,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
           <span className="text-gold-dim text-deco">✦</span>
         </div>
         <div className="font-fell-sc text-badge text-[#7a5820] text-center mb-3 tracking-[0.1em]">
-          {character.race} {character.className}
+          {gameLabel(t, 'race', character.race)} {gameLabel(t, 'class', character.className)}
         </div>
 
         <div
@@ -120,13 +123,13 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
         {/* Form */}
         <div className="px-6 pt-4 pb-3 flex flex-col gap-[clamp(10px,1.4vh,18px)]">
           <div>
-            <label className={labelCls}>Name</label>
+            <label className={labelCls}>{t('edit.name')}</label>
             <input className={inputCls} value={name} onChange={e => setName(e.target.value)} maxLength={60} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Level</label>
+              <label className={labelCls}>{t('edit.level')}</label>
               <input
                 className={inputCls}
                 type="number"
@@ -137,7 +140,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
               />
             </div>
             <div>
-              <label className={labelCls}>Experience</label>
+              <label className={labelCls}>{t('edit.experience')}</label>
               <input
                 className={inputCls}
                 type="number"
@@ -149,19 +152,19 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
           </div>
 
           <div>
-            <label className={labelCls}>Subclass</label>
+            <label className={labelCls}>{t('edit.subclass')}</label>
             <input
               className={inputCls}
               value={subclass}
               onChange={e => setSubclass(e.target.value)}
-              placeholder="None yet"
+              placeholder={t('edit.subclassPlaceholder')}
               maxLength={60}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Background</label>
+              <label className={labelCls}>{t('edit.background')}</label>
               <input
                 className={inputCls}
                 value={background}
@@ -170,11 +173,11 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
               />
             </div>
             <div>
-              <label className={labelCls}>Alignment</label>
+              <label className={labelCls}>{t('edit.alignment')}</label>
               <select className={inputCls} value={alignment} onChange={e => setAlignment(e.target.value)}>
                 {ALIGNMENTS.map(a => (
                   <option key={a} value={a}>
-                    {a}
+                    {gameLabel(t, 'alignment', a)}
                   </option>
                 ))}
               </select>
@@ -189,7 +192,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
               className="flex-1 font-cinzel text-caption tracking-[0.12em] text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-[clamp(5px,0.7vh,10px)] rounded-sm cursor-pointer transition-colors hover:border-[rgba(100,70,20,0.5)] hover:text-[#5a4020]"
               style={{ background: 'rgba(90,60,10,0.06)' }}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
@@ -197,7 +200,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
               className="flex-[2] font-cinzel text-caption tracking-[0.12em] text-[#e8d090] border border-[rgba(100,70,20,0.5)] py-[clamp(5px,0.7vh,10px)] rounded-sm cursor-pointer transition-colors hover:border-[rgba(200,168,75,0.6)] hover:text-gold disabled:opacity-40 disabled:cursor-default"
               style={{ background: 'linear-gradient(160deg, #3a2208 0%, #2a1606 100%)' }}
             >
-              {saving ? 'Saving…' : 'Save Changes'}
+              {saving ? t('common.saving') : t('common.saveChanges')}
             </button>
           </div>
         </div>
@@ -209,7 +212,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
             className="w-full font-cinzel text-caption tracking-[0.15em] text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-[clamp(5px,0.6vh,9px)] rounded-sm cursor-pointer transition-colors hover:border-[rgba(100,70,20,0.5)] hover:text-[#5a4020]"
             style={{ background: 'rgba(90,60,10,0.06)' }}
           >
-            {exported ? '✓ Exported' : '↓ Export Character'}
+            {exported ? t('edit.exported') : t('edit.export')}
           </button>
         </div>
 
@@ -226,20 +229,18 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
               onClick={() => setConfirmDelete(true)}
               className="w-full font-cinzel text-caption tracking-[0.15em] text-red-ink border border-[rgba(139,26,26,0.25)] py-[clamp(5px,0.6vh,9px)] rounded-sm cursor-pointer transition-colors hover:border-[rgba(139,26,26,0.5)] hover:bg-[rgba(139,26,26,0.06)]"
             >
-              Delete Character
+              {t('edit.delete')}
             </button>
           ) : (
             <div className="flex flex-col gap-2">
-              <p className="font-fell text-caption text-[#8a3020] text-center italic">
-                This cannot be undone. Are you sure?
-              </p>
+              <p className="font-fell text-caption text-[#8a3020] text-center italic">{t('edit.deleteConfirm')}</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmDelete(false)}
                   className="flex-1 font-cinzel text-deco text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-1.5 rounded-sm cursor-pointer transition-colors hover:border-[rgba(100,70,20,0.5)]"
                   style={{ background: 'rgba(90,60,10,0.06)' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleDelete}
@@ -247,7 +248,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
                   className="flex-[2] font-cinzel text-deco text-[#eec0a8] border border-[rgba(139,26,26,0.45)] py-1.5 rounded-sm cursor-pointer transition-colors hover:border-[rgba(139,26,26,0.65)] disabled:opacity-40 disabled:cursor-default"
                   style={{ background: 'linear-gradient(160deg, #4a0808 0%, #360606 100%)' }}
                 >
-                  {deleting ? 'Deleting…' : 'Yes, Delete'}
+                  {deleting ? t('edit.deleting') : t('edit.deleteYes')}
                 </button>
               </div>
             </div>

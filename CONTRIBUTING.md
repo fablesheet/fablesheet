@@ -44,6 +44,12 @@ Common types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`.
 
 Releases are automated with [release-please](https://github.com/googleapis/release-please): `feat` and `fix` commits on `main` end up in the changelog and determine the next version, so there is no need to edit `CHANGELOG.md` by hand.
 
+## Translations
+
+UI texts live in `apps/desktop/src/i18n/locales/<language>.json`. To add a language, copy `en.json`, translate the values (not the keys) and register it in `apps/desktop/src/i18n/index.ts`. A test checks that all languages have the same keys and placeholders.
+
+Stored character data always uses the English terms (e.g. `"Lawful Good"`); translations only affect what is displayed.
+
 ## Game content rules
 
 Fablesheet may only ship game content that is published under an open license.
