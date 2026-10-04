@@ -33,7 +33,7 @@ Builds are not code-signed yet, so Windows SmartScreen and macOS Gatekeeper may 
 
 ## Development
 
-Requirements: [Node.js](https://nodejs.org) ≥ 20, [Rust](https://rustup.rs) (stable) and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your OS.
+Requirements: [Node.js](https://nodejs.org) ≥ 22, [Rust](https://rustup.rs) (stable) and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your OS.
 
 ```bash
 npm install          # install all workspace dependencies
