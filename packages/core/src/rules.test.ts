@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   abilityModifier,
+  applyDamage,
+  applyHealing,
   carryingLimits,
   changeLevel,
   formatModifier,
@@ -141,5 +143,30 @@ describe('hitDieSize', () => {
     expect(hitDieSize('d12')).toBe(12)
     expect(hitDieSize('D6')).toBe(6)
     expect(hitDieSize('??')).toBe(8)
+  })
+})
+
+describe('applyDamage / applyHealing', () => {
+  const hero = migrateCharacter({ id: 'h', name: 'Hero', hp: { current: 10, max: 20, temp: 5 } })
+
+  it('removes temporary hit points first', () => {
+    expect(applyDamage(hero, 3).hp).toEqual({ current: 10, max: 20, temp: 2 })
+    expect(applyDamage(hero, 8).hp).toEqual({ current: 7, max: 20, temp: 0 })
+  })
+
+  it('does not go below 0', () => {
+    expect(applyDamage(hero, 100).hp.current).toBe(0)
+  })
+
+  it('heals up to the maximum and resets death saves when healed from 0', () => {
+    expect(applyHealing(hero, 50).hp.current).toBe(20)
+    const down = { ...hero, hp: { current: 0, max: 20, temp: 0 }, deathSaves: { successes: 1, failures: 2 } }
+    expect(applyHealing(down, 4)).toMatchObject({ hp: { current: 4 }, deathSaves: { successes: 0, failures: 0 } })
+  })
+
+  it('ignores negative or fractional amounts', () => {
+    expect(applyDamage(hero, -5)).toEqual(hero)
+    expect(applyHealing(hero, 0)).toBe(hero)
+    expect(applyDamage(hero, 2.9).hp.temp).toBe(3)
   })
 })

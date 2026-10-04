@@ -117,3 +117,25 @@ export function changeLevel(character: Character, newLevel: number): Character {
       castingScore !== undefined ? spellAttackBonus(castingScore, proficiencyBonus) : character.spellAttackBonus,
   }
 }
+
+// ── Hit points ────────────────────────────────────────────────────────────────
+
+/** Damage removes temporary hit points first, then current hit points (not below 0). */
+export function applyDamage(character: Character, amount: number): Character {
+  const damage = Math.max(0, Math.floor(amount))
+  const fromTemp = Math.min(character.hp.temp, damage)
+  const current = Math.max(0, character.hp.current - (damage - fromTemp))
+  return { ...character, hp: { ...character.hp, temp: character.hp.temp - fromTemp, current } }
+}
+
+/** Healing raises current hit points up to the maximum; regaining HP from 0 resets death saves. */
+export function applyHealing(character: Character, amount: number): Character {
+  const healing = Math.max(0, Math.floor(amount))
+  if (healing === 0) return character
+  const current = Math.min(character.hp.max, character.hp.current + healing)
+  return {
+    ...character,
+    hp: { ...character.hp, current },
+    deathSaves: character.hp.current === 0 ? { successes: 0, failures: 0 } : character.deathSaves,
+  }
+}

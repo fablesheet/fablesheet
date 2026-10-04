@@ -462,5 +462,27 @@
     "themeLight": "Hell",
     "themeDark": "Dunkel",
     "done": "Fertig"
+  },
+  "table": {
+    "rest": "Rasten",
+    "shortRest": "Kurze Rast",
+    "longRest": "Lange Rast",
+    "restNow": "Rasten",
+    "allCharacters": "Alle Charaktere",
+    "backToTable": "Tisch",
+    "sheet": "Charakterbogen",
+    "sheetHint": "Werte und Kampf",
+    "spellbook": "Zauberbuch",
+    "spellCount_one": "{{count}} Zauber",
+    "spellCount_other": "{{count}} Zauber",
+    "backpack": "Rucksack",
+    "journal": "Tagebuch",
+    "journalHint": "Notizen und Geschichte",
+    "abilitiesAndSaves": "Attribute und Rettungswürfe",
+    "save": "RW",
+    "tempHp": "Temp. TP",
+    "amount": "Wert",
+    "damage": "Schaden",
+    "heal": "Heilen"
   }
 }
