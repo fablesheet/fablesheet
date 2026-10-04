@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.0](https://github.com/fablesheet/fablesheet/compare/v0.2.0...v0.3.0) (2026-10-04)
+
+
+### Features
+
+* calculate armor class and show weapon attacks ([#21](https://github.com/fablesheet/fablesheet/issues/21)) ([1ccd13b](https://github.com/fablesheet/fablesheet/commit/1ccd13bb11134ac4a3cb7591e6ab0031e272d0e3))
+* edit currency and write notes in Markdown ([#20](https://github.com/fablesheet/fablesheet/issues/20)) ([75890b5](https://github.com/fablesheet/fablesheet/commit/75890b532c6cae2ff7640cb3b8b3207a44cea721))
+* track spell slots and take short and long rests ([#19](https://github.com/fablesheet/fablesheet/issues/19)) ([397e0dc](https://github.com/fablesheet/fablesheet/commit/397e0dc784a4c1dee0e640b002cfe539a538e20d))
+
+
+### Bug Fixes
+
+* include macOS in automatic updates ([#17](https://github.com/fablesheet/fablesheet/issues/17)) ([76235ef](https://github.com/fablesheet/fablesheet/commit/76235efc6bdd10df2eac4d8d6d23f41387fa799c))
+* recalculate level-dependent values and keep personality ([#18](https://github.com/fablesheet/fablesheet/issues/18)) ([da7fa91](https://github.com/fablesheet/fablesheet/commit/da7fa9136ae6578405b55f285ef9053f0c996d02))
+
 ## [0.2.0](https://github.com/fablesheet/fablesheet/compare/v0.1.0...v0.2.0) (2026-10-04)
 
 
