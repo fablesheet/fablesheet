@@ -23,11 +23,11 @@ Create characters, track hit points, conditions, spells and inventory — everyt
 
 Download the latest build for your platform from the [Releases page](https://github.com/fablesheet/fablesheet/releases).
 
-| Platform | Package                       |
-| -------- | ----------------------------- |
-| Windows  | `.msi` or `.exe` installer    |
-| macOS    | `.dmg`                        |
-| Linux    | `.AppImage`, `.deb` or `.rpm` |
+| Platform | Package                        |
+| -------- | ------------------------------ |
+| Windows  | `.msi` or `.exe` installer     |
+| macOS    | `.dmg` (Apple Silicon + Intel) |
+| Linux    | `.AppImage`, `.deb` or `.rpm`  |
 
 Builds are not code-signed yet, so Windows SmartScreen and macOS Gatekeeper may show a warning. See the [installation guide](docs/installation.md) for how to continue.
 
