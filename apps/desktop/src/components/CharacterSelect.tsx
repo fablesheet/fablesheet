@@ -2,44 +2,31 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character } from '@fablesheet/core'
 import { armorClass, CharacterMigrationError, importCharacter } from '@fablesheet/core'
+import logo from '../assets/logo.svg'
 import { createCharacter, getCharacters } from '../services/api'
 import { openJsonFile } from '../services/files'
-import { SettingsDialog } from './SettingsDialog'
 import { gameLabel } from '../i18n/game'
 import { CharacterEditModal } from './CharacterEditModal'
+import { SettingsDialog } from './SettingsDialog'
+import { Button } from './ui/Button'
 
 interface Props {
   onSelect: (character: Character) => void
   onCreateNew: () => void
 }
 
-const CLASS_SYMBOL: Record<string, string> = {
-  Wizard: '✦',
-  Fighter: '⚔',
-  Cleric: '☩',
-  Rogue: '◈',
-  Ranger: '◎',
-  Bard: '♪',
-  Paladin: '✠',
-  Barbarian: '⚡',
-  Druid: '✿',
-  Monk: '◯',
-  Sorcerer: '✧',
-  Warlock: '◆',
-}
-
 export function CharacterSelect({ onSelect, onCreateNew }: Props) {
   const { t } = useTranslation()
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [savedChars, setSavedChars] = useState<Character[]>([])
+  const [characters, setCharacters] = useState<Character[]>([])
   const [loading, setLoading] = useState(true)
-  const [editingChar, setEditingChar] = useState<Character | null>(null)
+  const [editing, setEditing] = useState<Character | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
 
   useEffect(() => {
     getCharacters()
-      .then(setSavedChars)
-      .catch(() => setSavedChars([]))
+      .then(setCharacters)
+      .catch(() => setCharacters([]))
       .finally(() => setLoading(false))
   }, [])
 
@@ -49,7 +36,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
       const file = await openJsonFile()
       if (file === null) return
       const created = await createCharacter(importCharacter(file))
-      setSavedChars(prev => [...prev, created])
+      setCharacters(prev => [...prev, created])
     } catch (e) {
       if (e instanceof CharacterMigrationError) setImportError(e.message)
       else if (e instanceof SyntaxError) setImportError(t('select.importNotJson'))
@@ -57,210 +44,138 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
     }
   }
 
-  function handleSaved(updated: Character) {
-    setSavedChars(prev => prev.map(c => (c.id === updated.id ? updated : c)))
-    setEditingChar(null)
-  }
-
-  function handleDeleted(id: string) {
-    setSavedChars(prev => prev.filter(c => c.id !== id))
-    setEditingChar(null)
-  }
-
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center gap-[clamp(20px,3vh,48px)] bg-dungeon animate-fade-up">
-      {/* ── Header ── */}
-      <header className="text-center">
-        <div className="font-cinzel text-[#4a3818] text-deco tracking-[0.9em] mb-[clamp(8px,1vh,16px)]">✦ · ⚔ · ✦</div>
-        <h1
-          className="font-cinzel-deco text-hero text-gold tracking-[0.1em] leading-[1.1]"
-          style={{ textShadow: '0 0 40px rgba(200,168,75,0.35), 0 2px 6px rgba(0,0,0,0.8)' }}
-        >
-          Fablesheet
-        </h1>
-        <p className="font-fell-sc text-[#7a6035] text-caption tracking-[0.35em] uppercase mt-[clamp(6px,1vh,14px)]">
-          {t('select.subtitle')}
-        </p>
+    <div className="w-screen h-dvh flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
+      <header className="flex items-center gap-3 px-2 pt-1">
+        <img src={logo} alt="" className="size-10 rounded-lg" />
+        <div className="flex-1 min-w-0">
+          <h1 className="font-display text-2xl font-medium leading-tight m-0 text-fs-bar-text">Fablesheet</h1>
+          <p className="text-xs text-fs-bar-muted m-0">{t('select.subtitle')}</p>
+        </div>
+        <Button onBar variant="ghost" onClick={() => setSettingsOpen(true)}>
+          ⚙ <span className="hidden sm:inline">{t('settings.title')}</span>
+        </Button>
       </header>
 
-      {/* ── Cards ── */}
-      <div className="flex gap-[clamp(14px,1.8vw,36px)] flex-wrap justify-center max-w-[90vw]">
+      <main
+        className="flex-1 min-h-0 overflow-y-auto parchment-scroll bg-fs-table border border-fs-table-line rounded-2xl p-6 lg:p-10"
+        style={{ backgroundImage: 'radial-gradient(ellipse at 50% 35%, rgba(201,154,79,0.08), transparent 65%)' }}
+      >
         {loading ? (
-          <div className="font-fell text-[#4a3818] text-body animate-pulse">{t('select.loading')}</div>
+          <p className="text-fs-bar-muted text-center mt-20 animate-pulse">{t('select.loading')}</p>
         ) : (
           <>
-            {savedChars.map(char => (
-              <CharacterCard key={char.id} char={char} onSelect={onSelect} onEdit={c => setEditingChar(c)} />
-            ))}
-
-            {/* New character button */}
-            <button
-              onClick={onCreateNew}
-              className="group relative w-[clamp(160px,14vw,240px)] px-[clamp(12px,1.2vw,20px)] py-[clamp(16px,2vh,28px)] border-2 border-dashed border-[rgba(100,70,20,0.3)] rounded-sm cursor-pointer text-center transition-all duration-200 hover:border-[rgba(200,168,75,0.5)] hover:bg-[rgba(100,70,20,0.06)] hover:-translate-y-1"
-            >
-              <div className="text-[clamp(1.6rem,2.4vw,3rem)] text-[#4a3818] group-hover:text-gold transition-colors mb-2 leading-none">
-                +
+            {characters.length === 0 && (
+              <div className="text-center max-w-md mx-auto mt-6 mb-10">
+                <h2 className="font-display text-xl font-medium text-fs-bar-text m-0">{t('select.welcomeTitle')}</h2>
+                <p className="text-sm text-fs-bar-muted mt-2">{t('select.welcomeText')}</p>
               </div>
-              <div className="font-cinzel text-caption tracking-widest text-[#5a3818] group-hover:text-gold transition-colors uppercase">
-                {t('select.newCharacter')}
-              </div>
-            </button>
-
-            {/* Import character button */}
-            <button
-              onClick={handleImport}
-              className="group relative w-[clamp(160px,14vw,240px)] px-[clamp(12px,1.2vw,20px)] py-[clamp(16px,2vh,28px)] border-2 border-dashed border-[rgba(100,70,20,0.3)] rounded-sm cursor-pointer text-center transition-all duration-200 hover:border-[rgba(200,168,75,0.5)] hover:bg-[rgba(100,70,20,0.06)] hover:-translate-y-1"
-            >
-              <div className="text-[clamp(1.6rem,2.4vw,3rem)] text-[#4a3818] group-hover:text-gold transition-colors mb-2 leading-none">
-                ↑
-              </div>
-              <div className="font-cinzel text-caption tracking-widest text-[#5a3818] group-hover:text-gold transition-colors uppercase">
-                {t('select.importCharacter')}
-              </div>
-            </button>
+            )}
+            <ul className="m-0 p-0 list-none flex flex-wrap justify-center gap-5 max-w-6xl mx-auto [&>li]:w-56">
+              {characters.map(c => (
+                <li key={c.id}>
+                  <CharacterCard character={c} onOpen={() => onSelect(c)} onEdit={() => setEditing(c)} />
+                </li>
+              ))}
+              <li>
+                <AddCard icon="+" label={t('select.newCharacter')} onClick={onCreateNew} />
+              </li>
+              <li>
+                <AddCard icon="↑" label={t('select.importCharacter')} onClick={handleImport} />
+              </li>
+            </ul>
+            {importError && <p className="text-sm text-fs-danger text-center mt-4">{importError}</p>}
           </>
         )}
-      </div>
-
-      {importError && <p className="font-fell text-caption text-red-ink italic">{importError}</p>}
-
-      {/* ── Footer ── */}
-      <footer className="flex items-center gap-3 text-[#3a2810] font-fell-sc text-caption">
-        <span>✦</span>
-        <span
-          className="w-[72px] h-px"
-          style={{ background: 'linear-gradient(to right, transparent, #4a3018, transparent)' }}
-        />
-        <button
-          onClick={() => setSettingsOpen(true)}
-          className="fs-focus font-ui text-sm text-[#8a7040] bg-transparent border-none cursor-pointer transition-colors hover:text-gold-dim px-2 py-1"
-        >
-          ⚙ {t('settings.title')}
-        </button>
-        <span
-          className="w-[72px] h-px"
-          style={{ background: 'linear-gradient(to right, transparent, #4a3018, transparent)' }}
-        />
-        <span>✦</span>
-      </footer>
+      </main>
 
       {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
-
-      {/* ── Edit modal ── */}
-      {editingChar && (
+      {editing && (
         <CharacterEditModal
-          character={editingChar}
-          onSaved={handleSaved}
-          onDeleted={() => handleDeleted(editingChar.id)}
-          onClose={() => setEditingChar(null)}
+          character={editing}
+          onSaved={updated => {
+            setCharacters(prev => prev.map(c => (c.id === updated.id ? updated : c)))
+            setEditing(null)
+          }}
+          onDeleted={() => {
+            setCharacters(prev => prev.filter(c => c.id !== editing.id))
+            setEditing(null)
+          }}
+          onClose={() => setEditing(null)}
         />
       )}
     </div>
   )
 }
 
-// ── Character card sub-component ─────────────────────────────────────────────
-
-interface CardProps {
-  char: Character
-  onSelect: (c: Character) => void
-  onEdit: (c: Character) => void
-}
-
-function CharacterCard({ char, onSelect, onEdit }: CardProps) {
+function CharacterCard({
+  character: c,
+  onOpen,
+  onEdit,
+}: {
+  character: Character
+  onOpen: () => void
+  onEdit: () => void
+}) {
   const { t } = useTranslation()
+  const percent = Math.max(0, Math.min(100, (c.hp.current / c.hp.max) * 100))
   return (
-    <div className="group relative w-[clamp(160px,14vw,240px)]">
-      {/* Main card — click to open sheet */}
+    <div className="group relative h-full">
       <button
-        onClick={() => onSelect(char)}
-        className="w-full px-[clamp(12px,1.2vw,20px)] py-[clamp(14px,1.8vh,24px)] bg-parchment-card shadow-card hover:shadow-card-hover rounded-sm cursor-pointer text-center font-fell-sc transition-[transform,box-shadow] duration-200 hover:-translate-y-2 hover:scale-[1.02] active:-translate-y-1 active:scale-[1.01]"
+        onClick={onOpen}
+        className="fs-focus w-full h-full flex flex-col items-center text-center gap-2 px-4 pt-6 pb-4 bg-fs-card text-fs-ink border border-fs-card-line rounded-fs shadow-lg cursor-pointer transition-transform duration-200 hover:-translate-y-1.5 hover:rotate-[-0.6deg]"
       >
-        {/* Corner ornaments */}
-        {(['tl', 'bl', 'br'] as const).map(pos => (
-          <span
-            key={pos}
-            className={[
-              'absolute text-gold-dim text-deco opacity-60 leading-none pointer-events-none',
-              pos === 'tl' ? 'top-1.5 left-2' : pos === 'bl' ? 'bottom-1.5 left-2' : 'bottom-1.5 right-2',
-            ].join(' ')}
-          >
-            ✦
+        <span className="size-14 rounded-full border-2 border-fs-brass text-fs-brass font-display text-2xl flex items-center justify-center">
+          {c.name.trim().charAt(0).toUpperCase() || '?'}
+        </span>
+        <span className="font-display text-lg leading-tight mt-1">{c.name}</span>
+        <span className="text-xs text-fs-ink-muted">
+          {gameLabel(t, 'race', c.race)} · {gameLabel(t, 'class', c.className)} ·{' '}
+          {t('common.level', { level: c.level })}
+        </span>
+        <span className="w-full h-px bg-fs-card-line my-1.5" />
+        <span className="w-full grid grid-cols-3 text-xs text-fs-ink-muted">
+          <span>
+            <span className="block font-display text-base text-fs-ink">
+              {c.hp.current}/{c.hp.max}
+            </span>
+            {t('select.hp')}
           </span>
-        ))}
-
-        <div
-          className="text-[clamp(1.6rem,2.4vw,3.2rem)] mb-[clamp(5px,0.8vh,12px)] leading-none text-[#5a3010]"
-          style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}
-        >
-          {CLASS_SYMBOL[char.className] ?? '◈'}
-        </div>
-
-        <div className="font-fell-sc text-subhead font-semibold text-ink leading-[1.2] mb-1">{char.name}</div>
-        <div className="font-fell-sc text-caption text-[#6b4a20] tracking-[0.06em]">
-          {gameLabel(t, 'race', char.race)}
-        </div>
-
-        <div
-          className="h-px my-[clamp(5px,0.8vh,12px)] mx-1"
-          style={{ background: 'linear-gradient(to right, transparent, rgba(100,70,20,0.4), transparent)' }}
-        />
-
-        <div className="font-fell-sc text-caption text-red-ink italic leading-[1.3]">
-          {gameLabel(t, 'class', char.className)}
-          {char.subclass ? ` · ${char.subclass}` : ''}
-        </div>
-        <div className="font-cinzel text-badge text-[#7a5820] tracking-[0.15em] uppercase mt-1">
-          {t('common.level', { level: char.level })}
-        </div>
-
-        <div
-          className="h-px my-[clamp(5px,0.8vh,12px)] mx-1"
-          style={{ background: 'linear-gradient(to right, transparent, rgba(100,70,20,0.4), transparent)' }}
-        />
-
-        <div className="flex items-center justify-center gap-2">
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">{t('select.hp')}</span>
-            <span className="font-fell-sc text-caption text-red-ink">
-              {char.hp.current}/{char.hp.max}
+          <span>
+            <span className="block font-display text-base text-fs-ink">{armorClass(c)}</span>
+            {t('select.ac')}
+          </span>
+          <span>
+            <span className="block font-display text-base text-fs-ink">
+              {c.alignment ? gameLabel(t, 'alignmentShort', c.alignment) : '—'}
             </span>
-          </div>
-          <span className="font-fell-sc text-caption text-[#9a8050] mt-1.5">·</span>
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">{t('select.ac')}</span>
-            <span className="font-fell-sc text-caption text-[#2a4a28]">{armorClass(char)}</span>
-          </div>
-          <span className="font-fell-sc text-caption text-[#9a8050] mt-1.5">·</span>
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-cinzel text-deco tracking-[0.1em] text-[#8a6838] uppercase">
-              {t('select.alignmentShort')}
-            </span>
-            <span className="font-fell-sc text-caption text-ink-light">
-              {char.alignment ? gameLabel(t, 'alignmentShort', char.alignment) : '—'}
-            </span>
-          </div>
-        </div>
-
-        {char.spellcastingAbility && (
-          <div className="mt-[clamp(5px,0.8vh,10px)] font-cinzel text-deco tracking-[0.1em] text-gold-dim uppercase">
-            {t('select.caster', { ability: gameLabel(t, 'abilityShort', char.spellcastingAbility) })}
-          </div>
-        )}
+            {t('select.alignmentShort')}
+          </span>
+        </span>
+        <span className="w-full h-1 rounded-full bg-fs-track overflow-hidden mt-1">
+          <span className="block h-full bg-fs-good" style={{ width: `${percent}%` }} />
+        </span>
       </button>
-
-      {/* Edit button — top-right corner, visible on hover */}
       <button
-        onClick={e => {
-          e.stopPropagation()
-          onEdit(char)
-        }}
-        className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-sm text-deco text-[#8a7040] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer border border-transparent hover:border-[rgba(100,70,20,0.35)] hover:text-gold hover:bg-[rgba(90,60,10,0.12)]"
+        onClick={onEdit}
         title={t('select.editCharacter')}
         aria-label={t('select.editCharacter')}
+        className="fs-focus absolute top-2 right-2 size-9 rounded-lg flex items-center justify-center bg-transparent border-none cursor-pointer text-fs-ink-muted opacity-60 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-fs-hover hover:text-fs-ink"
       >
         ✎
       </button>
     </div>
+  )
+}
+
+function AddCard({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="fs-focus w-full h-full min-h-56 flex flex-col items-center justify-center gap-3 rounded-fs border-2 border-dashed border-fs-table-line bg-transparent cursor-pointer text-fs-bar-muted transition-colors hover:border-fs-accent hover:text-fs-accent"
+    >
+      <span className="text-4xl leading-none">{icon}</span>
+      <span className="font-display text-sm tracking-wider">{label}</span>
+    </button>
   )
 }
