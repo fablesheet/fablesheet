@@ -9,7 +9,7 @@ import { CharacterHeader } from './components/CharacterHeader'
 import { RestDialog } from './components/RestDialog'
 import { SheetView } from './components/sheet/SheetView'
 import { TableView, type TableObject } from './components/table/TableView'
-import { SpellBook } from './components/SpellBook'
+import { SpellbookView } from './components/spellbook/SpellbookView'
 import { Inventory } from './components/Inventory'
 import { NotesPage } from './components/NotesPage'
 import { UpdateBanner } from './components/UpdateBanner'
@@ -64,9 +64,6 @@ function Screens() {
   }
 
   // Objects that still use their own full-screen layout
-  if (view === 'spellbook') {
-    return <SpellBook character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
-  }
   if (view === 'inventory') {
     return <Inventory character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
   }
@@ -89,6 +86,8 @@ function Screens() {
     >
       {onTable ? (
         <TableView character={character} onOpen={setView} />
+      ) : view === 'spellbook' ? (
+        <SpellbookView character={character} onUpdate={handleUpdate} />
       ) : (
         <SheetView character={character} onUpdate={handleUpdate} />
       )}

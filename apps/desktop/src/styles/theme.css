@@ -122,3 +122,31 @@
     outline-offset: 2px;
   }
 }
+
+/* Page turning in the spellbook */
+@keyframes fs-page-next {
+  from {
+    opacity: 0.35;
+    transform: perspective(1800px) rotateY(-7deg) translateX(16px);
+    transform-origin: left center;
+  }
+}
+@keyframes fs-page-prev {
+  from {
+    opacity: 0.35;
+    transform: perspective(1800px) rotateY(7deg) translateX(-16px);
+    transform-origin: right center;
+  }
+}
+.animate-page-next {
+  animation: fs-page-next 260ms ease-out;
+}
+.animate-page-prev {
+  animation: fs-page-prev 260ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-next,
+  .animate-page-prev {
+    animation: none;
+  }
+}

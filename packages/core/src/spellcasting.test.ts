@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clampUsedSlots, spellSlotMaximums } from './spellcasting'
+import { availableSlotLevels, clampUsedSlots, expendSlot, spellSlotMaximums } from './spellcasting'
 
 describe('spellSlotMaximums', () => {
   it('follows the full caster table', () => {
@@ -29,5 +29,22 @@ describe('spellSlotMaximums', () => {
 describe('clampUsedSlots', () => {
   it('keeps used slots within the maximums', () => {
     expect(clampUsedSlots([3, 2, 1], [2, 0, 0, 0, 0, 0, 0, 0, 0])).toEqual([2, 0, 0, 0, 0, 0, 0, 0, 0])
+  })
+})
+
+describe('casting', () => {
+  const wizard = { className: 'Wizard', level: 5, spellSlotsUsed: [4, 1, 0, 0, 0, 0, 0, 0, 0] }
+
+  it('lists slot levels that can cast a spell, lowest first', () => {
+    expect(availableSlotLevels(wizard, 1)).toEqual([2, 3])
+    expect(availableSlotLevels(wizard, 3)).toEqual([3])
+    expect(availableSlotLevels(wizard, 4)).toEqual([])
+    expect(availableSlotLevels(wizard, 0)).toEqual([])
+  })
+
+  it('expends a slot only if one is left', () => {
+    expect(expendSlot(wizard, 2).spellSlotsUsed).toEqual([4, 2, 0, 0, 0, 0, 0, 0, 0])
+    expect(expendSlot(wizard, 1)).toBe(wizard)
+    expect(expendSlot(wizard, 9)).toBe(wizard)
   })
 })

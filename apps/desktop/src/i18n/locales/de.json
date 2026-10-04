@@ -163,7 +163,17 @@
     "preparedBadge": "✦ Vorbereitet",
     "prepareButton": "○ Vorbereiten",
     "selectSpell": "Wähle einen Zauber, um seine Beschwörung zu lesen.",
-    "contentNote": "Zaubertexte stammen aus dem SRD 5.1 und sind nur auf Englisch verfügbar."
+    "contentNote": "Zaubertexte stammen aus dem SRD 5.1 und sind nur auf Englisch verfügbar.",
+    "library": "Bibliothek",
+    "castDone": "Zauberplatz des {{level}}. Grades verbraucht.",
+    "cantripHint": "Zaubertricks brauchen keinen Zauberplatz.",
+    "noSlotsAtLevel": "Noch keine Zauberplätze dieses Grades.",
+    "school": "Schule",
+    "allSchools": "Alle Schulen",
+    "cast": "Wirken",
+    "castAt": "Platz {{level}}. Grades",
+    "slotLevel": "Grad des Zauberplatzes",
+    "noSlotsLeft": "Keine Zauberplätze mehr frei – Zeit für eine Rast."
   },
   "inventory": {
     "title": "Inventar von <name>{{name}}</name>",
