@@ -87,7 +87,7 @@ mod tests {
                 '[\"The tome I carry is the record of my life work.\"]',
                 '[\"I would do almost anything to uncover historical secrets.\"]',
                 'High Elf with timeless grace.',
-                'A devotee of Oghma who has dedicated their life to scholarship.',
+                'A devotee of the god of knowledge who has dedicated their life to scholarship.',
                 ''
             )",
             rusqlite::params![race_json, background_json],

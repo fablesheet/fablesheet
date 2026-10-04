@@ -4,7 +4,8 @@
 
 ## Checklist
 
-- [ ] `npm run typecheck` and `npm run build` pass
-- [ ] `cargo fmt --all --check` and `cargo test --workspace` pass
+- [ ] The PR title follows Conventional Commits (e.g. `feat: add spell slots`)
+- [ ] `npm run lint`, `npm run typecheck` and `npm test` pass
+- [ ] `cargo clippy` and `cargo test --workspace` pass
+- [ ] Tests added or updated for changed rules/logic
 - [ ] Any added game content is from the SRD 5.1 (see CONTRIBUTING.md)
-- [ ] User-facing changes are noted in `CHANGELOG.md` under "Unreleased"

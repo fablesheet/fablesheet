@@ -9,19 +9,36 @@ interface Props {
 }
 
 const SCHOOL_COLOR: Record<string, string> = {
-  Abjuration: '#4a6fa5', Conjuration: '#7a5c8a', Divination: '#3a7a5a',
-  Enchantment: '#8a4a6a', Evocation: '#8a3020', Illusion: '#4a6a8a',
-  Necromancy: '#4a5a38', Transmutation: '#7a6a1a',
+  Abjuration: '#4a6fa5',
+  Conjuration: '#7a5c8a',
+  Divination: '#3a7a5a',
+  Enchantment: '#8a4a6a',
+  Evocation: '#8a3020',
+  Illusion: '#4a6a8a',
+  Necromancy: '#4a5a38',
+  Transmutation: '#7a6a1a',
 }
 
 const SCHOOL_SYMBOL: Record<string, string> = {
-  Abjuration: '◎', Conjuration: '◈', Divination: '◉', Enchantment: '◐',
-  Evocation: '◆', Illusion: '◌', Necromancy: '◑', Transmutation: '◒',
+  Abjuration: '◎',
+  Conjuration: '◈',
+  Divination: '◉',
+  Enchantment: '◐',
+  Evocation: '◆',
+  Illusion: '◌',
+  Necromancy: '◑',
+  Transmutation: '◒',
 }
 
 const ALL_SCHOOLS: SpellSchool[] = [
-  'Abjuration', 'Conjuration', 'Divination', 'Enchantment',
-  'Evocation', 'Illusion', 'Necromancy', 'Transmutation',
+  'Abjuration',
+  'Conjuration',
+  'Divination',
+  'Enchantment',
+  'Evocation',
+  'Illusion',
+  'Necromancy',
+  'Transmutation',
 ]
 
 function ordinalSuffix(n: number) {
@@ -33,8 +50,8 @@ function ordinalSuffix(n: number) {
 
 function componentString(spell: Spell) {
   const parts: string[] = []
-  if (spell.components.verbal)   parts.push('V')
-  if (spell.components.somatic)  parts.push('S')
+  if (spell.components.verbal) parts.push('V')
+  if (spell.components.somatic) parts.push('S')
   if (spell.components.material) parts.push('M')
   return parts.join(', ')
 }
@@ -84,9 +101,7 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
 
   function togglePrepared(spell: Spell) {
     if (spell.level === 0) return
-    const updated = isPrepared(spell.id)
-      ? preparedSpells.filter(id => id !== spell.id)
-      : [...preparedSpells, spell.id]
+    const updated = isPrepared(spell.id) ? preparedSpells.filter(id => id !== spell.id) : [...preparedSpells, spell.id]
     setPreparedSpells(updated)
     onUpdate({ ...character, knownSpells, preparedSpells: updated })
   }
@@ -108,24 +123,25 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
   }
 
   // Tab button style helper
-  const tabBtnCls = (active: boolean) => [
-    'font-cinzel text-deco tracking-[0.15em] px-[clamp(10px,1.2vw,18px)] py-[clamp(3px,0.4vh,6px)]',
-    'rounded-sm border cursor-pointer transition-colors',
-    active
-      ? 'text-[#3e2208] border-[rgba(100,70,20,0.45)] bg-[rgba(90,60,10,0.22)]'
-      : 'text-[rgba(100,70,20,0.55)] border-[rgba(100,70,20,0.18)] bg-transparent hover:text-[#6a4820] hover:border-[rgba(100,70,20,0.32)]',
-  ].join(' ')
+  const tabBtnCls = (active: boolean) =>
+    [
+      'font-cinzel text-deco tracking-[0.15em] px-[clamp(10px,1.2vw,18px)] py-[clamp(3px,0.4vh,6px)]',
+      'rounded-sm border cursor-pointer transition-colors',
+      active
+        ? 'text-[#3e2208] border-[rgba(100,70,20,0.45)] bg-[rgba(90,60,10,0.22)]'
+        : 'text-[rgba(100,70,20,0.55)] border-[rgba(100,70,20,0.18)] bg-transparent hover:text-[#6a4820] hover:border-[rgba(100,70,20,0.32)]',
+    ].join(' ')
 
-  const filterBtnCls = (active: boolean) => [
-    'font-cinzel text-deco px-1.5 py-0.5 rounded-sm border cursor-pointer transition-colors',
-    active
-      ? 'text-[#3e2208] border-[rgba(100,70,20,0.5)] bg-[rgba(90,60,10,0.2)]'
-      : 'text-[rgba(100,70,20,0.45)] border-[rgba(100,70,20,0.18)] bg-transparent hover:text-[#6a4820] hover:border-[rgba(100,70,20,0.35)]',
-  ].join(' ')
+  const filterBtnCls = (active: boolean) =>
+    [
+      'font-cinzel text-deco px-1.5 py-0.5 rounded-sm border cursor-pointer transition-colors',
+      active
+        ? 'text-[#3e2208] border-[rgba(100,70,20,0.5)] bg-[rgba(90,60,10,0.2)]'
+        : 'text-[rgba(100,70,20,0.45)] border-[rgba(100,70,20,0.18)] bg-transparent hover:text-[#6a4820] hover:border-[rgba(100,70,20,0.35)]',
+    ].join(' ')
 
   return (
     <div className="w-screen h-screen flex flex-col bg-dungeon-dark animate-fade-in">
-
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-[clamp(16px,2vw,32px)] py-[clamp(8px,1.2vh,16px)] border-b border-[#1e1608] shrink-0">
         <button
@@ -134,7 +150,6 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
         >
           ← Return
         </button>
-
         <div className="text-center">
           <span className="block font-cinzel text-heading text-gold tracking-[0.05em]">
             Spellbook of <em className="not-italic text-[#e8ca60]">{character.name}</em>
@@ -144,21 +159,22 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
             &ensp;·&ensp;{preparedSpells.length} prepared
           </span>
         </div>
-
         <div className="w-[clamp(100px,10vw,160px)]" /> {/* spacer */}
       </div>
 
       {/* ── Book ── */}
       <div className="flex-1 flex items-center justify-center px-[clamp(20px,3vw,48px)] py-[clamp(12px,2vh,28px)] min-h-0">
         <div className="flex h-full max-h-[min(88vh,820px)] rounded-[2px_6px_6px_2px] shadow-book">
-
           {/* ── Left page — spell index ── */}
           <div className="bg-parchment-page-left flex flex-col w-[clamp(340px,32vw,620px)] h-full px-[clamp(16px,1.8vw,28px)] py-[clamp(16px,2.2vh,30px)] overflow-hidden">
-
             {/* Tab toggle */}
             <div className="flex items-center gap-2 mb-[clamp(4px,0.6vh,8px)]">
-              <button className={tabBtnCls(tab === 'mine')}   onClick={() => setTab('mine')}>My Spells</button>
-              <button className={tabBtnCls(tab === 'browse')} onClick={() => setTab('browse')}>Browse All</button>
+              <button className={tabBtnCls(tab === 'mine')} onClick={() => setTab('mine')}>
+                My Spells
+              </button>
+              <button className={tabBtnCls(tab === 'browse')} onClick={() => setTab('browse')}>
+                Browse All
+              </button>
             </div>
 
             <div className="deco-rule my-[clamp(4px,0.7vh,9px)]" />
@@ -176,20 +192,32 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
                 />
                 {/* Level filter */}
                 <div className="flex flex-wrap gap-1">
-                  <button className={filterBtnCls(browseLevel === 'all')} onClick={() => setBrowseLevel('all')}>All</button>
-                  <button className={filterBtnCls(browseLevel === 0)}    onClick={() => setBrowseLevel(0)}>C</button>
-                  {[1,2,3,4,5,6,7,8,9].map(l => (
-                    <button key={l} className={filterBtnCls(browseLevel === l)} onClick={() => setBrowseLevel(l)}>{l}</button>
+                  <button className={filterBtnCls(browseLevel === 'all')} onClick={() => setBrowseLevel('all')}>
+                    All
+                  </button>
+                  <button className={filterBtnCls(browseLevel === 0)} onClick={() => setBrowseLevel(0)}>
+                    C
+                  </button>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(l => (
+                    <button key={l} className={filterBtnCls(browseLevel === l)} onClick={() => setBrowseLevel(l)}>
+                      {l}
+                    </button>
                   ))}
                 </div>
                 {/* School filter */}
                 <div className="flex flex-wrap gap-1">
-                  <button className={filterBtnCls(browseSchool === 'all')} onClick={() => setBrowseSchool('all')}>All</button>
+                  <button className={filterBtnCls(browseSchool === 'all')} onClick={() => setBrowseSchool('all')}>
+                    All
+                  </button>
                   {ALL_SCHOOLS.map(sc => (
                     <button
                       key={sc}
                       className={filterBtnCls(browseSchool === sc)}
-                      style={browseSchool === sc ? { color: SCHOOL_COLOR[sc], borderColor: `${SCHOOL_COLOR[sc]}88` } : undefined}
+                      style={
+                        browseSchool === sc
+                          ? { color: SCHOOL_COLOR[sc], borderColor: `${SCHOOL_COLOR[sc]}88` }
+                          : undefined
+                      }
                       onClick={() => setBrowseSchool(sc)}
                       title={sc}
                     >
@@ -207,14 +235,18 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-[#9a8050] py-10">
                   <div className="text-[2rem] opacity-30">✦</div>
                   <p className="font-fell italic text-body text-center leading-[1.5] px-4">
-                    No spells learned yet.<br />Switch to Browse All to learn spells.
+                    No spells learned yet.
+                    <br />
+                    Switch to Browse All to learn spells.
                   </p>
                 </div>
               )}
               {tab === 'browse' && characterSpells.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-[#9a8050] py-10">
                   <div className="text-[2rem] opacity-30">◌</div>
-                  <p className="font-fell italic text-body text-center leading-[1.5] px-4">No spells match your filters.</p>
+                  <p className="font-fell italic text-body text-center leading-[1.5] px-4">
+                    No spells match your filters.
+                  </p>
                 </div>
               )}
               {Object.entries(grouped)
@@ -231,14 +263,14 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
                           'flex items-center gap-[clamp(5px,0.6vw,10px)] w-full',
                           'px-[clamp(5px,0.6vw,10px)] py-[clamp(3px,0.5vh,8px)]',
                           'rounded-sm transition-colors',
-                          selected?.id === spell.id
-                            ? 'bg-[rgba(90,60,10,0.18)]'
-                            : 'hover:bg-[rgba(90,60,10,0.10)]',
+                          selected?.id === spell.id ? 'bg-[rgba(90,60,10,0.18)]' : 'hover:bg-[rgba(90,60,10,0.10)]',
                         ].join(' ')}
                       >
                         {/* School symbol */}
-                        <span className="text-caption w-[clamp(14px,1.2vw,20px)] text-center shrink-0"
-                              style={{ color: SCHOOL_COLOR[spell.school] }}>
+                        <span
+                          className="text-caption w-[clamp(14px,1.2vw,20px)] text-center shrink-0"
+                          style={{ color: SCHOOL_COLOR[spell.school] }}
+                        >
                           {SCHOOL_SYMBOL[spell.school]}
                         </span>
 
@@ -251,10 +283,14 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
                         </button>
 
                         {spell.concentration && (
-                          <span className="font-cinzel text-deco text-gold-dim bg-[rgba(100,70,20,0.14)] px-1 py-0.5 rounded-sm shrink-0">C</span>
+                          <span className="font-cinzel text-deco text-gold-dim bg-[rgba(100,70,20,0.14)] px-1 py-0.5 rounded-sm shrink-0">
+                            C
+                          </span>
                         )}
                         {spell.ritual && (
-                          <span className="font-cinzel text-deco text-gold-dim bg-[rgba(100,70,20,0.14)] px-1 py-0.5 rounded-sm shrink-0">R</span>
+                          <span className="font-cinzel text-deco text-gold-dim bg-[rgba(100,70,20,0.14)] px-1 py-0.5 rounded-sm shrink-0">
+                            R
+                          </span>
                         )}
 
                         {tab === 'mine' && spell.level > 0 && (
@@ -268,34 +304,50 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
                                 : 'text-[rgba(100,70,20,0.35)] border-[rgba(100,70,20,0.2)] bg-transparent hover:text-[#8a7040] hover:border-[rgba(100,70,20,0.4)]',
                             ].join(' ')}
                             title={isPrepared(spell.id) ? 'Unprepare' : 'Prepare'}
-                          >✦</button>
+                          >
+                            ✦
+                          </button>
                         )}
 
-                        {tab === 'browse' && (
-                          isKnown(spell.id) ? (
-                            <span className="shrink-0 font-cinzel text-deco text-[#4a7028] px-1 py-0.5" title="Already known">✓</span>
+                        {tab === 'browse' &&
+                          (isKnown(spell.id) ? (
+                            <span
+                              className="shrink-0 font-cinzel text-deco text-[#4a7028] px-1 py-0.5"
+                              title="Already known"
+                            >
+                              ✓
+                            </span>
                           ) : (
                             <button
-                              onClick={() => { learnSpell(spell); setSelected(spell) }}
+                              onClick={() => {
+                                learnSpell(spell)
+                                setSelected(spell)
+                              }}
                               className="shrink-0 font-cinzel text-deco text-[#8a7040] border border-[rgba(100,70,20,0.28)] px-1.5 py-0.5 rounded-sm cursor-pointer transition-colors hover:text-gold hover:border-[rgba(200,168,75,0.5)] bg-[rgba(90,60,10,0.06)]"
                               title="Learn this spell"
-                            >+</button>
-                          )
-                        )}
+                            >
+                              +
+                            </button>
+                          ))}
                       </div>
                     ))}
                   </div>
                 ))}
             </div>
 
-            <div className="font-cinzel text-deco text-[#9a8050] text-center mt-[clamp(6px,1vh,14px)] tracking-[0.2em] shrink-0">I</div>
+            <div className="font-cinzel text-deco text-[#9a8050] text-center mt-[clamp(6px,1vh,14px)] tracking-[0.2em] shrink-0">
+              I
+            </div>
           </div>
 
           {/* ── Spine ── */}
           <div className="bg-leather-spine flex flex-col items-center justify-evenly w-[clamp(24px,2.2vw,40px)] h-full shrink-0 py-[clamp(20px,3vh,40px)]">
-            {[0,1,2].map(i => (
-              <div key={i} className="w-[55%] h-px"
-                   style={{ background: 'linear-gradient(to right, transparent, rgba(140,90,40,0.6), transparent)' }} />
+            {[0, 1, 2].map(i => (
+              <div
+                key={i}
+                className="w-[55%] h-px"
+                style={{ background: 'linear-gradient(to right, transparent, rgba(140,90,40,0.6), transparent)' }}
+              />
             ))}
           </div>
 
@@ -304,18 +356,20 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
             {selected ? (
               <>
                 <div className="mb-[clamp(4px,0.7vh,8px)]">
-                  <div className="font-cinzel text-badge tracking-[0.22em] uppercase mb-1"
-                       style={{ color: SCHOOL_COLOR[selected.school] }}>
+                  <div
+                    className="font-cinzel text-badge tracking-[0.22em] uppercase mb-1"
+                    style={{ color: SCHOOL_COLOR[selected.school] }}
+                  >
                     {SCHOOL_SYMBOL[selected.school]}&nbsp;{selected.school}
                   </div>
-                  <h2 className="font-cinzel-deco text-display text-ink leading-[1.2] mb-1"
-                      style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.2)' }}>
+                  <h2
+                    className="font-cinzel-deco text-display text-ink leading-[1.2] mb-1"
+                    style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.2)' }}
+                  >
                     {selected.name}
                   </h2>
                   <div className="font-fell-sc text-caption text-[#6b4020] italic">
-                    {selected.level === 0
-                      ? 'Cantrip'
-                      : `${selected.level}${ordinalSuffix(selected.level)}-Level Spell`}
+                    {selected.level === 0 ? 'Cantrip' : `${selected.level}${ordinalSuffix(selected.level)}-Level Spell`}
                     {selected.ritual ? ' · Ritual' : ''}
                     {selected.concentration ? ' · Concentration' : ''}
                   </div>
@@ -326,9 +380,9 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
                 <div className="grid grid-cols-2 gap-[clamp(4px,0.6vh,10px)_clamp(10px,1.4vw,22px)] my-[clamp(5px,0.8vh,10px)]">
                   {[
                     { label: 'Casting Time', val: selected.castingTime },
-                    { label: 'Range',        val: selected.range },
-                    { label: 'Components',   val: null },
-                    { label: 'Duration',     val: selected.duration },
+                    { label: 'Range', val: selected.range },
+                    { label: 'Components', val: null },
+                    { label: 'Duration', val: selected.duration },
                   ].map(({ label, val }) => (
                     <div key={label} className="flex flex-col gap-0.5">
                       <span className="font-cinzel text-deco text-red-ink uppercase tracking-[0.15em]">{label}</span>
@@ -427,9 +481,10 @@ export function SpellBook({ character, onBack, onUpdate }: Props) {
               </div>
             )}
 
-            <div className="font-cinzel text-deco text-[#9a8050] text-center mt-[clamp(6px,1vh,14px)] tracking-[0.2em] shrink-0">II</div>
+            <div className="font-cinzel text-deco text-[#9a8050] text-center mt-[clamp(6px,1vh,14px)] tracking-[0.2em] shrink-0">
+              II
+            </div>
           </div>
-
         </div>
       </div>
     </div>

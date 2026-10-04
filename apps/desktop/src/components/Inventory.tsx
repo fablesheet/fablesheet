@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef } from 'react'
 import type { Character, Item, ItemCategory, ItemRarity } from '@fablesheet/core'
+import { carryingLimits } from '@fablesheet/core'
 import { ITEM_CATALOG } from '@fablesheet/srd-data'
 
 interface Props {
@@ -11,29 +12,42 @@ interface Props {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CATEGORIES: ItemCategory[] = [
-  'Weapon', 'Armor', 'Adventuring Gear', 'Tool',
-  'Potion', 'Scroll', 'Container', 'Valuable',
-  'Ammunition', 'Magic Item', 'Other',
+  'Weapon',
+  'Armor',
+  'Adventuring Gear',
+  'Tool',
+  'Potion',
+  'Scroll',
+  'Container',
+  'Valuable',
+  'Ammunition',
+  'Magic Item',
+  'Other',
 ]
 
-const RARITIES: ItemRarity[] = [
-  'Common', 'Uncommon', 'Rare', 'Very Rare', 'Legendary', 'Artifact',
-]
+const RARITIES: ItemRarity[] = ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Legendary', 'Artifact']
 
 const CATEGORY_SYMBOL: Record<ItemCategory, string> = {
-  'Weapon': '⚔', 'Armor': '🛡', 'Adventuring Gear': '🎒',
-  'Tool': '⚙', 'Potion': '⚗', 'Scroll': '📜',
-  'Container': '📦', 'Valuable': '◈', 'Ammunition': '◎',
-  'Magic Item': '✦', 'Other': '·',
+  Weapon: '⚔',
+  Armor: '🛡',
+  'Adventuring Gear': '🎒',
+  Tool: '⚙',
+  Potion: '⚗',
+  Scroll: '📜',
+  Container: '📦',
+  Valuable: '◈',
+  Ammunition: '◎',
+  'Magic Item': '✦',
+  Other: '·',
 }
 
 const RARITY_COLOR: Record<ItemRarity, string> = {
-  'Common':    '#8a8a7a',
-  'Uncommon':  '#3a7a3a',
-  'Rare':      '#3a5a9a',
+  Common: '#8a8a7a',
+  Uncommon: '#3a7a3a',
+  Rare: '#3a5a9a',
   'Very Rare': '#6a3a9a',
-  'Legendary': '#b87820',
-  'Artifact':  '#8b1a1a',
+  Legendary: '#b87820',
+  Artifact: '#8b1a1a',
 }
 
 function blankItem(): Omit<Item, 'id'> {
@@ -70,16 +84,21 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
   // ── Derived ──────────────────────────────────────────────────────────────────
 
   const totalWeight = items.reduce((s, it) => s + it.weight * it.quantity, 0)
-  const carryCapacity = character.scores.strength * 15
-  const encumberedAt = character.scores.strength * 5
-  const heavyAt      = character.scores.strength * 10
-  const weightPct    = Math.min(100, (totalWeight / carryCapacity) * 100)
-  const weightColor  = totalWeight > heavyAt ? '#8b1a1a' : totalWeight > encumberedAt ? '#8a7020' : '#3a7a3a'
+  const {
+    capacity: carryCapacity,
+    encumberedAt,
+    heavilyEncumberedAt: heavyAt,
+  } = carryingLimits(character.scores.strength)
+  const weightPct = Math.min(100, (totalWeight / carryCapacity) * 100)
+  const weightColor = totalWeight > heavyAt ? '#8b1a1a' : totalWeight > encumberedAt ? '#8a7020' : '#3a7a3a'
 
-  const grouped = CATEGORIES.reduce<Record<ItemCategory, Item[]>>((acc, cat) => {
-    acc[cat] = items.filter(i => i.category === cat)
-    return acc
-  }, {} as Record<ItemCategory, Item[]>)
+  const grouped = CATEGORIES.reduce<Record<ItemCategory, Item[]>>(
+    (acc, cat) => {
+      acc[cat] = items.filter(i => i.category === cat)
+      return acc
+    },
+    {} as Record<ItemCategory, Item[]>,
+  )
 
   // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -120,7 +139,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
       saveItems([...items, newItem])
       setSelectedId(newItem.id)
     } else if (selectedId) {
-      saveItems(items.map(i => i.id === selectedId ? { ...form, name: form.name.trim(), id: selectedId } : i))
+      saveItems(items.map(i => (i.id === selectedId ? { ...form, name: form.name.trim(), id: selectedId } : i)))
     }
   }
 
@@ -133,13 +152,13 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
 
   function toggleEquipped(item: Item, e: React.MouseEvent) {
     e.stopPropagation()
-    saveItems(items.map(i => i.id === item.id ? { ...i, equipped: !i.equipped } : i))
+    saveItems(items.map(i => (i.id === item.id ? { ...i, equipped: !i.equipped } : i)))
     if (selectedId === item.id) setForm(f => ({ ...f, equipped: !f.equipped }))
   }
 
   // ── Import ────────────────────────────────────────────────────────────────────
 
-  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     setImportError(null)
@@ -155,17 +174,17 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
           .filter((x: unknown) => typeof x === 'object' && x !== null && 'name' in (x as object))
           .map((x: Record<string, unknown>) => ({
             id: typeof x.id === 'string' ? x.id : crypto.randomUUID(),
-            name:               String(x.name ?? '').trim() || 'Unnamed Item',
-            category:           (CATEGORIES.includes(x.category as ItemCategory) ? x.category : 'Other') as ItemCategory,
-            description:        String(x.description ?? ''),
-            quantity:           Math.max(1, Number(x.quantity) || 1),
-            weight:             Math.max(0, Number(x.weight) || 0),
-            value:              Math.max(0, Number(x.value) || 0),
-            equipped:           Boolean(x.equipped),
-            rarity:             (RARITIES.includes(x.rarity as ItemRarity) ? x.rarity : null) as ItemRarity | null,
+            name: String(x.name ?? '').trim() || 'Unnamed Item',
+            category: (CATEGORIES.includes(x.category as ItemCategory) ? x.category : 'Other') as ItemCategory,
+            description: String(x.description ?? ''),
+            quantity: Math.max(1, Number(x.quantity) || 1),
+            weight: Math.max(0, Number(x.weight) || 0),
+            value: Math.max(0, Number(x.value) || 0),
+            equipped: Boolean(x.equipped),
+            rarity: (RARITIES.includes(x.rarity as ItemRarity) ? x.rarity : null) as ItemRarity | null,
             requiresAttunement: Boolean(x.requiresAttunement),
-            isAttuned:          Boolean(x.isAttuned),
-            notes:              String(x.notes ?? ''),
+            isAttuned: Boolean(x.isAttuned),
+            notes: String(x.notes ?? ''),
           }))
 
         if (imported.length === 0) {
@@ -185,7 +204,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
     }
     reader.readAsText(file)
     e.target.value = ''
-  }, [items, saveItems])
+  }
 
   // ── Export ────────────────────────────────────────────────────────────────────
 
@@ -214,7 +233,6 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
 
   return (
     <div className="w-screen h-screen flex flex-col bg-dungeon animate-fade-in overflow-hidden">
-
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-[clamp(14px,1.8vw,28px)] py-[clamp(8px,1.2vh,16px)] border-b border-[#1e1608] shrink-0 bg-topbar">
         <button
@@ -262,7 +280,10 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
           <button
             onClick={startNew}
             className="font-cinzel text-caption tracking-[0.1em] text-gold-dim border border-[#5a3e14] px-[clamp(12px,1.4vw,22px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm whitespace-nowrap transition-colors hover:text-gold hover:border-gold-dim"
-            style={{ background: 'linear-gradient(160deg, #2a1a06 0%, #1a1004 100%)', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+            style={{
+              background: 'linear-gradient(160deg, #2a1a06 0%, #1a1004 100%)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+            }}
           >
             + Add Item
           </button>
@@ -279,18 +300,23 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
 
       {/* ── Import feedback ── */}
       {(importError || importSuccess) && (
-        <div className={`text-center font-fell text-caption py-1.5 shrink-0 ${importError ? 'text-red-ink bg-[rgba(139,26,26,0.08)]' : 'text-[#3a7a3a] bg-[rgba(58,122,58,0.08)]'}`}>
+        <div
+          className={`text-center font-fell text-caption py-1.5 shrink-0 ${importError ? 'text-red-ink bg-[rgba(139,26,26,0.08)]' : 'text-[#3a7a3a] bg-[rgba(58,122,58,0.08)]'}`}
+        >
           {importError ?? importSuccess}
         </div>
       )}
 
       {/* ── Body: list + detail ── */}
       <div className="flex-1 flex min-h-0 mx-[clamp(10px,1.2vw,20px)] mt-[clamp(8px,1.2vh,16px)] mb-[clamp(6px,0.8vh,12px)] gap-[clamp(8px,1vw,16px)]">
-
         {/* ── Left: item list ── */}
-        <div className="flex flex-col w-[clamp(260px,30vw,420px)] shrink-0 rounded-sm overflow-hidden"
-             style={{ background: 'radial-gradient(ellipse at 40% 20%, #f0e2b8 0%, #e0cc90 50%, #ccb060 100%)', border: '1px solid rgba(100,70,20,0.3)' }}>
-
+        <div
+          className="flex flex-col w-[clamp(260px,30vw,420px)] shrink-0 rounded-sm overflow-hidden"
+          style={{
+            background: 'radial-gradient(ellipse at 40% 20%, #f0e2b8 0%, #e0cc90 50%, #ccb060 100%)',
+            border: '1px solid rgba(100,70,20,0.3)',
+          }}
+        >
           {/* Carrying capacity bar */}
           <div className="px-4 pt-3 pb-2 shrink-0 border-b border-[rgba(100,70,20,0.18)]">
             <div className="flex justify-between items-center mb-1">
@@ -318,7 +344,9 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
               <div className="flex flex-col items-center justify-center h-full gap-3 text-[#9a8050] py-10">
                 <div className="text-[2.5rem] opacity-30">⚔</div>
                 <p className="font-fell italic text-body text-center px-4 leading-[1.5]">
-                  Your pack is empty.<br />Add items or import a list.
+                  Your pack is empty.
+                  <br />
+                  Add items or import a list.
                 </p>
               </div>
             ) : (
@@ -338,9 +366,7 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
                         'w-full flex items-center gap-2 px-4 py-[clamp(5px,0.7vh,9px)] text-left',
                         'border-b border-[rgba(100,70,20,0.1)] transition-colors cursor-pointer',
                         'bg-transparent border-l-0 border-r-0 border-t-0',
-                        selectedId === item.id
-                          ? 'bg-[rgba(90,60,10,0.18)]'
-                          : 'hover:bg-[rgba(90,60,10,0.10)]',
+                        selectedId === item.id ? 'bg-[rgba(90,60,10,0.18)]' : 'hover:bg-[rgba(90,60,10,0.10)]',
                       ].join(' ')}
                     >
                       {/* Equipped dot */}
@@ -348,11 +374,15 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
                         onClick={e => toggleEquipped(item, e)}
                         title={item.equipped ? 'Equipped — click to unequip' : 'Unequipped — click to equip'}
                         className={`shrink-0 text-body cursor-pointer transition-colors ${item.equipped ? 'text-[#3a7a3a]' : 'text-[rgba(100,70,20,0.28)]'}`}
-                      >◉</span>
+                      >
+                        ◉
+                      </span>
 
                       {/* Name */}
-                      <span className={`font-fell-sc text-body flex-1 min-w-0 truncate ${item.rarity ? '' : 'text-ink'}`}
-                            style={item.rarity ? { color: RARITY_COLOR[item.rarity] } : undefined}>
+                      <span
+                        className={`font-fell-sc text-body flex-1 min-w-0 truncate ${item.rarity ? '' : 'text-ink'}`}
+                        style={item.rarity ? { color: RARITY_COLOR[item.rarity] } : undefined}
+                      >
                         {item.name}
                       </span>
 
@@ -376,9 +406,13 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
         </div>
 
         {/* ── Right: detail / form / catalog ── */}
-        <div className="flex-1 rounded-sm overflow-hidden flex flex-col"
-             style={{ background: 'radial-gradient(ellipse at 60% 30%, #f5e8c8 0%, #e8d5a8 40%, #d4b87a 100%)', border: '1px solid rgba(100,70,20,0.3)' }}>
-
+        <div
+          className="flex-1 rounded-sm overflow-hidden flex flex-col"
+          style={{
+            background: 'radial-gradient(ellipse at 60% 30%, #f5e8c8 0%, #e8d5a8 40%, #d4b87a 100%)',
+            border: '1px solid rgba(100,70,20,0.3)',
+          }}
+        >
           {rightPanel === 'catalog' ? (
             <CatalogBrowser
               catalogSearch={catalogSearch}
@@ -407,7 +441,9 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-[#9a8050]">
               <div className="text-[clamp(2.5rem,4vw,4rem)] opacity-20">⚔</div>
               <p className="font-fell italic text-body text-center leading-[1.6] px-6">
-                Select an item to view details,<br />or click <strong className="not-italic font-fell-sc text-[#8a7040]">+ Add Item</strong> to create one.
+                Select an item to view details,
+                <br />
+                or click <strong className="not-italic font-fell-sc text-[#8a7040]">+ Add Item</strong> to create one.
               </p>
             </div>
           )}
@@ -420,8 +456,15 @@ export function Inventory({ character, onBack, onUpdate }: Props) {
 // ── Catalog browser sub-component ────────────────────────────────────────────
 
 const CATALOG_CATEGORIES: Array<ItemCategory | 'all'> = [
-  'all', 'Weapon', 'Armor', 'Adventuring Gear', 'Tool',
-  'Potion', 'Container', 'Ammunition', 'Other',
+  'all',
+  'Weapon',
+  'Armor',
+  'Adventuring Gear',
+  'Tool',
+  'Potion',
+  'Container',
+  'Ammunition',
+  'Other',
 ]
 
 interface CatalogBrowserProps {
@@ -435,9 +478,12 @@ interface CatalogBrowserProps {
 }
 
 function CatalogBrowser({
-  catalogSearch, setCatalogSearch,
-  catalogCategory, setCatalogCategory,
-  onAddItem, inputCls,
+  catalogSearch,
+  setCatalogSearch,
+  catalogCategory,
+  setCatalogCategory,
+  onAddItem,
+  inputCls,
 }: CatalogBrowserProps) {
   const filtered = ITEM_CATALOG.filter(item => {
     if (catalogCategory !== 'all' && item.category !== catalogCategory) return false
@@ -448,12 +494,13 @@ function CatalogBrowser({
     return true
   })
 
-  const catBtnCls = (active: boolean) => [
-    'font-cinzel text-deco px-2 py-1 border rounded-sm cursor-pointer transition-colors whitespace-nowrap',
-    active
-      ? 'text-[#3e2208] border-[rgba(100,70,20,0.5)] bg-[rgba(90,60,10,0.2)]'
-      : 'text-[rgba(100,70,20,0.5)] border-[rgba(100,70,20,0.2)] bg-transparent hover:text-[#6a4820] hover:border-[rgba(100,70,20,0.38)]',
-  ].join(' ')
+  const catBtnCls = (active: boolean) =>
+    [
+      'font-cinzel text-deco px-2 py-1 border rounded-sm cursor-pointer transition-colors whitespace-nowrap',
+      active
+        ? 'text-[#3e2208] border-[rgba(100,70,20,0.5)] bg-[rgba(90,60,10,0.2)]'
+        : 'text-[rgba(100,70,20,0.5)] border-[rgba(100,70,20,0.2)] bg-transparent hover:text-[#6a4820] hover:border-[rgba(100,70,20,0.38)]',
+    ].join(' ')
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -477,11 +524,7 @@ function CatalogBrowser({
         />
         <div className="flex flex-wrap gap-1">
           {CATALOG_CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              className={catBtnCls(catalogCategory === cat)}
-              onClick={() => setCatalogCategory(cat)}
-            >
+            <button key={cat} className={catBtnCls(catalogCategory === cat)} onClick={() => setCatalogCategory(cat)}>
               {cat === 'all' ? 'All' : cat}
             </button>
           ))}
@@ -546,12 +589,21 @@ interface FormProps {
 }
 
 function ItemForm({
-  form, isNew, confirmDelete,
-  setForm, onSave, onDelete, onConfirmDelete, onCancelDelete,
-  inputCls, labelCls,
+  form,
+  isNew,
+  confirmDelete,
+  setForm,
+  onSave,
+  onDelete,
+  onConfirmDelete,
+  onCancelDelete,
+  inputCls,
+  labelCls,
 }: FormProps) {
-  const f = <K extends keyof Omit<Item, 'id'>>(key: K) =>
-    (val: Omit<Item, 'id'>[K]) => setForm(prev => ({ ...prev, [key]: val }))
+  const f =
+    <K extends keyof Omit<Item, 'id'>>(key: K) =>
+    (val: Omit<Item, 'id'>[K]) =>
+      setForm(prev => ({ ...prev, [key]: val }))
 
   const showMagic = form.rarity !== null || form.category === 'Magic Item'
 
@@ -564,8 +616,7 @@ function ItemForm({
             {isNew ? 'New Item' : form.name || 'Edit Item'}
           </span>
           {form.rarity && (
-            <span className="font-cinzel text-badge tracking-[0.15em]"
-                  style={{ color: RARITY_COLOR[form.rarity] }}>
+            <span className="font-cinzel text-badge tracking-[0.15em]" style={{ color: RARITY_COLOR[form.rarity] }}>
               {form.rarity}
             </span>
           )}
@@ -576,7 +627,6 @@ function ItemForm({
       {/* Scrollable form body */}
       <div className="flex-1 overflow-y-auto parchment-scroll px-[clamp(14px,1.6vw,24px)] pb-4">
         <div className="flex flex-col gap-[clamp(10px,1.4vh,18px)]">
-
           {/* Name */}
           <div>
             <label className={labelCls}>Name</label>
@@ -599,7 +649,11 @@ function ItemForm({
                 value={form.category}
                 onChange={e => f('category')(e.target.value as ItemCategory)}
               >
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {CATEGORIES.map(c => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -672,16 +726,24 @@ function ItemForm({
             <label className={labelCls}>Rarity</label>
             <div className="flex gap-2 flex-wrap">
               <button
-                onClick={() => { f('rarity')(null); f('requiresAttunement')(false); f('isAttuned')(false) }}
+                onClick={() => {
+                  f('rarity')(null)
+                  f('requiresAttunement')(false)
+                  f('isAttuned')(false)
+                }}
                 className={`font-cinzel text-deco px-2 py-1 border rounded-sm cursor-pointer transition-colors ${form.rarity === null ? 'text-[#8a7040] border-[rgba(100,70,20,0.5)] bg-[rgba(90,60,10,0.12)]' : 'text-[rgba(100,70,20,0.45)] border-[rgba(100,70,20,0.2)] hover:border-[rgba(100,70,20,0.4)]'}`}
-              >None</button>
+              >
+                None
+              </button>
               {RARITIES.map(r => (
                 <button
                   key={r}
                   onClick={() => f('rarity')(r)}
                   className={`font-cinzel text-deco px-2 py-1 border rounded-sm cursor-pointer transition-colors ${form.rarity === r ? 'border-current bg-[rgba(0,0,0,0.06)]' : 'border-[rgba(100,70,20,0.2)] hover:border-[rgba(100,70,20,0.4)]'}`}
                   style={{ color: RARITY_COLOR[r] }}
-                >{r}</button>
+                >
+                  {r}
+                </button>
               ))}
             </div>
           </div>
@@ -689,7 +751,10 @@ function ItemForm({
           {showMagic && (
             <div className="flex gap-4">
               <button
-                onClick={() => { f('requiresAttunement')(!form.requiresAttunement); if (form.requiresAttunement) f('isAttuned')(false) }}
+                onClick={() => {
+                  f('requiresAttunement')(!form.requiresAttunement)
+                  if (form.requiresAttunement) f('isAttuned')(false)
+                }}
                 className={`font-cinzel text-badge tracking-[0.12em] px-3 py-1 border rounded-sm cursor-pointer transition-colors ${form.requiresAttunement ? 'text-[#6a3a9a] border-[rgba(106,58,154,0.4)] bg-[rgba(106,58,154,0.08)]' : 'text-[#8a7040] border-[rgba(100,70,20,0.28)] hover:border-[rgba(100,70,20,0.45)]'}`}
               >
                 {form.requiresAttunement ? '◆ Requires Attunement' : '◇ No Attunement'}
@@ -730,19 +795,23 @@ function ItemForm({
           {isNew ? 'Add to Inventory' : 'Save Changes'}
         </button>
 
-        {!isNew && (
-          confirmDelete ? (
+        {!isNew &&
+          (confirmDelete ? (
             <div className="flex gap-2">
               <button
                 onClick={onCancelDelete}
                 className="flex-1 font-cinzel text-deco text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-1.5 rounded-sm cursor-pointer hover:border-[rgba(100,70,20,0.5)]"
                 style={{ background: 'rgba(90,60,10,0.06)' }}
-              >Cancel</button>
+              >
+                Cancel
+              </button>
               <button
                 onClick={onDelete}
                 className="flex-[2] font-cinzel text-deco text-[#eec0a8] border border-[rgba(139,26,26,0.45)] py-1.5 rounded-sm cursor-pointer hover:border-[rgba(139,26,26,0.65)]"
                 style={{ background: 'linear-gradient(160deg, #4a0808 0%, #360606 100%)' }}
-              >Yes, Remove</button>
+              >
+                Yes, Remove
+              </button>
             </div>
           ) : (
             <button
@@ -751,8 +820,7 @@ function ItemForm({
             >
               Remove from Inventory
             </button>
-          )
-        )}
+          ))}
       </div>
     </div>
   )

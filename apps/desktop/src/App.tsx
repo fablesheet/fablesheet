@@ -26,7 +26,10 @@ export default function App() {
   if (view === 'builder') {
     return (
       <CharacterBuilder
-        onCreated={c => { setCharacter(c); setView('sheet') }}
+        onCreated={c => {
+          setCharacter(c)
+          setView('sheet')
+        }}
         onCancel={() => setView('select')}
       />
     )
@@ -35,36 +38,30 @@ export default function App() {
   if (view === 'select' || !character) {
     return (
       <CharacterSelect
-        onSelect={c => { setCharacter(c); setView('sheet') }}
+        onSelect={c => {
+          setCharacter(c)
+          setView('sheet')
+        }}
         onCreateNew={() => setView('builder')}
       />
     )
   }
 
   if (view === 'spellbook') {
-    return (
-      <SpellBook
-        character={character}
-        onBack={() => setView('sheet')}
-        onUpdate={handleUpdate}
-      />
-    )
+    return <SpellBook character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
   }
 
   if (view === 'inventory') {
-    return (
-      <Inventory
-        character={character}
-        onBack={() => setView('sheet')}
-        onUpdate={handleUpdate}
-      />
-    )
+    return <Inventory character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
   }
 
   return (
     <CharacterSheet
       character={character}
-      onBack={() => { setCharacter(null); setView('select') }}
+      onBack={() => {
+        setCharacter(null)
+        setView('select')
+      }}
       onSpellbook={() => setView('spellbook')}
       onInventory={() => setView('inventory')}
       onUpdate={handleUpdate}

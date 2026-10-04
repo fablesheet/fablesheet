@@ -7,7 +7,11 @@ const STORAGE_KEY = 'fablesheet-characters'
 // ── localStorage (web offline) ─────────────────────────────────────────────
 
 function lsRead(): Character[] {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]') } catch { return [] }
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
+  } catch {
+    return []
+  }
 }
 function lsWrite(chars: Character[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chars))

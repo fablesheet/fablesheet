@@ -1,15 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ProficiencyLevel {
+    #[default]
     None,
     HalfProficiency,
     Proficient,
     Expertise,
-}
-
-impl Default for ProficiencyLevel {
-    fn default() -> Self {
-        ProficiencyLevel::None
-    }
 }

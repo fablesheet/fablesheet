@@ -3,9 +3,15 @@ import type { Character } from '@fablesheet/core'
 import { updateCharacter, deleteCharacter } from '../services/api'
 
 const ALIGNMENTS = [
-  'Lawful Good', 'Neutral Good', 'Chaotic Good',
-  'Lawful Neutral', 'True Neutral', 'Chaotic Neutral',
-  'Lawful Evil', 'Neutral Evil', 'Chaotic Evil',
+  'Lawful Good',
+  'Neutral Good',
+  'Chaotic Good',
+  'Lawful Neutral',
+  'True Neutral',
+  'Chaotic Neutral',
+  'Lawful Evil',
+  'Neutral Evil',
+  'Chaotic Evil',
 ]
 
 interface Props {
@@ -16,17 +22,17 @@ interface Props {
 }
 
 export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: Props) {
-  const [name, setName]           = useState(character.name)
-  const [level, setLevel]         = useState(character.level)
-  const [xp, setXp]               = useState(character.experiencePoints)
-  const [subclass, setSubclass]   = useState(character.subclass ?? '')
+  const [name, setName] = useState(character.name)
+  const [level, setLevel] = useState(character.level)
+  const [xp, setXp] = useState(character.experiencePoints)
+  const [subclass, setSubclass] = useState(character.subclass ?? '')
   const [background, setBackground] = useState(character.background)
   const [alignment, setAlignment] = useState(character.alignment)
 
-  const [saving, setSaving]           = useState(false)
+  const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [deleting, setDeleting]       = useState(false)
-  const [error, setError]             = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSave() {
     if (!name.trim()) return
@@ -73,10 +79,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[rgba(8,4,0,0.78)]"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-[rgba(8,4,0,0.78)]" onClick={onClose} />
 
       {/* Panel */}
       <div
@@ -90,29 +93,23 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
         {/* Header */}
         <div className="flex items-center justify-center gap-2 pt-[clamp(14px,2vh,24px)] pb-1">
           <span className="text-gold-dim text-deco">✦</span>
-          <span className="font-cinzel-deco text-heading text-ink tracking-[0.05em]">
-            {character.name}
-          </span>
+          <span className="font-cinzel-deco text-heading text-ink tracking-[0.05em]">{character.name}</span>
           <span className="text-gold-dim text-deco">✦</span>
         </div>
         <div className="font-fell-sc text-badge text-[#7a5820] text-center mb-3 tracking-[0.1em]">
           {character.race} {character.className}
         </div>
 
-        <div className="h-px mx-6"
-             style={{ background: 'linear-gradient(to right, transparent, rgba(100,70,20,0.4), transparent)' }} />
+        <div
+          className="h-px mx-6"
+          style={{ background: 'linear-gradient(to right, transparent, rgba(100,70,20,0.4), transparent)' }}
+        />
 
         {/* Form */}
         <div className="px-6 pt-4 pb-3 flex flex-col gap-[clamp(10px,1.4vh,18px)]">
-
           <div>
             <label className={labelCls}>Name</label>
-            <input
-              className={inputCls}
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={60}
-            />
+            <input className={inputCls} value={name} onChange={e => setName(e.target.value)} maxLength={60} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -162,19 +159,17 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
             </div>
             <div>
               <label className={labelCls}>Alignment</label>
-              <select
-                className={inputCls}
-                value={alignment}
-                onChange={e => setAlignment(e.target.value)}
-              >
-                {ALIGNMENTS.map(a => <option key={a} value={a}>{a}</option>)}
+              <select className={inputCls} value={alignment} onChange={e => setAlignment(e.target.value)}>
+                {ALIGNMENTS.map(a => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
-          {error && (
-            <p className="font-fell text-caption text-red-ink text-center italic">{error}</p>
-          )}
+          {error && <p className="font-fell text-caption text-red-ink text-center italic">{error}</p>}
 
           <div className="flex gap-2 pt-1">
             <button
@@ -196,8 +191,10 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
         </div>
 
         {/* Divider before danger zone */}
-        <div className="h-px mx-6"
-             style={{ background: 'linear-gradient(to right, transparent, rgba(139,26,26,0.22), transparent)' }} />
+        <div
+          className="h-px mx-6"
+          style={{ background: 'linear-gradient(to right, transparent, rgba(139,26,26,0.22), transparent)' }}
+        />
 
         {/* Delete zone */}
         <div className="px-6 py-[clamp(10px,1.4vh,18px)]">
@@ -218,7 +215,9 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
                   onClick={() => setConfirmDelete(false)}
                   className="flex-1 font-cinzel text-deco text-[#8a7040] border border-[rgba(100,70,20,0.3)] py-1.5 rounded-sm cursor-pointer transition-colors hover:border-[rgba(100,70,20,0.5)]"
                   style={{ background: 'rgba(90,60,10,0.06)' }}
-                >Cancel</button>
+                >
+                  Cancel
+                </button>
                 <button
                   onClick={handleDelete}
                   disabled={deleting}

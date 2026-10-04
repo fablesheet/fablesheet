@@ -1,7 +1,9 @@
 pub mod commands;
 pub mod db;
+#[cfg(test)]
 mod db_tests;
 pub mod models;
+#[cfg(test)]
 mod tests;
 
 use db::DbState;
