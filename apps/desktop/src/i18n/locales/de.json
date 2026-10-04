@@ -121,7 +121,9 @@
     "longRest": "☀ Lange Rast",
     "confirmRest": "Zum Rasten erneut klicken",
     "shortRestHint": "Kurze Rast: Paktmagie-Plätze und Merkmale mit kurzer Rast werden wiederhergestellt. Trefferwürfel über „Nutzen“ ausgeben.",
-    "longRestHint": "Lange Rast: volle TP, die Hälfte der Trefferwürfel, alle Zauberplätze und Merkmale, eine Stufe Erschöpfung weniger."
+    "longRestHint": "Lange Rast: volle TP, die Hälfte der Trefferwürfel, alle Zauberplätze und Merkmale, eine Stufe Erschöpfung weniger.",
+    "notes": "❧ Notizen",
+    "editCurrency": "Währung bearbeiten"
   },
   "spellbook": {
     "title": "Zauberbuch von <name>{{name}}</name>",
@@ -361,6 +363,13 @@
       "ep": "EM",
       "gp": "GM",
       "pp": "PM"
+    },
+    "currencyName": {
+      "cp": "Kupfer",
+      "sp": "Silber",
+      "ep": "Elektrum",
+      "gp": "Gold",
+      "pp": "Platin"
     }
   },
   "update": {
@@ -369,5 +378,22 @@
     "installing": "Wird installiert… {{percent}}%",
     "later": "Später",
     "failed": "Update fehlgeschlagen: {{error}}"
+  },
+  "notes": {
+    "title": "Notizen von <name>{{name}}</name>",
+    "personality": "Persönlichkeit",
+    "traits": "Persönlichkeitsmerkmale",
+    "ideals": "Ideale",
+    "bonds": "Bindungen",
+    "flaws": "Makel",
+    "backstory": "Hintergrundgeschichte",
+    "backstoryPlaceholder": "Woher kommt dein Charakter? Was treibt ihn an?",
+    "notes": "Notizen",
+    "notesPlaceholder": "Sitzungsnotizen, NSCs, Aufträge, Beute…\n\n## Überschriften, **fett**, - Listen und - [ ] Checklisten funktionieren auch",
+    "edit": "✎ Bearbeiten",
+    "preview": "◉ Vorschau",
+    "doubleClickToEdit": "Doppelklick zum Bearbeiten",
+    "empty": "Noch nichts geschrieben.",
+    "markdownHint": "Hintergrundgeschichte und Notizen unterstützen Markdown: # Überschriften, **fett**, *kursiv*, Listen, - [ ] Checklisten, Tabellen und Links."
   }
 }

@@ -11,6 +11,7 @@ import {
   spellSlotMaximums,
 } from '@fablesheet/core'
 import { CharacterEditModal } from './CharacterEditModal'
+import { CurrencyModal } from './CurrencyModal'
 import { gameLabel } from '../i18n/game'
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
   onBack: () => void
   onSpellbook: () => void
   onInventory: () => void
+  onNotes: () => void
   onUpdate: (c: Character) => void
 }
 
@@ -74,7 +76,7 @@ function Rule() {
   return <div className="deco-rule-subtle my-[clamp(6px,0.9vh,13px)]" />
 }
 
-export function CharacterSheet({ character, onBack, onSpellbook, onInventory, onUpdate }: Props) {
+export function CharacterSheet({ character, onBack, onSpellbook, onInventory, onNotes, onUpdate }: Props) {
   const { t } = useTranslation()
   const abilityShort = (a: string) => gameLabel(t, 'abilityShort', a)
   const [hp, setHp] = useState(character.hp.current)
@@ -91,6 +93,7 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [slotsUsed, setSlotsUsed] = useState<number[]>(character.spellSlotsUsed)
   const [confirmRest, setConfirmRest] = useState<'short' | 'long' | null>(null)
+  const [currencyOpen, setCurrencyOpen] = useState(false)
 
   // Stable refs so the debounced save never captures stale closures
   const characterRef = useRef(character)
@@ -249,6 +252,12 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
             className="font-cinzel text-caption text-[#8a7040] bg-transparent border border-[#2e2010] px-[clamp(8px,1vw,14px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm transition-colors hover:text-gold hover:border-[#5a4020]"
           >
             ✎
+          </button>
+          <button
+            onClick={onNotes}
+            className="font-cinzel text-caption tracking-[0.1em] text-[#8a7040] border border-[#2e2010] px-[clamp(10px,1.2vw,18px)] py-[clamp(5px,0.6vh,9px)] cursor-pointer rounded-sm whitespace-nowrap transition-colors hover:text-gold hover:border-[#5a4020]"
+          >
+            {t('sheet.notes')}
           </button>
           <button
             onClick={onInventory}
@@ -665,7 +674,11 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
 
         <div className="deco-vline h-[clamp(24px,3.5vh,40px)] mx-[clamp(10px,1.2vw,18px)]" />
 
-        <div className="flex flex-col flex-1 min-w-0">
+        <button
+          onClick={() => setCurrencyOpen(true)}
+          title={t('sheet.editCurrency')}
+          className="flex flex-col flex-1 min-w-0 text-left bg-transparent border-none p-0 cursor-pointer rounded-sm hover:bg-[rgba(90,60,10,0.08)]"
+        >
           <span className="font-cinzel text-deco text-red-ink tracking-[0.2em] uppercase mb-0.5">
             {t('sheet.currency')}
           </span>
@@ -679,7 +692,7 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
               .filter(Boolean)
               .join(' ') || '—'}
           </span>
-        </div>
+        </button>
 
         {character.features.length > 0 && (
           <>
@@ -695,6 +708,17 @@ export function CharacterSheet({ character, onBack, onSpellbook, onInventory, on
           </>
         )}
       </div>
+
+      {currencyOpen && (
+        <CurrencyModal
+          currency={character.currency}
+          onClose={() => setCurrencyOpen(false)}
+          onSave={currency => {
+            onUpdate(withLocalState({ ...character, currency }))
+            setCurrencyOpen(false)
+          }}
+        />
+      )}
 
       {/* ── Edit modal ── */}
       {editModalOpen && (
