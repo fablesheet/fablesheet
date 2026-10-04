@@ -22,7 +22,9 @@
     "alignmentShort": "Align",
     "caster": "✦ {{ability}} caster",
     "importNotJson": "The file is not valid JSON.",
-    "importFailed": "Import failed: {{error}}"
+    "importFailed": "Import failed: {{error}}",
+    "welcomeTitle": "Welcome to Fablesheet",
+    "welcomeText": "Create your first adventurer or import a character file."
   },
   "edit": {
     "name": "Name",
@@ -75,7 +77,10 @@
     "back": "← Back",
     "continue": "Continue →",
     "create": "✦ Create Character",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "stepOf": "Step {{current}} of {{total}}",
+    "previewName": "Your hero",
+    "previewHint": "Choose race, class and background"
   },
   "sheet": {
     "subtitle": "{{race}} {{className}} · Level {{level}}",

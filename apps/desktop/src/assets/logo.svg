@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b2219"/>
+      <stop offset="1" stop-color="#14100b"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="512" cy="540" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f5a623" stop-opacity="0.45"/>
+      <stop offset="0.55" stop-color="#f5a623" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#f5a623" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7b545"/>
+      <stop offset="1" stop-color="#c8621c"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9842f"/>
+      <stop offset="0.5" stop-color="#e8bd62"/>
+      <stop offset="1" stop-color="#a87526"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <circle cx="512" cy="540" r="420" fill="url(#halo)"/>
+  <!-- handle ring -->
+  <circle cx="512" cy="196" r="58" fill="none" stroke="url(#brass)" stroke-width="30"/>
+  <!-- cap -->
+  <rect x="482" y="246" width="60" height="28" rx="8" fill="url(#brass)"/>
+  <path d="M452 270 H572 L650 352 H374 Z" fill="url(#brass)" stroke-linejoin="round"/>
+  <!-- glass -->
+  <rect x="390" y="352" width="244" height="360" fill="url(#glass)"/>
+  <!-- flame -->
+  <path d="M512 410 C 470 480, 448 520, 448 572 C 448 618, 478 650, 512 650 C 546 650, 576 618, 576 572 C 576 520, 554 480, 512 410 Z" fill="#ffe7a6"/>
+  <path d="M512 500 C 492 538, 482 560, 482 586 C 482 610, 496 624, 512 624 C 528 624, 542 610, 542 586 C 542 560, 532 538, 512 500 Z" fill="#fffaf0"/>
+  <!-- frame -->
+  <rect x="390" y="352" width="244" height="360" fill="none" stroke="url(#brass)" stroke-width="30" stroke-linejoin="round"/>
+  <!-- base -->
+  <path d="M362 712 H662 L630 776 H394 Z" fill="url(#brass)"/>
+  <rect x="404" y="776" width="216" height="34" rx="10" fill="#9c6c22"/>
+</svg>

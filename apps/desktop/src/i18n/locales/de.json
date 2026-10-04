@@ -22,7 +22,9 @@
     "alignmentShort": "Gesinn.",
     "caster": "✦ Zauberwirker ({{ability}})",
     "importNotJson": "Die Datei ist kein gültiges JSON.",
-    "importFailed": "Import fehlgeschlagen: {{error}}"
+    "importFailed": "Import fehlgeschlagen: {{error}}",
+    "welcomeTitle": "Willkommen bei Fablesheet",
+    "welcomeText": "Erschaffe deinen ersten Abenteurer oder importiere eine Charakterdatei."
   },
   "edit": {
     "name": "Name",
@@ -75,7 +77,10 @@
     "back": "← Zurück",
     "continue": "Weiter →",
     "create": "✦ Charakter erschaffen",
-    "creating": "Wird erschaffen..."
+    "creating": "Wird erschaffen...",
+    "stepOf": "Schritt {{current}} von {{total}}",
+    "previewName": "Dein Held",
+    "previewHint": "Wähle Volk, Klasse und Hintergrund"
   },
   "sheet": {
     "subtitle": "{{race}} · {{className}} · Stufe {{level}}",
