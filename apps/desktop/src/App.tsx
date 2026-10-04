@@ -10,8 +10,8 @@ import { RestDialog } from './components/RestDialog'
 import { SheetView } from './components/sheet/SheetView'
 import { TableView, type TableObject } from './components/table/TableView'
 import { SpellbookView } from './components/spellbook/SpellbookView'
-import { Inventory } from './components/Inventory'
-import { NotesPage } from './components/NotesPage'
+import { BackpackView } from './components/backpack/BackpackView'
+import { JournalView } from './components/journal/JournalView'
 import { UpdateBanner } from './components/UpdateBanner'
 import { useCharacterSaver } from './hooks/useCharacterSaver'
 
@@ -63,14 +63,6 @@ function Screens() {
     return <CharacterSelect onSelect={open} onCreateNew={() => setView('builder')} />
   }
 
-  // Objects that still use their own full-screen layout
-  if (view === 'inventory') {
-    return <Inventory character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
-  }
-  if (view === 'notes') {
-    return <NotesPage character={character} onBack={() => setView('table')} onUpdate={handleUpdate} />
-  }
-
   const onTable = view === 'table'
   return (
     <Frame
@@ -88,6 +80,10 @@ function Screens() {
         <TableView character={character} onOpen={setView} />
       ) : view === 'spellbook' ? (
         <SpellbookView character={character} onUpdate={handleUpdate} />
+      ) : view === 'inventory' ? (
+        <BackpackView character={character} onUpdate={handleUpdate} />
+      ) : view === 'notes' ? (
+        <JournalView character={character} onUpdate={handleUpdate} />
       ) : (
         <SheetView character={character} onUpdate={handleUpdate} />
       )}

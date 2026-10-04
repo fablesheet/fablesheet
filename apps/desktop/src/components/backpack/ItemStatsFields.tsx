@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { ArmorStats, DamageType, WeaponStats } from '@fablesheet/core'
-import { gameLabel } from '../i18n/game'
+import { gameLabel } from '../../i18n/game'
 
 const DAMAGE_TYPES: DamageType[] = [
   'bludgeoning',
@@ -18,25 +18,6 @@ const DAMAGE_TYPES: DamageType[] = [
   'thunder',
 ]
 const ARMOR_TYPES: ArmorStats['type'][] = ['light', 'medium', 'heavy', 'shield']
-
-export const DEFAULT_WEAPON: WeaponStats = {
-  category: 'simple',
-  kind: 'melee',
-  damage: '1d6',
-  damageType: 'slashing',
-  versatileDamage: null,
-  properties: [],
-  range: null,
-}
-
-export const DEFAULT_ARMOR: ArmorStats = {
-  type: 'light',
-  baseAc: 11,
-  dexCap: null,
-  addDex: true,
-  strengthRequired: null,
-  stealthDisadvantage: false,
-}
 
 /** Dexterity rules follow from the armor type */
 function withArmorType(armor: ArmorStats, type: ArmorStats['type']): ArmorStats {
@@ -65,7 +46,7 @@ export function WeaponFields({
   const finesse = weapon.properties.includes('finesse')
 
   return (
-    <fieldset className="flex flex-col gap-3 border border-[rgba(100,70,20,0.2)] rounded-sm px-3 pt-1 pb-3">
+    <fieldset className="flex flex-col gap-3 border border-fs-card-line rounded-sm px-3 pt-1 pb-3">
       <legend className={`${labelCls} px-1`}>{t('inventory.weaponStats')}</legend>
       <div className="grid grid-cols-2 gap-3">
         <label>
@@ -132,7 +113,7 @@ export function WeaponFields({
           />
         </label>
       </div>
-      <label className="flex items-center gap-2 font-fell-sc text-caption text-[#5a3a18]">
+      <label className="flex items-center gap-2 text-sm text-fs-ink">
         <input
           type="checkbox"
           checked={finesse}
@@ -145,7 +126,7 @@ export function WeaponFields({
         {t('inventory.finesse')}
       </label>
       {weapon.properties.length > 0 && (
-        <div className="font-fell-sc text-deco text-[#7a5820]">
+        <div className="text-xs text-fs-ink-muted">
           {t('inventory.properties')}: {weapon.properties.map(p => gameLabel(t, 'weaponProperty', p)).join(', ')}
         </div>
       )}
@@ -162,7 +143,7 @@ export function ArmorFields({
   const { t } = useTranslation()
 
   return (
-    <fieldset className="flex flex-col gap-3 border border-[rgba(100,70,20,0.2)] rounded-sm px-3 pt-1 pb-3">
+    <fieldset className="flex flex-col gap-3 border border-fs-card-line rounded-sm px-3 pt-1 pb-3">
       <legend className={`${labelCls} px-1`}>{t('inventory.armorStats')}</legend>
       <div className="grid grid-cols-2 gap-3">
         <label>
@@ -193,12 +174,12 @@ export function ArmorFields({
           />
         </label>
       </div>
-      <div className="font-fell-sc text-deco text-[#7a5820]">
+      <div className="text-xs text-fs-ink-muted">
         {t(`inventory.acRule_${armor.type}`, { ac: armor.baseAc })}
         {armor.strengthRequired ? ` · ${t('inventory.strengthRequired', { value: armor.strengthRequired })}` : ''}
         {armor.stealthDisadvantage ? ` · ${t('inventory.stealthDisadvantage')}` : ''}
       </div>
-      <p className="font-fell italic text-deco text-[#9a8050]">{t('inventory.acHint')}</p>
+      <p className="italic text-xs text-fs-ink-muted">{t('inventory.acHint')}</p>
     </fieldset>
   )
 }

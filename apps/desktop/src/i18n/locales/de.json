@@ -8,7 +8,8 @@
     "level": "Stufe {{level}}",
     "none": "Keine",
     "all": "Alle",
-    "language": "Sprache"
+    "language": "Sprache",
+    "close": "Schließen"
   },
   "select": {
     "subtitle": "Wähle deinen Abenteurer",
@@ -248,7 +249,13 @@
     "acRule_shield": "+{{ac}} RK",
     "strengthRequired": "STÄ {{value}} benötigt",
     "stealthDisadvantage": "Nachteil auf Heimlichkeit",
-    "acHint": "Ausgerüstete Rüstungen und Schilde bestimmen deine RK."
+    "acHint": "Ausgerüstete Rüstungen und Schilde bestimmen deine RK.",
+    "onBody": "Am Körper",
+    "inBackpack": "Im Rucksack",
+    "nothingEquipped": "Nichts ausgerüstet. Tippe bei einem Gegenstand auf ◉, um ihn zu tragen oder zu führen.",
+    "equippedLabel": "Ausgerüstet (getragen oder geführt)",
+    "requiresAttunementLabel": "Erfordert Einstimmung",
+    "attunedLabel": "Eingestimmt"
   },
   "game": {
     "ability": {
