@@ -34,6 +34,8 @@ jobs:
             bundles: appimage,deb,rpm
           - platform: macos-latest
             bundles: dmg
+            # One .dmg for Apple Silicon and Intel Macs
+            target: universal-apple-darwin
           - platform: windows-latest
             bundles: nsis,msi
 
@@ -50,6 +52,8 @@ jobs:
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target == 'universal-apple-darwin' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -78,4 +82,4 @@ jobs:
           tagName: ${{ needs.release-please.outputs.tag_name }}
           releaseDraft: false
           uploadWorkflowArtifacts: ${{ github.event_name == 'workflow_dispatch' }}
-          args: --bundles ${{ matrix.bundles }}
+          args: --bundles ${{ matrix.bundles }}${{ matrix.target && format(' --target {0}', matrix.target) || '' }}
