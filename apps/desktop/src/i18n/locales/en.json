@@ -121,7 +121,9 @@
     "longRest": "☀ Long Rest",
     "confirmRest": "Click again to rest",
     "shortRestHint": "Short rest: Warlock pact slots and short-rest features recover. Spend hit dice with “Use”.",
-    "longRestHint": "Long rest: full HP, half your hit dice, all spell slots and features, one level of exhaustion removed."
+    "longRestHint": "Long rest: full HP, half your hit dice, all spell slots and features, one level of exhaustion removed.",
+    "notes": "❧ Notes",
+    "editCurrency": "Edit currency"
   },
   "spellbook": {
     "title": "Spellbook of <name>{{name}}</name>",
@@ -361,6 +363,13 @@
       "ep": "ep",
       "gp": "gp",
       "pp": "pp"
+    },
+    "currencyName": {
+      "cp": "Copper",
+      "sp": "Silver",
+      "ep": "Electrum",
+      "gp": "Gold",
+      "pp": "Platinum"
     }
   },
   "update": {
@@ -369,5 +378,22 @@
     "installing": "Installing… {{percent}}%",
     "later": "Later",
     "failed": "Update failed: {{error}}"
+  },
+  "notes": {
+    "title": "Notes of <name>{{name}}</name>",
+    "personality": "Personality",
+    "traits": "Personality Traits",
+    "ideals": "Ideals",
+    "bonds": "Bonds",
+    "flaws": "Flaws",
+    "backstory": "Backstory",
+    "backstoryPlaceholder": "Where does your character come from? What drives them?",
+    "notes": "Notes",
+    "notesPlaceholder": "Session notes, NPCs, quests, loot…\n\n## Headings, **bold**, - lists and - [ ] checklists work too",
+    "edit": "✎ Edit",
+    "preview": "◉ Preview",
+    "doubleClickToEdit": "Double-click to edit",
+    "empty": "Nothing written yet.",
+    "markdownHint": "Backstory and notes support Markdown: # headings, **bold**, *italic*, lists, - [ ] checklists, tables and links."
   }
 }

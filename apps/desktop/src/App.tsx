@@ -6,10 +6,11 @@ import { CharacterSheet } from './components/CharacterSheet'
 import { CharacterBuilder } from './components/CharacterBuilder'
 import { SpellBook } from './components/SpellBook'
 import { Inventory } from './components/Inventory'
+import { NotesPage } from './components/NotesPage'
 import { updateCharacter } from './services/api'
 import { UpdateBanner } from './components/UpdateBanner'
 
-type View = 'select' | 'builder' | 'sheet' | 'spellbook' | 'inventory'
+type View = 'select' | 'builder' | 'sheet' | 'spellbook' | 'inventory' | 'notes'
 
 function Screens() {
   const [character, setCharacter] = useState<Character | null>(null)
@@ -52,6 +53,10 @@ function Screens() {
     return <SpellBook character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
   }
 
+  if (view === 'notes') {
+    return <NotesPage character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
+  }
+
   if (view === 'inventory') {
     return <Inventory character={character} onBack={() => setView('sheet')} onUpdate={handleUpdate} />
   }
@@ -65,6 +70,7 @@ function Screens() {
       }}
       onSpellbook={() => setView('spellbook')}
       onInventory={() => setView('inventory')}
+      onNotes={() => setView('notes')}
       onUpdate={handleUpdate}
     />
   )
