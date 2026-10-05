@@ -1,29 +1,20 @@
 import { useTranslation } from 'react-i18next'
-import type { Character } from '@fablesheet/core'
-import { isItemUsable, spendCharge } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
+import type { GameSystemUI, TableToken } from '../../systems/types'
 
-interface Props {
-  character: Character
-  onUpdate: (c: Character) => void
-}
-
-interface Token {
-  key: string
-  name: string
-  current: number
-  max: number
-  /** Magic item charges are drawn as a round token, feature uses as a diamond */
-  item: boolean
-  spend: () => Character
+interface Props<C extends CharacterBase> {
+  character: C
+  system: GameSystemUI<C>
+  onUpdate: (c: C) => void
 }
 
 /**
- * Tokens for features with limited uses and magic items with charges, ready on the
- * table: tap to spend one.
+ * Tokens for features with limited uses (any system) and whatever else the
+ * system puts on the table, e.g. magic items with charges: tap to spend one.
  */
-export function FeatureTokens({ character, onUpdate }: Props) {
+export function FeatureTokens<C extends CharacterBase>({ character, system, onUpdate }: Props<C>) {
   const { t } = useTranslation()
-  const tokens: Token[] = [
+  const tokens: TableToken<C>[] = [
     ...character.features.flatMap((f, index) =>
       f.usesMax !== null && f.usesCurrent !== null
         ? [
@@ -32,7 +23,7 @@ export function FeatureTokens({ character, onUpdate }: Props) {
               name: f.name,
               current: f.usesCurrent,
               max: f.usesMax,
-              item: false,
+              shape: 'diamond' as const,
               spend: () => ({
                 ...character,
                 features: character.features.map((g, i) =>
@@ -43,16 +34,7 @@ export function FeatureTokens({ character, onUpdate }: Props) {
           ]
         : [],
     ),
-    ...character.items
-      .filter(i => i.charges && isItemUsable(i))
-      .map(i => ({
-        key: `item/${i.id}`,
-        name: i.name,
-        current: i.charges!.current,
-        max: i.charges!.max,
-        item: true,
-        spend: () => spendCharge(character, i.id),
-      })),
+    ...system.tokens(character),
   ]
   if (tokens.length === 0) return null
 
@@ -76,7 +58,7 @@ export function FeatureTokens({ character, onUpdate }: Props) {
             ].join(' ')}
           >
             <span
-              className={`size-2.5 border-[1.5px] border-fs-accent bg-fs-accent ${token.item ? 'rounded-full' : 'rotate-45'}`}
+              className={`size-2.5 border-[1.5px] border-fs-accent bg-fs-accent ${token.shape === 'round' ? 'rounded-full' : 'rotate-45'}`}
               aria-hidden="true"
             />
             <span className="font-display">{token.name}</span>

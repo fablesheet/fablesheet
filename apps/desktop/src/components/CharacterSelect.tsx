@@ -1,27 +1,27 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Character } from '@fablesheet/core'
-import { armorClass, CharacterMigrationError, importCharacter } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
+import { CharacterMigrationError, importCharacter } from '@fablesheet/core'
 import logo from '../assets/logo.svg'
 import { createCharacter, getCharacters } from '../services/api'
 import { openJsonFile } from '../services/files'
-import { gameLabel } from '../i18n/game'
-import { CharacterEditModal } from './CharacterEditModal'
+import { SYSTEM_DEFINITIONS } from '../systems/definitions'
+import { systemFor } from '../systems/registry'
 import { InstallHint } from './InstallHint'
 import { SettingsDialog } from './SettingsDialog'
 import { Button } from './ui/Button'
 
 interface Props {
-  onSelect: (character: Character) => void
+  onSelect: (character: CharacterBase) => void
   onCreateNew: () => void
 }
 
 export function CharacterSelect({ onSelect, onCreateNew }: Props) {
   const { t } = useTranslation()
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [characters, setCharacters] = useState<Character[]>([])
+  const [characters, setCharacters] = useState<CharacterBase[]>([])
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState<Character | null>(null)
+  const [editing, setEditing] = useState<CharacterBase | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
     try {
       const file = await openJsonFile()
       if (file === null) return
-      const created = await createCharacter(importCharacter(file))
+      const created = await createCharacter(importCharacter(file, SYSTEM_DEFINITIONS))
       setCharacters(prev => [...prev, created])
     } catch (e) {
       if (e instanceof CharacterMigrationError) setImportError(e.message)
@@ -94,20 +94,36 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
 
       {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
       {editing && (
-        <CharacterEditModal
-          character={editing}
-          onSaved={updated => {
-            setCharacters(prev => prev.map(c => (c.id === updated.id ? updated : c)))
-            setEditing(null)
-          }}
-          onDeleted={() => {
-            setCharacters(prev => prev.filter(c => c.id !== editing.id))
-            setEditing(null)
-          }}
-          onClose={() => setEditing(null)}
-        />
+        <EditDialog character={editing} onCharactersChange={setCharacters} onClose={() => setEditing(null)} />
       )}
     </div>
+  )
+}
+
+/** Opens the edit dialog of the character's game system. */
+function EditDialog({
+  character,
+  onCharactersChange,
+  onClose,
+}: {
+  character: CharacterBase
+  onCharactersChange: (update: (prev: CharacterBase[]) => CharacterBase[]) => void
+  onClose: () => void
+}) {
+  const { EditDialog: SystemEditDialog } = systemFor(character)
+  return (
+    <SystemEditDialog
+      character={character}
+      onSaved={updated => {
+        onCharactersChange(prev => prev.map(c => (c.id === updated.id ? updated : c)))
+        onClose()
+      }}
+      onDeleted={() => {
+        onCharactersChange(prev => prev.filter(c => c.id !== character.id))
+        onClose()
+      }}
+      onClose={onClose}
+    />
   )
 }
 
@@ -116,12 +132,14 @@ function CharacterCard({
   onOpen,
   onEdit,
 }: {
-  character: Character
+  character: CharacterBase
   onOpen: () => void
   onEdit: () => void
 }) {
   const { t } = useTranslation()
-  const percent = Math.max(0, Math.min(100, (c.hp.current / c.hp.max) * 100))
+  const system = systemFor(c)
+  const hp = system.hitPoints(c)
+  const percent = hp ? Math.max(0, Math.min(100, (hp.current / hp.max) * 100)) : 0
   return (
     <div className="group relative h-full">
       <button
@@ -132,32 +150,21 @@ function CharacterCard({
           {c.name.trim().charAt(0).toUpperCase() || '?'}
         </span>
         <span className="font-display text-lg leading-tight mt-1">{c.name}</span>
-        <span className="text-xs text-fs-ink-muted">
-          {gameLabel(t, 'race', c.race)} · {gameLabel(t, 'class', c.className)} ·{' '}
-          {t('common.level', { level: c.level })}
-        </span>
+        <span className="text-xs text-fs-ink-muted">{system.subtitle(c, t)}</span>
         <span className="w-full h-px bg-fs-card-line my-1.5" />
         <span className="w-full grid grid-cols-3 text-xs text-fs-ink-muted">
-          <span>
-            <span className="block font-display text-base text-fs-ink">
-              {c.hp.current}/{c.hp.max}
+          {system.cardStats(c, t).map(stat => (
+            <span key={stat.label}>
+              <span className="block font-display text-base text-fs-ink">{stat.value}</span>
+              {stat.label}
             </span>
-            {t('select.hp')}
-          </span>
-          <span>
-            <span className="block font-display text-base text-fs-ink">{armorClass(c)}</span>
-            {t('select.ac')}
-          </span>
-          <span>
-            <span className="block font-display text-base text-fs-ink">
-              {c.alignment ? gameLabel(t, 'alignmentShort', c.alignment) : '—'}
-            </span>
-            {t('select.alignmentShort')}
-          </span>
+          ))}
         </span>
-        <span className="w-full h-1 rounded-full bg-fs-track overflow-hidden mt-1">
-          <span className="block h-full bg-fs-good" style={{ width: `${percent}%` }} />
-        </span>
+        {hp && (
+          <span className="w-full h-1 rounded-full bg-fs-track overflow-hidden mt-1">
+            <span className="block h-full bg-fs-good" style={{ width: `${percent}%` }} />
+          </span>
+        )}
       </button>
       <button
         onClick={onEdit}

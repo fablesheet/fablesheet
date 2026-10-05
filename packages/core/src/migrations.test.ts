@@ -1,42 +1,46 @@
 import { describe, expect, it } from 'vitest'
-import { CHARACTER_SCHEMA_VERSION, CharacterMigrationError, migrateCharacter } from './migrations'
+import { CharacterMigrationError, LEGACY_SYSTEM, migrateCharacter, type GameSystemDefinition } from './migrations'
+import { testSystem } from './testing'
+
+const legacy: GameSystemDefinition = {
+  id: LEGACY_SYSTEM,
+  schemaVersion: 1,
+  migrations: [doc => ({ ...doc, old: true })],
+}
+const systems = [testSystem, legacy]
 
 describe('migrateCharacter', () => {
-  it('upgrades an unversioned v0.1.0 document and fills missing fields', () => {
-    const migrated = migrateCharacter({ id: 'a', name: 'Old Hero', level: 3 })
-    expect(migrated.schemaVersion).toBe(CHARACTER_SCHEMA_VERSION)
-    expect(migrated.level).toBe(3)
-    expect(migrated.items).toEqual([])
-    expect(migrated.knownSpells).toEqual([])
-    expect(migrated.currency).toEqual({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 })
+  it("runs the system's migrations up to its current version", () => {
+    const migrated = migrateCharacter({ id: 'a', name: 'Hero', system: 'test', hp: 7 }, systems)
+    expect(migrated).toMatchObject({ system: 'test', schemaVersion: 2, luck: 0, health: 7, conditions: [] })
+    expect('hp' in migrated).toBe(false)
   })
 
-  it('adds descriptions to features from older versions', () => {
-    const features = [{ name: 'Rage', source: 'Barbarian', usesMax: 2, usesCurrent: 1, recharge: 'long' }]
-    expect(migrateCharacter({ id: 'a', name: 'X', schemaVersion: 3, features }).features).toEqual([
-      { ...features[0], description: '' },
-    ])
-  })
-
-  it('keeps existing values', () => {
-    const items = [{ id: 'i', name: 'Rope' }]
-    expect(migrateCharacter({ id: 'a', name: 'X', items }).items).toEqual(items)
-  })
-
-  it('leaves current documents unchanged', () => {
-    const doc = { id: 'a', name: 'X', schemaVersion: CHARACTER_SCHEMA_VERSION, level: 5 }
-    expect(migrateCharacter(doc)).toEqual(doc)
-  })
-
-  it('rejects documents from a newer app version', () => {
-    expect(() => migrateCharacter({ name: 'X', schemaVersion: CHARACTER_SCHEMA_VERSION + 1 })).toThrow(
-      CharacterMigrationError,
+  it('continues from the stored version', () => {
+    const migrated = migrateCharacter(
+      { id: 'a', name: 'Hero', system: 'test', schemaVersion: 1, luck: 3, hp: 2 },
+      systems,
     )
+    expect(migrated).toMatchObject({ luck: 3, health: 2 })
+  })
+
+  it('treats documents without a system as legacy characters', () => {
+    expect(migrateCharacter({ id: 'a', name: 'Old' }, systems)).toMatchObject({ system: LEGACY_SYSTEM, old: true })
+  })
+
+  it('applies the normalize step after loading', () => {
+    const normalizing = { ...testSystem, normalize: (c: { name: string }) => ({ ...c, name: c.name.trim() }) }
+    expect(migrateCharacter({ id: 'a', name: ' X ', system: 'test' }, [normalizing]).name).toBe('X')
+  })
+
+  it('rejects unknown systems and documents from newer versions', () => {
+    expect(() => migrateCharacter({ name: 'X', system: 'unknown' }, systems)).toThrow(/doesn't know/)
+    expect(() => migrateCharacter({ name: 'X', system: 'test', schemaVersion: 3 }, systems)).toThrow(/newer version/)
   })
 
   it('rejects invalid input', () => {
-    expect(() => migrateCharacter(null)).toThrow(CharacterMigrationError)
-    expect(() => migrateCharacter([])).toThrow(CharacterMigrationError)
-    expect(() => migrateCharacter({ id: 'a' })).toThrow(CharacterMigrationError)
+    expect(() => migrateCharacter(null, systems)).toThrow(CharacterMigrationError)
+    expect(() => migrateCharacter([], systems)).toThrow(CharacterMigrationError)
+    expect(() => migrateCharacter({ id: 'a' }, systems)).toThrow(CharacterMigrationError)
   })
 })

@@ -1,19 +1,26 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Character, RollMode, RollResult } from '@fablesheet/core'
+import type { CharacterBase, RollMode, RollResult } from '@fablesheet/core'
 import { formatModifier, rollD20, startCombat } from '@fablesheet/core'
 import { Button } from '../ui/Button'
 import { Dialog } from '../ui/Dialog'
 import { Segmented } from '../ui/Segmented'
 
-interface Props {
-  character: Character
-  onStart: (updated: Character) => void
+interface Props<C extends CharacterBase> {
+  character: C
+  /** Initiative modifier from the game system */
+  initiativeModifier: number
+  onStart: (updated: C) => void
   onClose: () => void
 }
 
 /** Roll initiative in the app or enter a roll from the table, then start the combat. */
-export function StartCombatDialog({ character, onStart, onClose }: Props) {
+export function StartCombatDialog<C extends CharacterBase>({
+  character,
+  initiativeModifier,
+  onStart,
+  onClose,
+}: Props<C>) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<RollMode>('normal')
   const [roll, setRoll] = useState<RollResult | null>(null)
@@ -43,7 +50,7 @@ export function StartCombatDialog({ character, onStart, onClose }: Props) {
       <div className="flex flex-col gap-4">
         <section className="flex flex-col gap-2.5">
           <h3 className="fs-section-label m-0 font-normal">
-            {t('combat.initiative')} ({formatModifier(character.initiativeBonus)})
+            {t('combat.initiative')} ({formatModifier(initiativeModifier)})
           </h3>
           <Segmented
             label={t('dice.mode')}
@@ -59,7 +66,7 @@ export function StartCombatDialog({ character, onStart, onClose }: Props) {
             <Button
               onClick={() => {
                 setManual('')
-                setRoll(rollD20(character.initiativeBonus, mode, t('combat.initiative')))
+                setRoll(rollD20(initiativeModifier, mode, t('combat.initiative')))
               }}
             >
               🎲 {t('combat.rollInitiative')}

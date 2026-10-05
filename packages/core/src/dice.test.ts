@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDice, parseDice, rollD20, rollDie, rollExpression } from './dice'
+import { formatDice, parseDice, rollD20, rollDie, rollExpression, formatModifier } from './dice'
 
 /** Returns values so that rollDie gives the listed faces in order */
 function faces(sides: number[], values: number[]) {
@@ -64,5 +64,15 @@ describe('rolling', () => {
     expect(rollD20(0, 'normal', 'x', faces([20], [20])).critical).toBe('success')
     expect(rollD20(9, 'normal', 'x', faces([20], [1])).critical).toBe('failure')
     expect(rollD20(0, 'advantage', 'x', faces([20, 20], [1, 20])).critical).toBe('success')
+  })
+})
+
+describe('formatModifier', () => {
+  it('prefixes non-negative values with +', () => {
+    expect(formatModifier(0)).toBe('+0')
+    expect(formatModifier(3)).toBe('+3')
+  })
+  it('keeps the minus sign for negative values', () => {
+    expect(formatModifier(-2)).toBe('-2')
   })
 })

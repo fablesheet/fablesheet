@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import type { Character } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
 import { updateCharacter } from '../services/api'
 
 const SAVE_DELAY_MS = 500
@@ -10,7 +10,7 @@ const SAVE_DELAY_MS = 500
  * `flush()`, when the page is hidden or the app closes.
  */
 export function useCharacterSaver() {
-  const pending = useRef<Character | null>(null)
+  const pending = useRef<CharacterBase | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const flush = useCallback(() => {
@@ -21,7 +21,7 @@ export function useCharacterSaver() {
   }, [])
 
   const schedule = useCallback(
-    (character: Character) => {
+    (character: CharacterBase) => {
       pending.current = character
       clearTimeout(timer.current)
       timer.current = setTimeout(flush, SAVE_DELAY_MS)

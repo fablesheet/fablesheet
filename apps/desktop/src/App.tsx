@@ -1,27 +1,28 @@
 import { useCallback, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import './App.css'
-import type { Character } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
 import { CharacterSelect } from './components/CharacterSelect'
-import { CharacterBuilder } from './components/CharacterBuilder'
-import { CharacterEditModal } from './components/CharacterEditModal'
 import { CharacterHeader } from './components/CharacterHeader'
-import { RestDialog } from './components/RestDialog'
-import { LevelUpDialog } from './components/levelup/LevelUpDialog'
 import { CombatBar } from './components/combat/CombatBar'
 import { StartCombatDialog } from './components/combat/StartCombatDialog'
-import { SheetView } from './components/sheet/SheetView'
-import { TableView, type TableObject } from './components/table/TableView'
-import { SpellbookView } from './components/spellbook/SpellbookView'
-import { BackpackView } from './components/backpack/BackpackView'
-import { JournalView } from './components/journal/JournalView'
 import { DiceView } from './components/dice/DiceView'
+import { SystemPicker } from './components/SystemPicker'
+import { DICE_OBJECT, TableView } from './components/table/TableView'
 import { UpdateBanner } from './components/UpdateBanner'
 import { useCharacterSaver } from './hooks/useCharacterSaver'
+import { SYSTEMS, systemFor } from './systems/registry'
+import type { GameSystemUI } from './systems/types'
 
-type View = 'select' | 'builder' | 'table' | TableObject
+/** Character list, choosing a game system, creating a character, the table, or an object on it */
+type View =
+  | { kind: 'select' }
+  | { kind: 'pickSystem' }
+  | { kind: 'builder'; system: GameSystemUI }
+  | { kind: 'table' }
+  | { kind: 'object'; id: string }
 
-/** Page frame for the redesigned screens: header on top, content below */
+/** Page frame: header on top, content below */
 function Frame({ header, children }: { header: ReactNode; children: ReactNode }) {
   return (
     <div className="w-full h-full flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
@@ -33,74 +34,97 @@ function Frame({ header, children }: { header: ReactNode; children: ReactNode })
 
 function Screens() {
   const { t } = useTranslation()
-  const [character, setCharacter] = useState<Character | null>(null)
-  const [view, setView] = useState<View>('select')
+  const [character, setCharacter] = useState<CharacterBase | null>(null)
+  const [view, setView] = useState<View>({ kind: 'select' })
   const [editing, setEditing] = useState(false)
-  const [resting, setResting] = useState(false)
-  const [levelling, setLevelling] = useState(false)
   const [startingCombat, setStartingCombat] = useState(false)
   const saver = useCharacterSaver()
 
   // Single source of truth: update in memory right away, persist shortly after
   const handleUpdate = useCallback(
-    (updated: Character) => {
+    (updated: CharacterBase) => {
       setCharacter(updated)
       saver.schedule(updated)
     },
     [saver],
   )
 
-  const open = (c: Character) => {
+  const open = (c: CharacterBase) => {
     setCharacter(c)
-    setView('table')
+    setView({ kind: 'table' })
   }
 
   const toList = () => {
     saver.flush()
     setCharacter(null)
-    setView('select')
+    setView({ kind: 'select' })
   }
 
-  if (view === 'builder') {
-    return <CharacterBuilder onCreated={open} onCancel={() => setView('select')} />
+  // With a single game system there is nothing to choose
+  const createNew = () =>
+    setView(SYSTEMS.length === 1 ? { kind: 'builder', system: SYSTEMS[0] } : { kind: 'pickSystem' })
+
+  if (view.kind === 'pickSystem') {
+    return (
+      <SystemPicker
+        systems={SYSTEMS}
+        onPick={system => setView({ kind: 'builder', system })}
+        onCancel={() => setView({ kind: 'select' })}
+      />
+    )
   }
 
-  if (view === 'select' || !character) {
-    return <CharacterSelect onSelect={open} onCreateNew={() => setView('builder')} />
+  if (view.kind === 'builder') {
+    const { Builder } = view.system
+    return <Builder onCreated={open} onCancel={() => setView({ kind: 'select' })} />
   }
 
-  const onTable = view === 'table'
+  if (view.kind === 'select' || !character) {
+    return <CharacterSelect onSelect={open} onCreateNew={createNew} />
+  }
+
+  const system = systemFor(character)
+  const onTable = view.kind === 'table'
+  const object = view.kind === 'object' ? system.tableObjects(character, t).find(o => o.id === view.id) : undefined
+  const { EditDialog } = system
+
   return (
     <Frame
       header={
         <CharacterHeader
           character={character}
+          system={system}
+          onUpdate={handleUpdate}
           backLabel={onTable ? t('table.allCharacters') : t('table.backToTable')}
-          onBack={onTable ? toList : () => setView('table')}
+          onBack={onTable ? toList : () => setView({ kind: 'table' })}
           onEdit={() => setEditing(true)}
-          onRest={() => setResting(true)}
-          onLevelUp={() => setLevelling(true)}
           onStartCombat={() => setStartingCombat(true)}
         />
       }
     >
-      <CombatBar character={character} onUpdate={handleUpdate} />
+      <CombatBar character={character} system={system} onUpdate={handleUpdate} />
       {onTable ? (
-        <TableView character={character} onOpen={setView} onUpdate={handleUpdate} />
-      ) : view === 'spellbook' ? (
-        <SpellbookView character={character} onUpdate={handleUpdate} />
-      ) : view === 'inventory' ? (
-        <BackpackView character={character} onUpdate={handleUpdate} />
-      ) : view === 'notes' ? (
-        <JournalView character={character} onUpdate={handleUpdate} />
-      ) : view === 'dice' ? (
-        <DiceView character={character} />
+        <TableView
+          character={character}
+          system={system}
+          onOpen={id => setView({ kind: 'object', id })}
+          onUpdate={handleUpdate}
+        />
+      ) : object ? (
+        <object.View character={character} onUpdate={handleUpdate} />
+      ) : view.kind === 'object' && view.id === DICE_OBJECT ? (
+        <DiceView quickRolls={system.quickRolls(character, t)} />
       ) : (
-        <SheetView character={character} onUpdate={handleUpdate} />
+        <TableView
+          character={character}
+          system={system}
+          onOpen={id => setView({ kind: 'object', id })}
+          onUpdate={handleUpdate}
+        />
       )}
 
       {editing && (
-        <CharacterEditModal
+        <EditDialog
           character={character}
           onSaved={updated => {
             setCharacter(updated)
@@ -109,7 +133,7 @@ function Screens() {
           onDeleted={() => {
             setEditing(false)
             setCharacter(null)
-            setView('select')
+            setView({ kind: 'select' })
           }}
           onClose={() => setEditing(false)}
         />
@@ -117,6 +141,7 @@ function Screens() {
       {startingCombat && (
         <StartCombatDialog
           character={character}
+          initiativeModifier={system.combat.initiativeModifier(character)}
           onStart={updated => {
             handleUpdate(updated)
             setStartingCombat(false)
@@ -124,17 +149,6 @@ function Screens() {
           onClose={() => setStartingCombat(false)}
         />
       )}
-      {levelling && (
-        <LevelUpDialog
-          character={character}
-          onLevelUp={updated => {
-            handleUpdate(updated)
-            setLevelling(false)
-          }}
-          onClose={() => setLevelling(false)}
-        />
-      )}
-      {resting && <RestDialog character={character} onRest={handleUpdate} onClose={() => setResting(false)} />}
     </Frame>
   )
 }

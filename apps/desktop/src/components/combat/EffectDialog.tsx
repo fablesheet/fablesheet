@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Character } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
 import { addTimedEffect, ROUNDS_PER_MINUTE } from '@fablesheet/core'
-import { gameLabel } from '../../i18n/game'
-import { CONDITIONS } from '../sheet/conditions'
 import { Button } from '../ui/Button'
 import { Dialog } from '../ui/Dialog'
 
-interface Props {
-  character: Character
-  onAdd: (updated: Character) => void
+interface Props<C extends CharacterBase> {
+  character: C
+  /** Conditions of the game system, offered as quick choices (stored names) */
+  conditions: readonly string[]
+  conditionLabel: (condition: string) => string
+  onAdd: (updated: C) => void
   onClose: () => void
 }
 
@@ -17,11 +18,17 @@ const inputCls =
   'fs-focus min-h-10 text-sm text-fs-ink bg-fs-tile border border-fs-card-line rounded-lg px-3 placeholder:text-fs-ink-muted'
 
 /** Adds a condition or any other effect that lasts a number of rounds. */
-export function EffectDialog({ character, onAdd, onClose }: Props) {
+export function EffectDialog<C extends CharacterBase>({
+  character,
+  conditions,
+  conditionLabel,
+  onAdd,
+  onClose,
+}: Props<C>) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [rounds, setRounds] = useState(ROUNDS_PER_MINUTE)
-  const isCondition = (CONDITIONS as readonly string[]).includes(name)
+  const isCondition = conditions.includes(name)
   const valid = name.trim() !== '' && rounds >= 1
 
   return (
@@ -57,14 +64,14 @@ export function EffectDialog({ character, onAdd, onClose }: Props) {
           {t('combat.effectName')}
           <input
             autoFocus
-            value={isCondition ? gameLabel(t, 'condition', name) : name}
+            value={isCondition ? conditionLabel(name) : name}
             onChange={e => setName(e.target.value)}
             placeholder={t('combat.effectPlaceholder')}
             className={inputCls}
           />
         </label>
         <div className="flex flex-wrap gap-1.5" aria-label={t('sheet.conditions')}>
-          {CONDITIONS.filter(c => !c.startsWith('Exhaustion')).map(c => (
+          {conditions.map(c => (
             <button
               key={c}
               type="button"
@@ -77,7 +84,7 @@ export function EffectDialog({ character, onAdd, onClose }: Props) {
                   : 'bg-fs-tile border-fs-card-line text-fs-ink-muted hover:border-fs-brass',
               ].join(' ')}
             >
-              {gameLabel(t, 'condition', c)}
+              {conditionLabel(c)}
             </button>
           ))}
         </div>

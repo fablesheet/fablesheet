@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Character } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
+import type { GameSystemUI } from '../../systems/types'
 import { FeatureTokens } from './FeatureTokens'
-import { BackpackArt, BookArt, DiceArt, JournalArt, SheetArt } from './TableObjects'
+import { DiceArt } from './TableObjects'
 
-export type TableObject = 'sheet' | 'spellbook' | 'inventory' | 'notes' | 'dice'
+/** The dice tray is on every table, whatever the system */
+export const DICE_OBJECT = 'dice'
 
-interface Props {
-  character: Character
-  onOpen: (object: TableObject) => void
-  onUpdate: (c: Character) => void
+interface Props<C extends CharacterBase> {
+  character: C
+  system: GameSystemUI<C>
+  onOpen: (objectId: string) => void
+  onUpdate: (c: C) => void
 }
 
 function ObjectButton({
@@ -40,11 +43,8 @@ function ObjectButton({
 }
 
 /** The character's table: every part of the character is an object you pick up. */
-export function TableView({ character, onOpen, onUpdate }: Props) {
+export function TableView<C extends CharacterBase>({ character, system, onOpen, onUpdate }: Props<C>) {
   const { t } = useTranslation()
-  // Racial cantrips (e.g. High Elf, Tiefling) also go into the spellbook
-  const isCaster = character.spellcastingAbility !== null || character.knownSpells.length > 0
-  const spellCount = new Set([...character.knownSpells, ...character.preparedSpells]).size
 
   return (
     <div
@@ -52,40 +52,17 @@ export function TableView({ character, onOpen, onUpdate }: Props) {
       style={{ backgroundImage: 'radial-gradient(ellipse at 50% 45%, rgba(201,154,79,0.09), transparent 65%)' }}
     >
       <div className="flex flex-wrap justify-center gap-x-6 gap-y-10 md:gap-x-10 xl:gap-x-14 w-full max-w-6xl">
-        <ObjectButton
-          art={<SheetArt initial={character.name.toUpperCase()} />}
-          title={t('table.sheet')}
-          subtitle={t('table.sheetHint')}
-          onClick={() => onOpen('sheet')}
-        />
-        {isCaster && (
-          <ObjectButton
-            art={<BookArt />}
-            title={t('table.spellbook')}
-            subtitle={t('table.spellCount', { count: spellCount })}
-            onClick={() => onOpen('spellbook')}
-          />
-        )}
-        <ObjectButton
-          art={<BackpackArt />}
-          title={t('table.backpack')}
-          subtitle={t('inventory.catalogCount', { count: character.items.length })}
-          onClick={() => onOpen('inventory')}
-        />
-        <ObjectButton
-          art={<JournalArt label={t('table.journal')} />}
-          title={t('table.journal')}
-          subtitle={t('table.journalHint')}
-          onClick={() => onOpen('notes')}
-        />
+        {system.tableObjects(character, t).map(o => (
+          <ObjectButton key={o.id} art={o.art} title={o.title} subtitle={o.subtitle} onClick={() => onOpen(o.id)} />
+        ))}
         <ObjectButton
           art={<DiceArt />}
           title={t('table.dice')}
           subtitle={t('table.diceHint')}
-          onClick={() => onOpen('dice')}
+          onClick={() => onOpen(DICE_OBJECT)}
         />
       </div>
-      <FeatureTokens character={character} onUpdate={onUpdate} />
+      <FeatureTokens character={character} system={system} onUpdate={onUpdate} />
     </div>
   )
 }
