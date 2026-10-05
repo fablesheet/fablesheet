@@ -752,7 +752,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
   const isLast = step === STEP_LABELS.length - 1
 
   return (
-    <div className="w-screen h-dvh flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
+    <div className="w-full h-full flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
       {/* Steps */}
       <header className="flex items-center gap-3 bg-fs-bar border border-fs-bar-line rounded-fs px-3 py-2.5">
         <Button onBar variant="ghost" size="sm" onClick={onCancel}>

@@ -7,6 +7,7 @@ import { createCharacter, getCharacters } from '../services/api'
 import { openJsonFile } from '../services/files'
 import { gameLabel } from '../i18n/game'
 import { CharacterEditModal } from './CharacterEditModal'
+import { InstallHint } from './InstallHint'
 import { SettingsDialog } from './SettingsDialog'
 import { Button } from './ui/Button'
 
@@ -45,7 +46,7 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
   }
 
   return (
-    <div className="w-screen h-dvh flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
+    <div className="w-full h-full flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
       <header className="flex items-center gap-3 px-2 pt-1">
         <img src={logo} alt="" className="size-10 rounded-lg" />
         <div className="flex-1 min-w-0">
@@ -56,6 +57,8 @@ export function CharacterSelect({ onSelect, onCreateNew }: Props) {
           ⚙ <span className="hidden sm:inline">{t('settings.title')}</span>
         </Button>
       </header>
+
+      <InstallHint />
 
       <main
         className="flex-1 min-h-0 overflow-y-auto parchment-scroll bg-fs-table border border-fs-table-line rounded-2xl p-6 lg:p-10"

@@ -21,7 +21,7 @@ type View = 'select' | 'builder' | 'table' | TableObject
 /** Page frame for the redesigned screens: header on top, content below */
 function Frame({ header, children }: { header: ReactNode; children: ReactNode }) {
   return (
-    <div className="w-screen h-dvh flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
+    <div className="w-full h-full flex flex-col gap-3 bg-fs-bg p-3 font-ui overflow-hidden animate-fade-in">
       {header}
       {children}
     </div>

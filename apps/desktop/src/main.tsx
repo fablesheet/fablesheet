@@ -7,6 +7,9 @@ import App from './App'
 import './i18n'
 import './settings/theme'
 
+// In the browser, ask to keep our data even when storage runs low (installed apps get this automatically)
+if (!('__TAURI_INTERNALS__' in window)) void navigator.storage?.persist?.()
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <App />

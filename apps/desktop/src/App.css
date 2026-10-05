@@ -2,7 +2,22 @@
 @import './styles/theme.css';
 
 @layer base {
+  html {
+    /* No double-tap zoom on touch screens; taps react immediately */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Full-height app that keeps clear of the notch and home indicator */
+  #root {
+    height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    box-sizing: border-box;
+  }
+
   body {
+    overscroll-behavior: none;
     background: var(--fs-bg);
     color: var(--fs-ink);
     font-family: var(--font-ui);
