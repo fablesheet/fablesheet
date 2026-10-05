@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/fablesheet/fablesheet/compare/v0.3.0...v0.4.0) (2026-10-05)
+
+
+### Features
+
+* add a dice tray to the table ([#28](https://github.com/fablesheet/fablesheet/issues/28)) ([6d0d972](https://github.com/fablesheet/fablesheet/commit/6d0d972e44d0ba271264aa87d4e6a62737ffd05c))
+* add design foundation with light and dark mode ([#23](https://github.com/fablesheet/fablesheet/issues/23)) ([dd3f9cb](https://github.com/fablesheet/fablesheet/commit/dd3f9cb45ee3b8c01ed62b63123f22fdc628cbbf))
+* add the character table and redesigned character sheet ([#25](https://github.com/fablesheet/fablesheet/issues/25)) ([964499a](https://github.com/fablesheet/fablesheet/commit/964499aa9128c6b3531f04c82381a04ab0c03cba))
+* publish Fablesheet as an installable web app ([#30](https://github.com/fablesheet/fablesheet/issues/30)) ([402b0a5](https://github.com/fablesheet/fablesheet/commit/402b0a56193b78cade3a767edc3595ececb09304))
+* redesign the backpack and the journal ([#27](https://github.com/fablesheet/fablesheet/issues/27)) ([1072d91](https://github.com/fablesheet/fablesheet/commit/1072d91fbb48d48ff9497d770240056fd22b7f0d))
+* redesign the character list and the character builder ([#29](https://github.com/fablesheet/fablesheet/issues/29)) ([964eae3](https://github.com/fablesheet/fablesheet/commit/964eae3118d65c33201aaa8281eb929995700cb5))
+* turn the spellbook into a real book ([#26](https://github.com/fablesheet/fablesheet/issues/26)) ([6db22dc](https://github.com/fablesheet/fablesheet/commit/6db22dc508cc813a266320356bdfcae44859e8e1))
+
 ## [0.3.0](https://github.com/fablesheet/fablesheet/compare/v0.2.0...v0.3.0) (2026-10-04)
 
 
