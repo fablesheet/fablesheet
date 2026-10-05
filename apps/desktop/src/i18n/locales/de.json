@@ -531,5 +531,9 @@
     "noHistory": "Noch nicht gewürfelt.",
     "natural20": "Natürliche 20!",
     "natural1": "Natürliche 1"
+  },
+  "web": {
+    "installHint": "Tipp: Füge Fablesheet zum Home-Bildschirm hinzu (Teilen → Zum Home-Bildschirm). Dann läuft es offline wie eine App, und deine Charaktere bleiben sicher auf diesem Gerät.",
+    "dismiss": "Verstanden"
   }
 }

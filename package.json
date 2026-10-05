@@ -19,7 +19,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:web": "FABLESHEET_TARGET=web npm run build -w @fablesheet/desktop",
+    "preview:web": "npm run preview -w @fablesheet/desktop"
   },
   "engines": {
     "node": ">=22"

@@ -17,10 +17,16 @@ Create characters, track hit points, conditions, spells and inventory — everyt
 - **Spellbook** — browse SRD spells by level and school, learn, forget and prepare spells
 - **Inventory** — add items manually or from the SRD equipment catalog, carrying capacity, JSON import/export
 - **Offline-first** — local SQLite database on desktop, works without a connection
-- **Cross-platform** — Linux, Windows and macOS
+- **Cross-platform** — Linux, Windows and macOS, plus a web app for iPad and other tablets
 - **Multilingual** — English and German (game texts from the SRD are English only)
 
 ## Installation
+
+### iPad, tablet and browser
+
+Open **[fablesheet.github.io/fablesheet](https://fablesheet.github.io/fablesheet/)** and add it to your home screen (Safari: Share → Add to Home Screen). It then runs full screen and works offline; your characters stay on your device.
+
+### Desktop
 
 Download the latest build for your platform from the [Releases page](https://github.com/fablesheet/fablesheet/releases).
 
@@ -40,6 +46,7 @@ Requirements: [Node.js](https://nodejs.org) ≥ 22, [Rust](https://rustup.rs) (s
 npm install          # install all workspace dependencies
 npm run dev          # start the desktop app with hot reload
 npm run dev:web      # frontend only, in the browser (uses localStorage)
+npm run build:web    # installable web app (PWA) in apps/desktop/dist
 npm test             # unit tests (Vitest)
 npm run lint         # ESLint
 npm run format       # Prettier

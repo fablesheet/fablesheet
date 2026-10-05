@@ -2,6 +2,12 @@
 
 Download the latest build for your platform from the [Releases page](https://github.com/fablesheet/fablesheet/releases).
 
+## iPad and other tablets
+
+Fablesheet also runs as a web app: open [fablesheet.github.io/fablesheet](https://fablesheet.github.io/fablesheet/) in Safari, tap **Share → Add to Home Screen**, then start it from the home screen. It runs full screen, works offline and updates itself.
+
+> Characters are stored in the browser on that device. Use **Export character** in the character dialog to keep a backup or move a character to another device.
+
 Builds are not code-signed yet, so your operating system may warn you the first time you open Fablesheet.
 
 ## Windows

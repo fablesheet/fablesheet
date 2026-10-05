@@ -531,5 +531,9 @@
     "noHistory": "No rolls yet.",
     "natural20": "Natural 20!",
     "natural1": "Natural 1"
+  },
+  "web": {
+    "installHint": "Tip: add Fablesheet to your home screen (Share → Add to Home Screen). It then works offline like an app and your characters are kept safely on this device.",
+    "dismiss": "Got it"
   }
 }

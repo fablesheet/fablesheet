@@ -87,3 +87,13 @@ jobs:
           releaseDraft: false
           uploadWorkflowArtifacts: ${{ github.event_name == 'workflow_dispatch' }}
           args: --bundles ${{ matrix.bundles }}${{ matrix.target && format(' --target {0}', matrix.target) || '' }}
+
+  # Publish the web app for the same release
+  web:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
