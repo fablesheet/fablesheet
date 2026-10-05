@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0](https://github.com/fablesheet/fablesheet/compare/v0.4.0...v0.5.0) (2026-10-05)
+
+
+### Features
+
+* add SRD subraces, racial traits and a complete Acolyte background ([#33](https://github.com/fablesheet/fablesheet/issues/33)) ([74cbb21](https://github.com/fablesheet/fablesheet/commit/74cbb2161bb68c8caec632e2a48f0950f37074bd))
+* level up with guidance and track class features ([#31](https://github.com/fablesheet/fablesheet/issues/31)) ([5fe70db](https://github.com/fablesheet/fablesheet/commit/5fe70db9ada64c3a5cb85dba11178341026816ee))
+* track combat rounds, timed effects and concentration ([#34](https://github.com/fablesheet/fablesheet/issues/34)) ([f80ea86](https://github.com/fablesheet/fablesheet/commit/f80ea865980f3b72c23f13cfef0ec4468f05b1ef))
+
 ## [0.4.0](https://github.com/fablesheet/fablesheet/compare/v0.3.0...v0.4.0) (2026-10-05)
 
 
