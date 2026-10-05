@@ -46,8 +46,18 @@ const EXTRA_WEAPONS: Record<string, string[]> = {
 const MARTIAL_CLASSES = new Set(['Barbarian', 'Fighter', 'Paladin', 'Ranger'])
 const SIMPLE_CLASSES = new Set([...MARTIAL_CLASSES, 'Bard', 'Cleric', 'Monk', 'Rogue', 'Warlock'])
 
-export function isProficientWithWeapon(className: string, weaponName: string, weapon: WeaponStats): boolean {
+/**
+ * Proficiency from the class, or from other proficiencies such as racial weapon
+ * training (listed by weapon name).
+ */
+export function isProficientWithWeapon(
+  className: string,
+  weaponName: string,
+  weapon: WeaponStats,
+  otherProficiencies: string[] = [],
+): boolean {
   if (MARTIAL_CLASSES.has(className)) return true
+  if (otherProficiencies.some(p => p.toLowerCase() === weaponName.toLowerCase())) return true
   if (weapon.category === 'simple' && SIMPLE_CLASSES.has(className)) return true
   return EXTRA_WEAPONS[className]?.includes(weaponName) ?? false
 }
@@ -73,7 +83,8 @@ export interface Attack {
 
 /** Attack and damage for a weapon: finesse uses the better of STR/DEX, ranged weapons DEX, melee STR. */
 export function weaponAttack(
-  character: Pick<Character, 'className' | 'scores' | 'proficiencyBonus'>,
+  character: Pick<Character, 'className' | 'scores' | 'proficiencyBonus'> &
+    Partial<Pick<Character, 'otherProficiencies'>>,
   item: Item,
 ): Attack | null {
   const weapon = item.weapon
@@ -89,7 +100,7 @@ export function weaponAttack(
       ? 'dexterity'
       : 'strength'
   const mod = ability === 'dexterity' ? dex : str
-  const proficient = isProficientWithWeapon(character.className, item.name, weapon)
+  const proficient = isProficientWithWeapon(character.className, item.name, weapon, character.otherProficiencies)
 
   return {
     itemId: item.id,

@@ -1,6 +1,6 @@
 // Class progression from the System Reference Document 5.1 (CC-BY-4.0). See NOTICE.
 // Summaries are short paraphrases of the SRD rules, meant as reminders at the table.
-import type { AbilityName, AbilityScores, Character, CharacterFeature } from '@fablesheet/core'
+import type { AbilityName, AbilityScores, CharacterFeature } from '@fablesheet/core'
 import { abilityModifier } from '@fablesheet/core'
 
 export type FeatureRecharge = 'short' | 'long'
@@ -19,6 +19,8 @@ export interface ClassFeatureDef {
   /** Maximum uses at the given level; null = unlimited. Omitted for features without uses. */
   uses?: (ctx: UsesContext) => number | null
   recharge?: FeatureRecharge | ((level: number) => FeatureRecharge)
+  /** The description depends on a choice made for the character (e.g. a cantrip) and is kept when syncing */
+  personal?: boolean
 }
 
 export interface SubclassDef {
@@ -927,7 +929,12 @@ function srdSubclass(cls: ClassDef, subclass: string | null): SubclassDef | null
   return subclass !== null && subclass.trim().toLowerCase() === cls.subclass.name.toLowerCase() ? cls.subclass : null
 }
 
-function toFeature(def: ClassFeatureDef, source: string, level: number, scores: AbilityScores): CharacterFeature {
+export function toFeature(
+  def: ClassFeatureDef,
+  source: string,
+  level: number,
+  scores: AbilityScores,
+): CharacterFeature {
   const usesMax = def.uses ? def.uses({ level, mod: a => abilityModifier(scores[a]) }) : null
   const recharge = typeof def.recharge === 'function' ? def.recharge(level) : (def.recharge ?? null)
   return {
@@ -968,36 +975,4 @@ export function featuresGainedAt(
 ): CharacterFeature[] {
   const before = new Set(classFeaturesAt(className, subclass, level - 1, scores).map(f => `${f.source}/${f.name}`))
   return classFeaturesAt(className, subclass, level, scores).filter(f => !before.has(`${f.source}/${f.name}`))
-}
-
-/** Whether the catalog has features for the character that it does not track yet. */
-type FeatureHolder = Pick<Character, 'className' | 'subclass' | 'level' | 'scores' | 'features'>
-
-export function hasMissingClassFeatures(character: FeatureHolder): boolean {
-  const have = new Set(character.features.map(f => `${f.source}/${f.name}`))
-  return classFeaturesAt(character.className, character.subclass, character.level, character.scores).some(
-    f => !have.has(`${f.source}/${f.name}`),
-  )
-}
-
-/**
- * Brings the character's class and subclass features in line with its level:
- * adds new ones, recalculates uses (keeping how many are spent), drops ones from
- * levels the character no longer has. Features from other sources are kept as they are.
- */
-export function syncClassFeatures<T extends FeatureHolder>(character: T): T {
-  const cls = findClass(character.className)
-  if (!cls) return character
-  const catalogSources = new Set([cls.name, cls.subclass.name])
-  const expected = classFeaturesAt(character.className, character.subclass, character.level, character.scores)
-  const existing = new Map(character.features.map(f => [`${f.source}/${f.name}`, f]))
-
-  const synced = expected.map(f => {
-    const old = existing.get(`${f.source}/${f.name}`)
-    if (!old || old.usesCurrent === null || old.usesMax === null || f.usesMax === null) return f
-    const spent = Math.max(0, old.usesMax - old.usesCurrent)
-    return { ...f, usesCurrent: Math.max(0, f.usesMax - spent) }
-  })
-  const others = character.features.filter(f => !catalogSources.has(f.source))
-  return { ...character, features: [...synced, ...others] }
 }

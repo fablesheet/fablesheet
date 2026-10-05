@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character, CharacterFeature } from '@fablesheet/core'
-import { hasMissingClassFeatures, syncClassFeatures } from '@fablesheet/srd-data'
+import { hasMissingFeatures, syncFeatures } from '@fablesheet/srd-data'
 import { gameLabel } from '../../i18n/game'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
@@ -75,7 +75,7 @@ export function FeaturesCard({ character, onUpdate }: Props) {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState<string | null>(null)
   const [editing, setEditing] = useState<{ index: number | null; feature: CharacterFeature } | null>(null)
-  const missing = hasMissingClassFeatures(character)
+  const missing = hasMissingFeatures(character)
 
   const setFeatures = (features: CharacterFeature[]) => onUpdate({ ...character, features })
   const patch = (index: number, change: Partial<CharacterFeature>) =>
@@ -111,7 +111,7 @@ export function FeaturesCard({ character, onUpdate }: Props) {
           <span className="flex-1 min-w-40">
             {t('features.missing', { className: gameLabel(t, 'class', character.className) })}
           </span>
-          <Button size="sm" variant="primary" onClick={() => onUpdate(syncClassFeatures(character))}>
+          <Button size="sm" variant="primary" onClick={() => onUpdate(syncFeatures(character))}>
             {t('features.addFromClass')}
           </Button>
         </div>

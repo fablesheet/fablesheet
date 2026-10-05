@@ -12,7 +12,7 @@ Create characters, track hit points, conditions, spells and inventory — everyt
 
 ## Features
 
-- **Character builder** — step-by-step creation: race, class, ability scores, background and skills
+- **Character builder** — step-by-step creation: race and SRD subrace, class, ability scores, background (or your own), skills and languages
 - **Level up** — guided level-up with hit points (average or rolled), subclass, ability score improvements and the new class features
 - **Class features** — all SRD class and subclass features with limited uses as tokens on the table, plus your own features
 - **Character sheet** — HP, temporary HP, death saves, hit dice, conditions and inspiration, saved automatically

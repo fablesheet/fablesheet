@@ -11,7 +11,7 @@ import {
   rollDie,
   spellSlotMaximums,
 } from '@fablesheet/core'
-import { findClass, syncClassFeatures } from '@fablesheet/srd-data'
+import { findClass, raceHitPointsPerLevel, syncFeatures } from '@fablesheet/srd-data'
 import { gameLabel } from '../../i18n/game'
 import { Button } from '../ui/Button'
 import { Dialog } from '../ui/Dialog'
@@ -66,9 +66,10 @@ export function LevelUpDialog({ character, onLevelUp, onClose }: Props) {
     for (const a of picked) abilityIncreases[a] = asiMode === 'two' ? 2 : 1
   }
 
-  const preview = syncClassFeatures(
+  const preview = syncFeatures(
     levelUp(character, {
       hitDieResult: hitDieResult ?? 0,
+      bonusHitPointsPerLevel: raceHitPointsPerLevel(character.race),
       abilityIncreases,
       ...(needsSubclass ? { subclass: subclass.trim() || null } : {}),
     }),

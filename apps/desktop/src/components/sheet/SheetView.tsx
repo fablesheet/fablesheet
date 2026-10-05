@@ -403,7 +403,7 @@ function DetailsCard({ character, update }: { character: Character; update: (p: 
     <Card>
       <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm items-baseline">
         <dt className="fs-section-label">{t('sheet.languages')}</dt>
-        <dd className="m-0">{character.languages.join(', ') || '—'}</dd>
+        <dd className="m-0">{character.languages.map(l => gameLabel(t, 'language', l)).join(', ') || '—'}</dd>
         <dt className="fs-section-label">{t('sheet.currency')}</dt>
         <dd className="m-0">
           <button

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character } from '@fablesheet/core'
 import { changeLevel, characterFileName, exportCharacter } from '@fablesheet/core'
-import { syncClassFeatures } from '@fablesheet/srd-data'
+import { syncFeatures } from '@fablesheet/srd-data'
 import { updateCharacter, deleteCharacter } from '../services/api'
 import { saveJsonFile } from '../services/files'
 import { gameLabel } from '../i18n/game'
@@ -51,7 +51,7 @@ export function CharacterEditModal({ character, onSaved, onDeleted, onClose }: P
     setSaving(true)
     setError(null)
     // Features follow level and subclass; spent uses are kept
-    const updated: Character = syncClassFeatures({
+    const updated: Character = syncFeatures({
       ...changeLevel(character, level),
       name: name.trim(),
       experiencePoints: xp,
