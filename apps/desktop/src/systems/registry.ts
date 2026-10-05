@@ -1,13 +1,18 @@
 import type { CharacterBase } from '@fablesheet/core'
 import type { Dnd5eCharacter } from '@fablesheet/dnd5e'
+import type { TemplateCharacter } from '@fablesheet/templates'
 import { dnd5e } from './dnd5e'
+import { templateSystem } from './template'
 import type { GameSystemUI } from './types'
 
 /** A character of any game system Fablesheet knows */
-export type AnyCharacter = Dnd5eCharacter
+export type AnyCharacter = Dnd5eCharacter | TemplateCharacter
 
 /** Game systems available in the app, in the order they are offered */
-export const SYSTEMS: readonly GameSystemUI[] = [dnd5e as unknown as GameSystemUI]
+export const SYSTEMS: readonly GameSystemUI[] = [
+  dnd5e as unknown as GameSystemUI,
+  templateSystem as unknown as GameSystemUI,
+]
 
 /** The game system of a character. Characters are only loaded for known systems. */
 export function systemFor<C extends CharacterBase>(character: C): GameSystemUI<C> {

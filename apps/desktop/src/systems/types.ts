@@ -95,9 +95,9 @@ export interface GameSystemUI<C extends CharacterBase = CharacterBase> {
 
   combat: {
     initiativeModifier: (character: C) => number
-    actions: (t: TFunction) => CombatAction[]
+    actions: (t: TFunction, character: C) => CombatAction[]
     /** Conditions offered as timed effects (stored names) */
-    conditions: readonly string[]
+    conditions: (character: C) => readonly string[]
     conditionLabel: (t: TFunction, condition: string) => string
     /** Extra content in the combat bar, e.g. concentration */
     BarExtras?: ComponentType<CharacterViewProps<C>>

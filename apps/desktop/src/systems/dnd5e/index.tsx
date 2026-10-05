@@ -26,6 +26,9 @@ import { CONDITIONS } from './sheet/conditions'
 import { SheetView } from './sheet/SheetView'
 import { SpellbookView } from './spellbook/SpellbookView'
 
+/** Exhaustion has levels and isn't a timed effect */
+const TIMED_CONDITIONS = CONDITIONS.filter(c => !c.startsWith('Exhaustion'))
+
 export const dnd5e: GameSystemUI<Dnd5eCharacter> = {
   definition: dnd5eSystemDefinition,
   name: t => t('systems.dnd5e.name'),
@@ -155,7 +158,7 @@ export const dnd5e: GameSystemUI<Dnd5eCharacter> = {
       { id: 'bonusAction', label: t('combat.bonusActionUsed') },
       { id: 'reaction', label: t('combat.reactionUsed') },
     ],
-    conditions: CONDITIONS.filter(c => !c.startsWith('Exhaustion')),
+    conditions: () => TIMED_CONDITIONS,
     conditionLabel: (t, condition) => gameLabel(t, 'condition', condition),
     BarExtras: ConcentrationChip,
     showBarOutsideCombat: c => c.concentration !== null,

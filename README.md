@@ -8,7 +8,7 @@
 
 Create characters, track hit points, conditions, spells and inventory — everything is stored locally on your device. No account, no tracking, no internet required.
 
-Fablesheet is built for many game systems. Today it fully supports the **fifth edition rules of the SRD 5.1**; more systems are on the [roadmap](ROADMAP.md).
+Fablesheet is built for many game systems. It fully supports the **fifth edition rules of the SRD 5.1**, and **any other game** with sheet templates — included are templates for Fate, Blades in the Dark, 2d6 moves (PbtA style) and 3d20 checks, and the sheet builder makes your own. More systems are on the [roadmap](ROADMAP.md).
 
 > 🚧 Fablesheet is in early development (pre-1.0). Expect rough edges and breaking changes.
 
@@ -22,6 +22,7 @@ Fablesheet is built for many game systems. Today it fully supports the **fifth e
 - **Spellbook** — browse SRD spells by level and school, learn, forget and prepare spells
 - **Inventory** — add items manually or from the SRD equipment catalog, carrying capacity, JSON import/export
 - **Magic items** — SRD magic items, +1 to +3 weapons and armor, attunement (max. 3), bonuses to AC, attacks and saving throws, charges that recharge on rests
+- **Sheet builder** — build a sheet for any game from numbers, text, boxes, resources and lists, with rolls and formulas; share it as a template file
 - **Dice for every game** — dice tray with keep highest/lowest, exploding dice, success pools and Fudge dice, plus percentile, 3d20, Hope & Fear, d6 action rolls and 2d6 moves
 - **Offline-first** — local SQLite database on desktop, works without a connection
 - **Cross-platform** — Linux, Windows and macOS, plus a web app for iPad and other tablets
@@ -71,6 +72,7 @@ packages/
   core/           System-independent core: characters, dice, combat, migrations, file format
   dnd5e/          Fifth edition rules (SRD 5.1)
   dnd5e-srd/      Fifth edition content from the SRD 5.1 (classes, races, spells, items)
+  templates/      Sheet templates: data model, formulas, validation, built-in templates
 ```
 
 ## Contributing

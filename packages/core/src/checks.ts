@@ -26,7 +26,9 @@ export function rollUnder(
   mode: RollMode,
   label: string,
   random: RandomSource = secureRandom,
+  sides: 20 | 100 = 100,
 ): RollResult {
+  if (sides === 20) return rollUnderD20(target, mode, label, random)
   const units = rollDie(10, random) - 1
   const tensRolls = [rollDie(10, random) - 1]
   if (mode !== 'normal') tensRolls.push(rollDie(10, random) - 1)
@@ -56,6 +58,30 @@ export function rollUnder(
     total: kept,
     critical: null,
     outcome: { kind, detail, values: { target } },
+  }
+}
+
+/**
+ * A d20 at or under a target value (e.g. an attribute check); 1 is a critical,
+ * 20 a fumble. Advantage and disadvantage roll two dice and keep the better or worse.
+ */
+function rollUnderD20(target: number, mode: RollMode, label: string, random: RandomSource): RollResult {
+  const values = [rollDie(20, random), ...(mode !== 'normal' ? [rollDie(20, random)] : [])]
+  const kept = mode === 'advantage' ? Math.min(...values) : mode === 'disadvantage' ? Math.max(...values) : values[0]
+  const keptIndex = values.indexOf(kept)
+  const dice: DieResult[] = values.map((v, i) => ({
+    sides: 20,
+    value: v,
+    ...(i !== keptIndex ? { dropped: true } : {}),
+  }))
+  const kind: OutcomeKind = kept === 1 ? 'critical' : kept === 20 ? 'fumble' : kept <= target ? 'success' : 'failure'
+  return {
+    label,
+    dice,
+    modifier: 0,
+    total: kept,
+    critical: null,
+    outcome: { kind, detail: `dice.outcome.${kind}`, values: { target } },
   }
 }
 
@@ -209,7 +235,8 @@ export function applyBands(result: RollResult, bands: readonly OutcomeBand[]): R
 export type RollSpec =
   | { kind: 'd20'; modifier: number }
   | { kind: 'dice'; expression: string; bands?: OutcomeBand[] }
-  | { kind: 'under'; target: number }
+  /** Roll-under: d100 by default, or a single d20 */
+  | { kind: 'under'; target: number; sides?: 20 | 100 }
   | { kind: '3d20'; attributes: [number, number, number]; skill: number; modifier?: number }
   | { kind: 'duality'; modifier: number; difficulty?: number | null }
   | { kind: 'highest'; pool: number }
@@ -235,7 +262,7 @@ export function performRoll(
       return spec.bands ? applyBands(result, spec.bands) : result
     }
     case 'under':
-      return rollUnder(spec.target, mode, label, random)
+      return rollUnder(spec.target, mode, label, random, spec.sides ?? 100)
     case '3d20':
       return rollThreeD20(spec.attributes, spec.skill, spec.modifier ?? 0, label, random)
     case 'duality':
