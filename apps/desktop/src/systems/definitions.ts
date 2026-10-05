@@ -2,5 +2,6 @@
 // Kept apart from the screens so that storage code doesn't depend on UI code.
 import type { GameSystemDefinition } from '@fablesheet/core'
 import { dnd5eSystemDefinition } from './dnd5e/definition'
+import { templateDefinition } from './template/definition'
 
-export const SYSTEM_DEFINITIONS: readonly GameSystemDefinition[] = [dnd5eSystemDefinition]
+export const SYSTEM_DEFINITIONS: readonly GameSystemDefinition[] = [dnd5eSystemDefinition, templateDefinition]

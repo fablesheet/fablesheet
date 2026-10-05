@@ -8,19 +8,13 @@ import { Card } from '../ui/Card'
 import { Segmented } from '../ui/Segmented'
 import { ChecksCard } from './ChecksCard'
 import { DieShape } from './DieShape'
+import { addToHistory, clearHistory, getHistory } from './history'
 import { describeRoll, dieTone, displayTotal, OUTCOME_COLOR, outcomeText } from './rollText'
 
-const MAX_HISTORY = 30
 const ROLL_MS = 650
 const POOL_DICE: Sides[] = [...DIE_SIZES, FUDGE]
 /** Examples shown in the syntax help */
 const EXAMPLES = ['2d6+3', '4d6kh3', '2d20kl1', '3d6!', '8d6>=5', '4dF+2']
-
-/** Roll history survives switching between table objects during a session */
-let sessionHistory: RollResult[] = []
-function rememberHistory(history: RollResult[]) {
-  sessionHistory = history
-}
 
 interface Props {
   /** Rolls for the character, e.g. saving throws and skills */
@@ -38,7 +32,7 @@ export function DiceView({ quickRolls: allQuickRolls }: Props) {
   const [successAt, setSuccessAt] = useState('')
   const [custom, setCustom] = useState('')
   const [customError, setCustomError] = useState(false)
-  const [history, setHistory] = useState<RollResult[]>(sessionHistory)
+  const [history, setHistory] = useState<RollResult[]>(getHistory)
   const [rolling, setRolling] = useState(false)
   const [flicker, setFlicker] = useState(0)
   const timers = useRef<number[]>([])
@@ -48,9 +42,7 @@ export function DiceView({ quickRolls: allQuickRolls }: Props) {
 
   function show(result: RollResult | null) {
     if (!result) return
-    const next = [result, ...history].slice(0, MAX_HISTORY)
-    rememberHistory(next)
-    setHistory(next)
+    setHistory(addToHistory(result))
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     setRolling(true)
     const interval = window.setInterval(() => setFlicker(f => f + 1), 60)
@@ -301,7 +293,7 @@ export function DiceView({ quickRolls: allQuickRolls }: Props) {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    rememberHistory([])
+                    clearHistory()
                     setHistory([])
                   }}
                 >

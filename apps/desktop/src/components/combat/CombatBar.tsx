@@ -37,7 +37,7 @@ export function CombatBar<C extends CharacterBase>({ character, system, onUpdate
             </span>
           </span>
           <span className="flex gap-1" role="group" aria-label={t('combat.actions')}>
-            {system.combat.actions(t).map(action => {
+            {system.combat.actions(t, character).map(action => {
               const spent = combat.spentActions.includes(action.id)
               return (
                 <button
@@ -103,7 +103,7 @@ export function CombatBar<C extends CharacterBase>({ character, system, onUpdate
       {adding && (
         <EffectDialog
           character={character}
-          conditions={system.combat.conditions}
+          conditions={system.combat.conditions(character)}
           conditionLabel={c => system.combat.conditionLabel(t, c)}
           onClose={() => setAdding(false)}
           onAdd={updated => {

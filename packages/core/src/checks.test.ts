@@ -56,6 +56,28 @@ describe('rollUnder', () => {
   })
 })
 
+describe('rollUnder with a d20', () => {
+  const roll = (target: number, ...values: number[]) =>
+    rollUnder(
+      target,
+      values.length > 1 ? 'advantage' : 'normal',
+      'Courage',
+      faces(
+        values.map(() => 20),
+        values,
+      ),
+      20,
+    )
+
+  it('succeeds at or under the target, 1 is critical and 20 a fumble', () => {
+    expect(roll(12, 12).outcome?.kind).toBe('success')
+    expect(roll(12, 13).outcome?.kind).toBe('failure')
+    expect(roll(12, 1).outcome?.kind).toBe('critical')
+    expect(roll(25, 20).outcome?.kind).toBe('fumble')
+    expect(roll(10, 15, 4).total).toBe(4)
+  })
+})
+
 describe('rollThreeD20', () => {
   const roll = (rolls: number[], skill = 6, modifier = 0) =>
     rollThreeD20([12, 13, 14], skill, modifier, 'Climb', faces([20, 20, 20], rolls))

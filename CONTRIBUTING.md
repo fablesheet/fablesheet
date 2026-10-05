@@ -58,6 +58,8 @@ Fablesheet supports several pen & paper games. The code is split into:
 - `packages/<system>` and `packages/<system>-srd` — rules and openly licensed content of one game, e.g. `dnd5e` and `dnd5e-srd`.
 - `apps/desktop/src/systems/<system>` — the screens of that game and its `GameSystemUI` definition (see `apps/desktop/src/systems/types.ts`), registered in `systems/registry.ts` and `systems/definitions.ts`.
 
+Games that don't need their own code can be played with **sheet templates** (`packages/templates`): a template is data (sections, fields, rolls with formulas) and can be built in the app or shipped in `packages/templates/src/builtin`. New built-in templates need a test-clean definition and, if they follow an openly licensed game, its attribution in the template and in [NOTICE](NOTICE).
+
 Each system has its own character format version and migration chain. See the [roadmap](ROADMAP.md) for the systems that are planned.
 
 ## Game content rules
