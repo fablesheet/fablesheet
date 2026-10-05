@@ -124,6 +124,8 @@ describe('weapons', () => {
     const rapier = weapon('Rapier', {}).weapon!
     expect(isProficientWithWeapon('Rogue', 'Rapier', rapier)).toBe(true)
     expect(isProficientWithWeapon('Cleric', 'Rapier', rapier)).toBe(false)
+    expect(isProficientWithWeapon('Wizard', 'Longsword', rapier, ['Longsword'])).toBe(true)
+    expect(isProficientWithWeapon('Wizard', 'Longsword', rapier)).toBe(false)
     expect(isProficientWithWeapon('Cleric', 'Mace', { ...rapier, category: 'simple' })).toBe(true)
     expect(isProficientWithWeapon('Wizard', 'Quarterstaff', { ...rapier, category: 'simple' })).toBe(true)
   })

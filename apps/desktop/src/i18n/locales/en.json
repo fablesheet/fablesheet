@@ -80,7 +80,34 @@
     "creating": "Creating...",
     "stepOf": "Step {{current}} of {{total}}",
     "previewName": "Your hero",
-    "previewHint": "Choose race, class and background"
+    "previewHint": "Choose race, class and background",
+    "subrace": "Subrace",
+    "otherSubrace": "Other subrace",
+    "otherSubraceHint": "Only the racial traits; add the rest yourself",
+    "ancestry": "Draconic ancestry",
+    "cantrip": "Cantrip",
+    "cantripHint": "One cantrip from the wizard spell list, cast with Intelligence.",
+    "abilityChoices": "{{race}}: +1 to {{count}} abilities of your choice",
+    "customBackground": "Custom background",
+    "customBackgroundHint": "Your own name, two skills of your choice",
+    "customBackgroundName": "Name of the background, e.g. Soldier",
+    "backgroundSkills": "Background skills",
+    "backgroundGives": "Also gives {{gold}} gp, {{items}} pieces of equipment and a background feature.",
+    "raceSkills": "{{race}} skills",
+    "languages": "Languages",
+    "languagesHint": "You already speak {{languages}}.",
+    "dragon": {
+      "Black": "Black",
+      "Blue": "Blue",
+      "Brass": "Brass",
+      "Bronze": "Bronze",
+      "Copper": "Copper",
+      "Gold": "Gold",
+      "Green": "Green",
+      "Red": "Red",
+      "Silver": "Silver",
+      "White": "White"
+    }
   },
   "sheet": {
     "subtitle": "{{race}} {{className}} · Level {{level}}",
@@ -308,7 +335,11 @@
       "Half-Elf": "Half-Elf",
       "Half-Orc": "Half-Orc",
       "Tiefling": "Tiefling",
-      "Dragonborn": "Dragonborn"
+      "Dragonborn": "Dragonborn",
+      "High Elf": "High Elf",
+      "Hill Dwarf": "Hill Dwarf",
+      "Lightfoot Halfling": "Lightfoot Halfling",
+      "Rock Gnome": "Rock Gnome"
     },
     "class": {
       "Barbarian": "Barbarian",
@@ -451,6 +482,24 @@
       "medium": "Medium armor",
       "heavy": "Heavy armor",
       "shield": "Shield"
+    },
+    "language": {
+      "Common": "Common",
+      "Dwarvish": "Dwarvish",
+      "Elvish": "Elvish",
+      "Giant": "Giant",
+      "Gnomish": "Gnomish",
+      "Goblin": "Goblin",
+      "Halfling": "Halfling",
+      "Orc": "Orc",
+      "Abyssal": "Abyssal",
+      "Celestial": "Celestial",
+      "Draconic": "Draconic",
+      "Deep Speech": "Deep Speech",
+      "Infernal": "Infernal",
+      "Primordial": "Primordial",
+      "Sylvan": "Sylvan",
+      "Undercommon": "Undercommon"
     }
   },
   "update": {

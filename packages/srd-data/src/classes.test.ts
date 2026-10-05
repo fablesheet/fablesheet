@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { migrateCharacter } from '@fablesheet/core'
-import { CLASS_CATALOG, classFeaturesAt, featuresGainedAt, hasMissingClassFeatures, syncClassFeatures } from './classes'
+import { CLASS_CATALOG, classFeaturesAt, featuresGainedAt } from './classes'
+import { hasMissingFeatures, syncFeatures } from './features'
 
 const scores = { strength: 16, dexterity: 14, constitution: 14, intelligence: 8, wisdom: 10, charisma: 14 }
 
@@ -50,7 +51,7 @@ describe('class catalog', () => {
   })
 })
 
-describe('syncClassFeatures', () => {
+describe('syncFeatures (classes)', () => {
   const barbarian = migrateCharacter({ id: 'b', name: 'Grog', className: 'Barbarian', level: 1, scores, features: [] })
 
   it('adds missing features and keeps custom ones', () => {
@@ -62,28 +63,28 @@ describe('syncClassFeatures', () => {
       usesCurrent: 1,
       recharge: 'long',
     }
-    expect(hasMissingClassFeatures(barbarian)).toBe(true)
-    const synced = syncClassFeatures({ ...barbarian, features: [custom] })
+    expect(hasMissingFeatures(barbarian)).toBe(true)
+    const synced = syncFeatures({ ...barbarian, features: [custom] })
     expect(synced.features.map(f => f.name)).toEqual(['Rage', 'Unarmored Defense', 'Lucky charm'])
-    expect(hasMissingClassFeatures(synced)).toBe(false)
+    expect(hasMissingFeatures(synced)).toBe(false)
   })
 
   it('keeps spent uses when the maximum grows, and removes features above the level', () => {
-    const lvl2 = syncClassFeatures({ ...barbarian, level: 2 })
+    const lvl2 = syncFeatures({ ...barbarian, level: 2 })
     const spent = {
       ...lvl2,
       level: 3,
       features: lvl2.features.map(f => (f.name === 'Rage' ? { ...f, usesCurrent: 0 } : f)),
     }
-    const lvl3 = syncClassFeatures(spent)
+    const lvl3 = syncFeatures(spent)
     expect(lvl3.features.find(f => f.name === 'Rage')).toMatchObject({ usesMax: 3, usesCurrent: 1 })
 
-    const down = syncClassFeatures({ ...lvl3, level: 1 })
+    const down = syncFeatures({ ...lvl3, level: 1 })
     expect(down.features.map(f => f.name)).toEqual(['Rage', 'Unarmored Defense'])
   })
 
   it('leaves characters of unknown classes alone', () => {
     const homebrew = { ...barbarian, className: 'Artificer' }
-    expect(syncClassFeatures(homebrew)).toBe(homebrew)
+    expect(syncFeatures(homebrew)).toBe(homebrew)
   })
 })

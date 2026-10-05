@@ -184,6 +184,10 @@ describe('levelUp', () => {
     expect(levelUp({ ...fighter, level: 20 }, { hitDieResult: 5 }).level).toBe(20)
   })
 
+  it('adds bonus hit points per level, such as Dwarven Toughness', () => {
+    expect(levelUp(fighter, { hitDieResult: 6, bonusHitPointsPerLevel: 1 }).hp.max).toBe(28 + 8 + 1)
+  })
+
   it('updates the proficiency bonus at 5th level', () => {
     expect(levelUp({ ...fighter, level: 4 }, { hitDieResult: 6 }).proficiencyBonus).toBe(3)
   })

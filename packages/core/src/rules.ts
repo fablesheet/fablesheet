@@ -128,6 +128,8 @@ export interface LevelUpChoice {
   hitDieResult: number
   /** Ability Score Improvement, e.g. { strength: 2 } or { dexterity: 1, wisdom: 1 } */
   abilityIncreases?: Partial<Record<AbilityName, number>>
+  /** Extra hit points per level from other sources, e.g. Dwarven Toughness */
+  bonusHitPointsPerLevel?: number
   /** Subclass chosen at this level (keeps the current one if omitted) */
   subclass?: string | null
 }
@@ -151,7 +153,10 @@ export function levelUp(character: Character, choice: LevelUpChoice): Character 
 
   const conMod = abilityModifier(scores.constitution)
   const conGain = conMod - abilityModifier(character.scores.constitution)
-  const gain = Math.max(1, Math.floor(choice.hitDieResult) + conMod) + conGain * character.level
+  const gain =
+    Math.max(1, Math.floor(choice.hitDieResult) + conMod) +
+    conGain * character.level +
+    (choice.bonusHitPointsPerLevel ?? 0)
   const max = Math.max(1, character.hp.max + gain)
   const current = Math.min(max, Math.max(0, character.hp.current + gain))
   const dexGain = abilityModifier(scores.dexterity) - abilityModifier(character.scores.dexterity)

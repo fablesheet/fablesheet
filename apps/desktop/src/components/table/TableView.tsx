@@ -42,7 +42,8 @@ function ObjectButton({
 /** The character's table: every part of the character is an object you pick up. */
 export function TableView({ character, onOpen, onUpdate }: Props) {
   const { t } = useTranslation()
-  const isCaster = character.spellcastingAbility !== null
+  // Racial cantrips (e.g. High Elf, Tiefling) also go into the spellbook
+  const isCaster = character.spellcastingAbility !== null || character.knownSpells.length > 0
   const spellCount = new Set([...character.knownSpells, ...character.preparedSpells]).size
 
   return (

@@ -18,6 +18,7 @@ type GameGroup =
   | 'damageType'
   | 'weaponProperty'
   | 'armorType'
+  | 'language'
 
 /**
  * Display label for a game term. Characters store terms in English (e.g. "Lawful Good"),

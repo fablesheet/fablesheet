@@ -10,7 +10,19 @@ import {
   spellAttackBonus,
   spellSaveDC,
 } from '@fablesheet/core'
-import { findClass, syncClassFeatures } from '@fablesheet/srd-data'
+import {
+  BACKGROUND_CATALOG,
+  CUSTOM_BACKGROUND_SKILLS,
+  LANGUAGES,
+  RACE_CATALOG,
+  SPELL_CATALOG,
+  ancestryDescription,
+  findBackground,
+  findClass,
+  raceAbilityBonuses,
+  startingItems,
+  syncFeatures,
+} from '@fablesheet/srd-data'
 import { createCharacter } from '../services/api'
 import { gameLabel } from '../i18n/game'
 import { Button } from './ui/Button'
@@ -42,49 +54,17 @@ const SKILL_ABILITY: Record<SkillName, AbilityName> = {
   survival: 'wisdom',
 }
 
-interface RaceInfo {
-  name: string
-  symbol: string
-  speed: number
-  abilityBonuses: Partial<Record<AbilityName, number>>
-  languages: string[]
+const RACE_SYMBOLS: Record<string, string> = {
+  Human: '◈',
+  Elf: '🌙',
+  Dwarf: '⛏',
+  Halfling: '🍀',
+  Dragonborn: '🐉',
+  Gnome: '⚙',
+  'Half-Elf': '🌿',
+  'Half-Orc': '⚡',
+  Tiefling: '🔥',
 }
-
-const RACES: RaceInfo[] = [
-  {
-    name: 'Human',
-    symbol: '◈',
-    speed: 30,
-    abilityBonuses: { strength: 1, dexterity: 1, constitution: 1, intelligence: 1, wisdom: 1, charisma: 1 },
-    languages: ['Common'],
-  },
-  { name: 'Elf', symbol: '🌙', speed: 30, abilityBonuses: { dexterity: 2 }, languages: ['Common', 'Elvish'] },
-  { name: 'Dwarf', symbol: '⛏', speed: 25, abilityBonuses: { constitution: 2 }, languages: ['Common', 'Dwarvish'] },
-  { name: 'Halfling', symbol: '🍀', speed: 25, abilityBonuses: { dexterity: 2 }, languages: ['Common', 'Halfling'] },
-  { name: 'Gnome', symbol: '⚙', speed: 25, abilityBonuses: { intelligence: 2 }, languages: ['Common', 'Gnomish'] },
-  { name: 'Half-Elf', symbol: '🌿', speed: 30, abilityBonuses: { charisma: 2 }, languages: ['Common', 'Elvish'] },
-  {
-    name: 'Half-Orc',
-    symbol: '⚡',
-    speed: 30,
-    abilityBonuses: { strength: 2, constitution: 1 },
-    languages: ['Common', 'Orc'],
-  },
-  {
-    name: 'Tiefling',
-    symbol: '🔥',
-    speed: 30,
-    abilityBonuses: { intelligence: 1, charisma: 2 },
-    languages: ['Common', 'Infernal'],
-  },
-  {
-    name: 'Dragonborn',
-    symbol: '🐉',
-    speed: 30,
-    abilityBonuses: { strength: 2, charisma: 1 },
-    languages: ['Common', 'Draconic'],
-  },
-]
 
 interface ClassInfo {
   name: string
@@ -256,17 +236,16 @@ const CLASSES: ClassInfo[] = [
   },
 ]
 
-interface BackgroundInfo {
-  name: string
-  skills: SkillName[]
-}
+/** Background value for a background the player describes themselves */
+const CUSTOM_BACKGROUND = '__custom__'
+const ALL_SKILLS = Object.keys(SKILL_ABILITY) as SkillName[]
 
-const BACKGROUNDS: BackgroundInfo[] = [
-  { name: 'Acolyte', skills: ['insight', 'religion'] },
-  { name: 'Criminal', skills: ['deception', 'stealth'] },
-  { name: 'Sage', skills: ['arcana', 'history'] },
-  { name: 'Soldier', skills: ['athletics', 'intimidation'] },
-]
+/** Toggles a value in a list that may hold at most `max` values (1 = single choice). */
+function toggleIn<T>(list: T[], value: T, max: number): T[] {
+  if (list.includes(value)) return list.filter(v => v !== value)
+  if (max === 1) return [value]
+  return list.length < max ? [...list, value] : list
+}
 
 const ALIGNMENTS = [
   'Lawful Good',
@@ -291,6 +270,20 @@ interface BuilderState {
   name: string
   race: string
   alignment: string
+  /** Without the SRD subrace (e.g. for a subrace from another book) */
+  noSubrace: boolean
+  /** Dragonborn ancestry (dragon colour) */
+  ancestry: string
+  /** Spell name of the racial cantrip choice (High Elf) */
+  cantrip: string
+  /** Free +1 ability bonuses (Half-Elf) */
+  raceAbilityPicks: AbilityName[]
+  /** Skills of choice from the race (Half-Elf) */
+  raceSkills: SkillName[]
+  /** Languages of choice */
+  languages: string[]
+  customBackgroundName: string
+  customSkills: SkillName[]
   className: string
   /** Only asked for classes that choose their subclass at 1st level */
   subclass: string
@@ -314,6 +307,14 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
     name: '',
     race: '',
     alignment: '',
+    noSubrace: false,
+    ancestry: '',
+    cantrip: '',
+    raceAbilityPicks: [],
+    raceSkills: [],
+    languages: [],
+    customBackgroundName: '',
+    customSkills: [],
     className: '',
     subclass: '',
     assignedScores: {},
@@ -328,17 +329,31 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const race = RACES.find(r => r.name === s.race)
+  const race = RACE_CATALOG.find(r => r.name === s.race)
+  const subrace = race?.subrace && !s.noSubrace ? race.subrace : null
+  /** Stored race name: the SRD subrace if chosen, otherwise the race */
+  const raceName = subrace?.name ?? race?.name ?? ''
+  const raceBonuses = raceAbilityBonuses(raceName)
+  const bonusFor = (a: AbilityName) => (raceBonuses[a] ?? 0) + (s.raceAbilityPicks.includes(a) ? 1 : 0)
+  const cantripOptions = subrace?.cantripChoice
+    ? SPELL_CATALOG.filter(sp => sp.level === 0 && subrace.cantripChoice!.spells.includes(sp.name))
+    : []
   const cls = CLASSES.find(c => c.name === s.className)
   const srdClass = findClass(s.className)
-  const bg = BACKGROUNDS.find(b => b.name === s.background)
+  const bg = findBackground(s.background)
+  const customBg = s.background === CUSTOM_BACKGROUND
+  const bgSkills: SkillName[] = bg?.skills ?? (customBg ? s.customSkills : [])
+  const fixedRaceSkills = race?.skills ?? []
+  const raceSkillCount = race?.skillChoices ?? 0
+  const languageCount = (race?.extraLanguages ?? 0) + (subrace?.extraLanguages ?? 0) + (bg?.extraLanguages ?? 0)
+  const lockedSkills = new Set<SkillName>([...bgSkills, ...fixedRaceSkills, ...s.raceSkills])
+  const classSkills = s.chosenSkills.filter(sk => !lockedSkills.has(sk))
 
   // Computed final ability scores (base + race bonus)
   const finalScores = ABILITY_NAMES.reduce(
     (acc, a) => {
       const base = s.assignedScores[a] ?? 0
-      const bonus = race?.abilityBonuses[a] ?? 0
-      acc[a] = base + bonus
+      acc[a] = base + bonusFor(a)
       return acc
     },
     {} as Record<AbilityName, number>,
@@ -350,10 +365,17 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
 
   // Step validity
   const valid = [
-    s.name.trim().length > 0 && !!s.race && !!s.alignment,
+    s.name.trim().length > 0 &&
+      !!race &&
+      !!s.alignment &&
+      (!race.ancestries || !!s.ancestry) &&
+      (cantripOptions.length === 0 || !!s.cantrip),
     !!s.className,
-    allAssigned,
-    !!s.background && s.chosenSkills.length === (cls?.skillCount ?? 0),
+    allAssigned && s.raceAbilityPicks.length === (race?.abilityChoices ?? 0),
+    (!!bg || (customBg && !!s.customBackgroundName.trim() && s.customSkills.length === CUSTOM_BACKGROUND_SKILLS)) &&
+      classSkills.length === (cls?.skillCount ?? 0) &&
+      s.raceSkills.length === raceSkillCount &&
+      s.languages.length === languageCount,
     true, // personality is optional
   ]
 
@@ -392,28 +414,34 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
     }))
   }
 
+  // ── Race change: clear choices that depend on the race ─────────────────────
+  function setRace(name: string) {
+    setS(prev => ({
+      ...prev,
+      race: name,
+      noSubrace: false,
+      ancestry: '',
+      cantrip: '',
+      raceAbilityPicks: [],
+      raceSkills: [],
+      languages: [],
+    }))
+  }
+
   // ── Background change: clear skill choices ──────────────────────────────────
   function setBackground(name: string) {
-    setS(prev => ({ ...prev, background: name, chosenSkills: [] }))
+    setS(prev => ({ ...prev, background: name, chosenSkills: [], customSkills: [], languages: [] }))
   }
 
   // ── Skill toggling ──────────────────────────────────────────────────────────
   function toggleSkill(skill: SkillName) {
-    if (!cls) return
-    const bgSkills = bg?.skills ?? []
-    if (bgSkills.includes(skill)) return // locked by background
-
-    setS(prev => {
-      const has = prev.chosenSkills.includes(skill)
-      if (has) return { ...prev, chosenSkills: prev.chosenSkills.filter(sk => sk !== skill) }
-      if (prev.chosenSkills.length >= (cls.skillCount ?? 0)) return prev
-      return { ...prev, chosenSkills: [...prev.chosenSkills, skill] }
-    })
+    if (!cls || lockedSkills.has(skill)) return
+    setS(prev => ({ ...prev, chosenSkills: toggleIn(classSkills, skill, cls.skillCount) }))
   }
 
   // ── Create character ────────────────────────────────────────────────────────
   async function handleCreate() {
-    if (!cls || !race || !bg) return
+    if (!cls || !race || (!bg && !customBg)) return
     setCreating(true)
     setError(null)
 
@@ -422,9 +450,12 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
     const dexMod = mod(scores.dexterity)
     const spAbility = cls.spellcastingAbility
     const pb = proficiencyBonusForLevel(1)
-    const hpMax = cls.hitDie + conMod
+    const hpMax = cls.hitDie + conMod + (subrace?.hitPointsPerLevel ?? 0)
 
-    const allProficientSkills = new Set([...bg.skills, ...s.chosenSkills])
+    const allProficientSkills = new Set([...lockedSkills, ...classSkills])
+    const cantrips = [s.cantrip, ...(race.cantrips ?? [])].filter(Boolean)
+    const ancestry = race.ancestries?.find(a => a.dragon === s.ancestry)
+    const ancestryText = ancestry ? ancestryDescription(ancestry) : null
 
     const skills: SkillEntry[] = (Object.keys(SKILL_ABILITY) as SkillName[]).map(skill => ({
       name: skill,
@@ -432,14 +463,14 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       proficiency: allProficientSkills.has(skill) ? 'proficient' : 'none',
     }))
 
-    const character: Omit<Character, 'id'> = syncClassFeatures({
+    const character: Omit<Character, 'id'> = syncFeatures({
       schemaVersion: CHARACTER_SCHEMA_VERSION,
       name: s.name.trim(),
-      race: s.race,
+      race: raceName,
       className: s.className,
       level: 1,
       subclass: s.subclass.trim() || null,
-      background: s.background,
+      background: bg ? bg.name : s.customBackgroundName.trim(),
       alignment: s.alignment,
       experiencePoints: 0,
       scores: {
@@ -464,14 +495,25 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       spellcastingAbility: spAbility ?? null,
       spellSaveDC: spAbility ? spellSaveDC(scores[spAbility], pb) : null,
       spellAttackBonus: spAbility ? spellAttackBonus(scores[spAbility], pb) : null,
-      knownSpells: [],
+      knownSpells: SPELL_CATALOG.filter(sp => cantrips.includes(sp.name)).map(sp => sp.id),
       preparedSpells: [],
       spellSlotsUsed: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      features: [],
-      currency: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
-      languages: [...race.languages],
-      otherProficiencies: [],
-      items: [],
+      features: bg
+        ? [
+            {
+              name: bg.feature.name,
+              source: bg.name,
+              description: bg.feature.summary,
+              usesMax: null,
+              usesCurrent: null,
+              recharge: null,
+            },
+          ]
+        : [],
+      currency: { cp: 0, sp: 0, ep: 0, gp: bg?.gold ?? 0, pp: 0 },
+      languages: [...race.languages, ...s.languages],
+      otherProficiencies: [...(race.weapons ?? []), ...(subrace?.weapons ?? [])],
+      items: startingItems(bg?.equipment ?? []).map(item => ({ ...item, id: crypto.randomUUID() })),
       personality: {
         traits: s.personalityTraits.trim(),
         ideals: s.ideals.trim(),
@@ -480,6 +522,13 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       },
       backstory: '',
       notes: '',
+    })
+    // Racial traits whose text depends on a choice made here
+    character.features = character.features.map(f => {
+      if (f.name === 'Cantrip' && s.cantrip) return { ...f, description: `${f.description} ${s.cantrip}.` }
+      if (f.name === 'Draconic Ancestry' && ancestryText) return { ...f, description: ancestryText.ancestry }
+      if (f.name === 'Damage Resistance' && ancestryText) return { ...f, description: ancestryText.resistance }
+      return f
     })
 
     try {
@@ -529,15 +578,15 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
         {section(
           t('builder.race'),
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {RACES.map(r => (
+            {RACE_CATALOG.map(r => (
               <button
                 key={r.name}
-                onClick={() => setS(prev => ({ ...prev, race: r.name }))}
+                onClick={() => setRace(r.name)}
                 aria-pressed={s.race === r.name}
                 className={`${choice(s.race === r.name)} px-3 py-2.5 flex items-center gap-2.5`}
               >
                 <span className="text-xl leading-none" aria-hidden="true">
-                  {r.symbol}
+                  {RACE_SYMBOLS[r.name] ?? '◇'}
                 </span>
                 <span className="flex-1">
                   <span className="block">{gameLabel(t, 'race', r.name)}</span>
@@ -551,6 +600,67 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             ))}
           </div>,
         )}
+        {race?.subrace &&
+          section(
+            t('builder.subrace'),
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setS(prev => ({ ...prev, noSubrace: false, cantrip: '', languages: [] }))}
+                aria-pressed={!s.noSubrace}
+                className={`${choice(!s.noSubrace)} px-3 py-2.5`}
+              >
+                <span className="block font-display">{gameLabel(t, 'race', race.subrace.name)}</span>
+                <span className="block text-xs text-fs-ink-muted">
+                  {Object.entries(race.subrace.abilityBonuses)
+                    .map(([a, b]) => `${abilityShort(a as AbilityName)} +${b}`)
+                    .join(' · ')}
+                </span>
+              </button>
+              <button
+                onClick={() => setS(prev => ({ ...prev, noSubrace: true, cantrip: '', languages: [] }))}
+                aria-pressed={s.noSubrace}
+                className={`${choice(s.noSubrace)} px-3 py-2.5`}
+              >
+                <span className="block font-display">{t('builder.otherSubrace')}</span>
+                <span className="block text-xs text-fs-ink-muted">{t('builder.otherSubraceHint')}</span>
+              </button>
+            </div>,
+          )}
+        {race?.ancestries &&
+          section(
+            t('builder.ancestry'),
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+              {race.ancestries.map(a => (
+                <button
+                  key={a.dragon}
+                  onClick={() => setS(prev => ({ ...prev, ancestry: a.dragon }))}
+                  aria-pressed={s.ancestry === a.dragon}
+                  className={`${choice(s.ancestry === a.dragon)} px-2 py-2 text-center`}
+                >
+                  <span className="block text-sm">{t(`builder.dragon.${a.dragon}`)}</span>
+                  <span className="block text-xs text-fs-ink-muted">{gameLabel(t, 'damageType', a.damageType)}</span>
+                </button>
+              ))}
+            </div>,
+          )}
+        {cantripOptions.length > 0 &&
+          section(
+            t('builder.cantrip'),
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+              {cantripOptions.map(sp => (
+                <button
+                  key={sp.id}
+                  onClick={() => setS(prev => ({ ...prev, cantrip: sp.name }))}
+                  aria-pressed={s.cantrip === sp.name}
+                  title={sp.description}
+                  className={`${choice(s.cantrip === sp.name)} px-3 py-2 text-sm`}
+                >
+                  {sp.name}
+                </button>
+              ))}
+            </div>,
+            t('builder.cantripHint'),
+          )}
         {section(
           t('builder.alignment'),
           <div className="grid grid-cols-3 gap-1.5">
@@ -658,7 +768,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {ABILITY_NAMES.map(ability => {
             const base = s.assignedScores[ability]
-            const bonus = race?.abilityBonuses[ability] ?? 0
+            const bonus = bonusFor(ability)
             const final = (base ?? 0) + bonus
             const hasBase = base !== undefined
             return (
@@ -682,20 +792,73 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             )
           })}
         </div>
+        {race?.abilityChoices &&
+          section(
+            t('builder.abilityChoices', { count: race.abilityChoices, race: gameLabel(t, 'race', race.name) }),
+            <div className="grid grid-cols-3 gap-1.5">
+              {ABILITY_NAMES.filter(a => !(a in race.abilityBonuses)).map(a => {
+                const picked = s.raceAbilityPicks.includes(a)
+                const full = !picked && s.raceAbilityPicks.length >= race.abilityChoices!
+                return (
+                  <button
+                    key={a}
+                    disabled={full}
+                    aria-pressed={picked}
+                    onClick={() =>
+                      setS(prev => ({
+                        ...prev,
+                        raceAbilityPicks: toggleIn(prev.raceAbilityPicks, a, race.abilityChoices!),
+                      }))
+                    }
+                    className={`${choice(picked, full)} px-2 py-2 text-center`}
+                  >
+                    {gameLabel(t, 'ability', a)} {picked && <span className="text-fs-brass">+1</span>}
+                  </button>
+                )
+              })}
+            </div>,
+          )}
+      </div>
+    )
+  }
+
+  function skillChips(options: SkillName[], selected: SkillName[], max: number, onToggle: (sk: SkillName) => void) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        {options.map(skill => {
+          const chosen = selected.includes(skill)
+          const maxed = selected.length >= max && !chosen
+          return (
+            <button
+              key={skill}
+              onClick={() => onToggle(skill)}
+              disabled={maxed}
+              aria-pressed={chosen}
+              className={`${choice(chosen, maxed)} px-3 py-2 flex items-center gap-2.5`}
+            >
+              <span className={chosen ? 'text-fs-brass' : 'text-fs-card-line'} aria-hidden="true">
+                ◆
+              </span>
+              <span className="flex-1">{skillLabel(skill)}</span>
+              <span className="text-xs text-fs-ink-muted">{abilityShort(SKILL_ABILITY[skill])}</span>
+            </button>
+          )
+        })}
       </div>
     )
   }
 
   function renderPath() {
-    const bgSkills = bg?.skills ?? []
-    const availableClassSkills = (cls?.skillPool ?? []).filter(sk => !bgSkills.includes(sk))
+    const availableClassSkills = (cls?.skillPool ?? []).filter(sk => !lockedSkills.has(sk))
+    const grants = [...bgSkills, ...fixedRaceSkills]
+    const baseLanguages = race?.languages ?? []
 
     return (
       <div className="flex flex-col gap-6">
         {section(
           t('builder.background'),
           <div className="grid grid-cols-2 gap-2">
-            {BACKGROUNDS.map(b => (
+            {BACKGROUND_CATALOG.map(b => (
               <button
                 key={b.name}
                 onClick={() => setBackground(b.name)}
@@ -706,35 +869,78 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
                 <span className="block text-xs text-fs-ink-muted">{b.skills.map(skillLabel).join(' · ')}</span>
               </button>
             ))}
+            <button
+              onClick={() => setBackground(CUSTOM_BACKGROUND)}
+              aria-pressed={customBg}
+              className={`${choice(customBg)} px-3 py-2.5`}
+            >
+              <span className="block font-display">{t('builder.customBackground')}</span>
+              <span className="block text-xs text-fs-ink-muted">{t('builder.customBackgroundHint')}</span>
+            </button>
           </div>,
+          bg ? t('builder.backgroundGives', { gold: bg.gold, items: bg.equipment.length }) : undefined,
         )}
+        {customBg && (
+          <>
+            <input
+              value={s.customBackgroundName}
+              onChange={e => setS(prev => ({ ...prev, customBackgroundName: e.target.value }))}
+              placeholder={t('builder.customBackgroundName')}
+              aria-label={t('builder.customBackgroundName')}
+              className="fs-focus w-full min-h-11 px-3 text-fs-ink bg-fs-tile border border-fs-card-line rounded-lg placeholder:text-fs-ink-muted -mt-3"
+            />
+            {section(
+              `${t('builder.backgroundSkills')} ${t('builder.chosen', { count: s.customSkills.length, total: CUSTOM_BACKGROUND_SKILLS })}`,
+              skillChips(
+                ALL_SKILLS.filter(sk => !fixedRaceSkills.includes(sk) && !s.raceSkills.includes(sk)),
+                s.customSkills,
+                CUSTOM_BACKGROUND_SKILLS,
+                sk =>
+                  setS(prev => ({ ...prev, customSkills: toggleIn(prev.customSkills, sk, CUSTOM_BACKGROUND_SKILLS) })),
+              ),
+            )}
+          </>
+        )}
+        {race &&
+          raceSkillCount > 0 &&
+          section(
+            `${t('builder.raceSkills', { race: gameLabel(t, 'race', race.name) })} ${t('builder.chosen', { count: s.raceSkills.length, total: raceSkillCount })}`,
+            skillChips(
+              ALL_SKILLS.filter(sk => !bgSkills.includes(sk) && !fixedRaceSkills.includes(sk)),
+              s.raceSkills,
+              raceSkillCount,
+              sk => setS(prev => ({ ...prev, raceSkills: toggleIn(prev.raceSkills, sk, raceSkillCount) })),
+            ),
+          )}
         {cls &&
           section(
-            `${t('builder.classSkills')} ${t('builder.chosen', { count: s.chosenSkills.length, total: cls.skillCount })}`,
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              {availableClassSkills.map(skill => {
-                const chosen = s.chosenSkills.includes(skill)
-                const maxed = s.chosenSkills.length >= cls.skillCount && !chosen
+            `${t('builder.classSkills')} ${t('builder.chosen', { count: classSkills.length, total: cls.skillCount })}`,
+            skillChips(availableClassSkills, classSkills, cls.skillCount, toggleSkill),
+            grants.length > 0
+              ? t('builder.backgroundGrants', { skills: grants.map(skillLabel).join(', ') })
+              : undefined,
+          )}
+        {languageCount > 0 &&
+          section(
+            `${t('builder.languages')} ${t('builder.chosen', { count: s.languages.length, total: languageCount })}`,
+            <div className="flex flex-wrap gap-1.5">
+              {LANGUAGES.filter(l => !baseLanguages.includes(l)).map(l => {
+                const picked = s.languages.includes(l)
+                const full = !picked && s.languages.length >= languageCount
                 return (
                   <button
-                    key={skill}
-                    onClick={() => toggleSkill(skill)}
-                    disabled={maxed}
-                    aria-pressed={chosen}
-                    className={`${choice(chosen, maxed)} px-3 py-2 flex items-center gap-2.5`}
+                    key={l}
+                    disabled={full}
+                    aria-pressed={picked}
+                    onClick={() => setS(prev => ({ ...prev, languages: toggleIn(prev.languages, l, languageCount) }))}
+                    className={`${choice(picked, full)} px-3 py-1.5 min-h-9`}
                   >
-                    <span className={chosen ? 'text-fs-brass' : 'text-fs-card-line'} aria-hidden="true">
-                      ◆
-                    </span>
-                    <span className="flex-1">{skillLabel(skill)}</span>
-                    <span className="text-xs text-fs-ink-muted">{abilityShort(SKILL_ABILITY[skill])}</span>
+                    {gameLabel(t, 'language', l)}
                   </button>
                 )
               })}
             </div>,
-            bg && bgSkills.length > 0
-              ? t('builder.backgroundGrants', { skills: bgSkills.map(skillLabel).join(', ') })
-              : undefined,
+            t('builder.languagesHint', { languages: baseLanguages.map(l => gameLabel(t, 'language', l)).join(', ') }),
           )}
       </div>
     )
@@ -843,9 +1049,9 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             <span className="font-display text-xl mt-2">{s.name.trim() || t('builder.previewName')}</span>
             <span className="text-sm text-fs-ink-muted">
               {[
-                s.race && gameLabel(t, 'race', s.race),
+                raceName && gameLabel(t, 'race', raceName),
                 s.className && gameLabel(t, 'class', s.className),
-                s.background && gameLabel(t, 'background', s.background),
+                bg ? gameLabel(t, 'background', bg.name) : customBg && s.customBackgroundName.trim(),
               ]
                 .filter(Boolean)
                 .join(' · ') || t('builder.previewHint')}
@@ -868,7 +1074,12 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3 text-center">
               {[
-                [t('builder.hp'), cls && allAssigned ? cls.hitDie + mod(finalScores.constitution) : '—'],
+                [
+                  t('builder.hp'),
+                  cls && allAssigned
+                    ? cls.hitDie + mod(finalScores.constitution) + (subrace?.hitPointsPerLevel ?? 0)
+                    : '—',
+                ],
                 [
                   t('builder.ac'),
                   cls && allAssigned ? armorClass({ className: cls.name, scores: finalScores, items: [] }) : '—',
@@ -883,10 +1094,10 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             </div>
           </div>
 
-          {(bg || s.chosenSkills.length > 0) && (
+          {lockedSkills.size + classSkills.length > 0 && (
             <div className="bg-fs-card text-fs-ink border border-fs-card-line rounded-fs px-5 py-4">
               <h3 className="fs-section-label m-0 mb-2 font-normal">{t('sheet.skills')}</h3>
-              <p className="text-sm m-0">{[...(bg?.skills ?? []), ...s.chosenSkills].map(skillLabel).join(' · ')}</p>
+              <p className="text-sm m-0">{[...lockedSkills, ...classSkills].map(skillLabel).join(' · ')}</p>
             </div>
           )}
         </aside>

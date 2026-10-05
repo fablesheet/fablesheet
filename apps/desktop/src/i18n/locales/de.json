@@ -80,7 +80,34 @@
     "creating": "Wird erschaffen...",
     "stepOf": "Schritt {{current}} von {{total}}",
     "previewName": "Dein Held",
-    "previewHint": "Wähle Volk, Klasse und Hintergrund"
+    "previewHint": "Wähle Volk, Klasse und Hintergrund",
+    "subrace": "Unterrasse",
+    "otherSubrace": "Andere Unterrasse",
+    "otherSubraceHint": "Nur die Merkmale der Rasse, den Rest trägst du selbst ein",
+    "ancestry": "Drachenabstammung",
+    "cantrip": "Zaubertrick",
+    "cantripHint": "Ein Zaubertrick von der Magier-Zauberliste, gewirkt mit Intelligenz.",
+    "abilityChoices": "{{race}}: +1 auf {{count}} Attribute deiner Wahl",
+    "customBackground": "Eigener Hintergrund",
+    "customBackgroundHint": "Eigener Name, zwei Fertigkeiten nach Wahl",
+    "customBackgroundName": "Name des Hintergrunds, z. B. Soldat",
+    "backgroundSkills": "Fertigkeiten des Hintergrunds",
+    "backgroundGives": "Dazu {{gold}} GM, {{items}} Ausrüstungsgegenstände und ein Hintergrundmerkmal.",
+    "raceSkills": "Fertigkeiten ({{race}})",
+    "languages": "Sprachen",
+    "languagesHint": "Du sprichst bereits {{languages}}.",
+    "dragon": {
+      "Black": "Schwarz",
+      "Blue": "Blau",
+      "Brass": "Messing",
+      "Bronze": "Bronze",
+      "Copper": "Kupfer",
+      "Gold": "Gold",
+      "Green": "Grün",
+      "Red": "Rot",
+      "Silver": "Silber",
+      "White": "Weiß"
+    }
   },
   "sheet": {
     "subtitle": "{{race}} · {{className}} · Stufe {{level}}",
@@ -308,7 +335,11 @@
       "Half-Elf": "Halbelf",
       "Half-Orc": "Halbork",
       "Tiefling": "Tiefling",
-      "Dragonborn": "Drachenblütiger"
+      "Dragonborn": "Drachenblütiger",
+      "High Elf": "Hochelf",
+      "Hill Dwarf": "Hügelzwerg",
+      "Lightfoot Halfling": "Leichtfuß-Halbling",
+      "Rock Gnome": "Felsengnom"
     },
     "class": {
       "Barbarian": "Barbar",
@@ -325,7 +356,7 @@
       "Wizard": "Magier"
     },
     "background": {
-      "Acolyte": "Akolyth",
+      "Acolyte": "Tempeldiener",
       "Criminal": "Krimineller",
       "Sage": "Weiser",
       "Soldier": "Soldat"
@@ -451,6 +482,24 @@
       "medium": "Mittelschwere Rüstung",
       "heavy": "Schwere Rüstung",
       "shield": "Schild"
+    },
+    "language": {
+      "Common": "Gemeinsprache",
+      "Dwarvish": "Zwergisch",
+      "Elvish": "Elfisch",
+      "Giant": "Riesisch",
+      "Gnomish": "Gnomisch",
+      "Goblin": "Goblinisch",
+      "Halfling": "Halblingisch",
+      "Orc": "Orkisch",
+      "Abyssal": "Abyssisch",
+      "Celestial": "Celestisch",
+      "Draconic": "Drakonisch",
+      "Deep Speech": "Tiefensprache",
+      "Infernal": "Infernalisch",
+      "Primordial": "Urtümlich",
+      "Sylvan": "Sylvanisch",
+      "Undercommon": "Gemeinsprache der Unterreiche"
     }
   },
   "update": {
