@@ -43,13 +43,7 @@
     "deleting": "Wird gelöscht…"
   },
   "builder": {
-    "steps": [
-      "Herkunft",
-      "Berufung",
-      "Gaben",
-      "Weg",
-      "Schicksal"
-    ],
+    "steps": ["Herkunft", "Berufung", "Gaben", "Weg", "Schicksal"],
     "characterName": "Name des Charakters",
     "namePlaceholder": "Namen eingeben...",
     "race": "Volk",

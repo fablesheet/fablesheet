@@ -43,13 +43,7 @@
     "deleting": "Deleting…"
   },
   "builder": {
-    "steps": [
-      "Heritage",
-      "Calling",
-      "Gifts",
-      "Path",
-      "Destiny"
-    ],
+    "steps": ["Heritage", "Calling", "Gifts", "Path", "Destiny"],
     "characterName": "Character Name",
     "namePlaceholder": "Enter a name...",
     "race": "Race",
