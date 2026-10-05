@@ -16,6 +16,7 @@ Create characters, track hit points, conditions, spells and inventory — everyt
 - **Level up** — guided level-up with hit points (average or rolled), subclass, ability score improvements and the new class features
 - **Class features** — all SRD class and subclass features with limited uses as tokens on the table, plus your own features
 - **Character sheet** — HP, temporary HP, death saves, hit dice, conditions and inspiration, saved automatically
+- **Combat** — initiative, round counter, action/bonus action/reaction, conditions and effects with a duration in rounds, concentration with the Constitution save after damage
 - **Spellbook** — browse SRD spells by level and school, learn, forget and prepare spells
 - **Inventory** — add items manually or from the SRD equipment catalog, carrying capacity, JSON import/export
 - **Offline-first** — local SQLite database on desktop, works without a connection

@@ -498,6 +498,8 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       knownSpells: SPELL_CATALOG.filter(sp => cantrips.includes(sp.name)).map(sp => sp.id),
       preparedSpells: [],
       spellSlotsUsed: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      concentration: null,
+      combat: null,
       features: bg
         ? [
             {

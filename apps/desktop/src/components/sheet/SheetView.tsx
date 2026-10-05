@@ -3,45 +3,24 @@ import { useTranslation } from 'react-i18next'
 import type { AbilityName, Character } from '@fablesheet/core'
 import {
   abilityModifier,
-  applyDamage,
   applyHealing,
   equippedAttacks,
   formatModifier,
   savingThrowBonus,
   skillBonus,
   spellSlotMaximums,
+  takeDamage,
 } from '@fablesheet/core'
 import { gameLabel } from '../../i18n/game'
+import { ConcentrationCheckDialog } from '../combat/ConcentrationCheckDialog'
 import { CurrencyModal } from '../CurrencyModal'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { FeaturesCard } from './FeaturesCard'
 import { Pips } from './Pips'
+import { CONDITIONS } from './conditions'
 
 const ABILITIES: AbilityName[] = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
-
-const CONDITIONS = [
-  'Blinded',
-  'Charmed',
-  'Deafened',
-  'Exhaustion 1',
-  'Exhaustion 2',
-  'Exhaustion 3',
-  'Exhaustion 4',
-  'Exhaustion 5',
-  'Exhaustion 6',
-  'Frightened',
-  'Grappled',
-  'Incapacitated',
-  'Invisible',
-  'Paralyzed',
-  'Petrified',
-  'Poisoned',
-  'Prone',
-  'Restrained',
-  'Stunned',
-  'Unconscious',
-]
 
 const PROFICIENCY_MARK = { none: '◇', half: '◈', proficient: '◆', expertise: '❖' } as const
 
@@ -115,16 +94,33 @@ function HitPointsCard({ character, onUpdate }: Props) {
   const { t } = useTranslation()
   const [amount, setAmount] = useState('')
   const value = Math.max(0, Math.floor(Number(amount) || 0))
+  const [concentrationDC, setConcentrationDC] = useState<number | null>(null)
   const { hp, hitDice, deathSaves } = character
 
   function apply(kind: 'damage' | 'heal') {
     if (value === 0) return
-    onUpdate(kind === 'damage' ? applyDamage(character, value) : applyHealing(character, value))
+    if (kind === 'damage') {
+      const result = takeDamage(character, value)
+      onUpdate(result.character)
+      setConcentrationDC(result.concentrationCheck)
+    } else {
+      onUpdate(applyHealing(character, value))
+    }
     setAmount('')
   }
 
   return (
     <Card label={t('sheet.hitPoints')}>
+      {concentrationDC !== null && (
+        <ConcentrationCheckDialog
+          character={character}
+          dc={concentrationDC}
+          onResolve={updated => {
+            onUpdate(updated)
+            setConcentrationDC(null)
+          }}
+        />
+      )}
       <div className="flex items-end gap-3">
         <div className="flex items-baseline gap-1.5">
           <span className="font-display text-4xl leading-none">{hp.current}</span>
