@@ -11,6 +11,13 @@ describe('migrateCharacter', () => {
     expect(migrated.currency).toEqual({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 })
   })
 
+  it('adds descriptions to features from older versions', () => {
+    const features = [{ name: 'Rage', source: 'Barbarian', usesMax: 2, usesCurrent: 1, recharge: 'long' }]
+    expect(migrateCharacter({ id: 'a', name: 'X', schemaVersion: 3, features }).features).toEqual([
+      { ...features[0], description: '' },
+    ])
+  })
+
   it('keeps existing values', () => {
     const items = [{ id: 'i', name: 'Rope' }]
     expect(migrateCharacter({ id: 'a', name: 'X', items }).items).toEqual(items)

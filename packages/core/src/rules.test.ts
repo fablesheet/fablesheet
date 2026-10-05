@@ -7,6 +7,7 @@ import {
   changeLevel,
   formatModifier,
   hitDieSize,
+  levelUp,
   proficiencyBonusForLevel,
   proficiencyContribution,
   savingThrowBonus,
@@ -135,6 +136,56 @@ describe('changeLevel', () => {
   it('gains at least 1 HP per level with a low Constitution', () => {
     const frail = { ...wizard, scores: { ...wizard.scores, constitution: 1 } }
     expect(changeLevel(frail, 2).hp.max).toBe(9)
+  })
+})
+
+describe('levelUp', () => {
+  const fighter = migrateCharacter({
+    id: 'f',
+    name: 'Fighter',
+    level: 3,
+    proficiencyBonus: 2,
+    initiativeBonus: 1,
+    scores: { strength: 16, dexterity: 13, constitution: 15, intelligence: 10, wisdom: 12, charisma: 8 },
+    hp: { current: 20, max: 28, temp: 0 },
+    hitDice: { die: 'd10', total: 3, used: 0 },
+    spellcastingAbility: null,
+  })
+
+  it('adds the hit die result plus Constitution modifier', () => {
+    const up = levelUp(fighter, { hitDieResult: 7 })
+    expect(up.level).toBe(4)
+    expect(up.hitDice.total).toBe(4)
+    expect(up.hp).toEqual({ current: 29, max: 37, temp: 0 })
+  })
+
+  it('applies an ability score improvement, capped at 20, with retroactive HP', () => {
+    const up = levelUp(fighter, { hitDieResult: 6, abilityIncreases: { constitution: 1, dexterity: 1 } })
+    expect(up.scores.constitution).toBe(16)
+    expect(up.scores.dexterity).toBe(14)
+    // 6 + CON +3 for the new level, +1 for each of the 3 earlier levels
+    expect(up.hp.max).toBe(28 + 9 + 3)
+    expect(up.initiativeBonus).toBe(2)
+    const capped = levelUp(
+      { ...fighter, scores: { ...fighter.scores, strength: 19 } },
+      {
+        hitDieResult: 6,
+        abilityIncreases: { strength: 2 },
+      },
+    )
+    expect(capped.scores.strength).toBe(20)
+  })
+
+  it('sets the subclass, gains at least 1 HP and stops at level 20', () => {
+    const frail = { ...fighter, scores: { ...fighter.scores, constitution: 3 } }
+    const up = levelUp(frail, { hitDieResult: 1, subclass: 'Champion' })
+    expect(up.subclass).toBe('Champion')
+    expect(up.hp.max).toBe(29)
+    expect(levelUp({ ...fighter, level: 20 }, { hitDieResult: 5 }).level).toBe(20)
+  })
+
+  it('updates the proficiency bonus at 5th level', () => {
+    expect(levelUp({ ...fighter, level: 4 }, { hitDieResult: 6 }).proficiencyBonus).toBe(3)
   })
 })
 

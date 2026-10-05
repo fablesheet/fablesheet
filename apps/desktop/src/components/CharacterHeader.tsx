@@ -11,6 +11,7 @@ interface Props {
   onBack: () => void
   onEdit: () => void
   onRest: () => void
+  onLevelUp: () => void
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -23,7 +24,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 /** Leather bar with the character's identity and the numbers needed at every moment. */
-export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest }: Props) {
+export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest, onLevelUp }: Props) {
   const { t } = useTranslation()
   const { current, max, temp } = character.hp
   const percent = Math.max(0, Math.min(100, (current / max) * 100))
@@ -71,6 +72,18 @@ export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest }
             <div className={`h-full rounded-full transition-[width] ${hpColor}`} style={{ width: `${percent}%` }} />
           </div>
         </div>
+        {character.level < 20 && (
+          <Button
+            onBar
+            size="sm"
+            onClick={onLevelUp}
+            title={t('levelUp.button')}
+            aria-label={t('levelUp.button')}
+            className="mr-2"
+          >
+            ▲<span className="hidden sm:inline"> {t('levelUp.short')}</span>
+          </Button>
+        )}
         <Button onBar variant="primary" size="sm" onClick={onRest}>
           {t('table.rest')}
         </Button>
