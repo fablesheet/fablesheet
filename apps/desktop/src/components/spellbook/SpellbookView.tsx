@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import type { Character, Spell, SpellSchool } from '@fablesheet/core'
-import { availableSlotLevels, expendSlot, spellSlotMaximums } from '@fablesheet/core'
+import { availableSlotLevels, expendSlot, spellSlotMaximums, startConcentration } from '@fablesheet/core'
 import { SPELL_CATALOG } from '@fablesheet/srd-data'
 import { gameLabel } from '../../i18n/game'
 import { Button } from '../ui/Button'
@@ -124,9 +124,19 @@ export function SpellbookView({ character, onUpdate }: Props) {
     })
     setSelectedId(null)
   }
-  function cast(slotLevel: number) {
-    onUpdate(expendSlot(character, slotLevel))
-    setCastMessage(t('spellbook.castDone', { level: slotLevel }))
+  /** Casting uses a slot (not for cantrips); concentration spells replace the current concentration. */
+  function cast(spell: Spell, slotLevel: number | null) {
+    let updated = slotLevel !== null ? expendSlot(character, slotLevel) : character
+    const messages = slotLevel !== null ? [t('spellbook.castDone', { level: slotLevel })] : []
+    if (spell.concentration) {
+      if (character.concentration && character.concentration !== spell.name) {
+        messages.push(t('spellbook.concentrationReplaced', { spell: character.concentration }))
+      }
+      updated = startConcentration(updated, spell.name)
+      messages.push(t('spellbook.concentratingOn', { spell: spell.name }))
+    }
+    onUpdate(updated)
+    setCastMessage(messages.join(' '))
   }
 
   // ── Pages ────────────────────────────────────────────────────────────────────
@@ -209,7 +219,7 @@ export function SpellbookView({ character, onUpdate }: Props) {
                 character={character}
                 spell={selected}
                 prepared={isPrepared(selected.id)}
-                onCast={cast}
+                onCast={slotLevel => cast(selected, slotLevel)}
                 onTogglePrepared={() => togglePrepared(selected)}
                 onForget={() => forget(selected)}
                 message={castMessage}
@@ -471,7 +481,7 @@ function CastActions({
   character: Character
   spell: Spell
   prepared: boolean
-  onCast: (slotLevel: number) => void
+  onCast: (slotLevel: number | null) => void
   onTogglePrepared: () => void
   onForget: () => void
   message: string | null
@@ -484,7 +494,13 @@ function CastActions({
   return (
     <>
       {spell.level === 0 ? (
-        <span className="text-sm text-fs-ink-muted">{t('spellbook.cantripHint')}</span>
+        spell.concentration ? (
+          <Button variant="primary" onClick={() => onCast(null)}>
+            {t('spellbook.cast')}
+          </Button>
+        ) : (
+          <span className="text-sm text-fs-ink-muted">{t('spellbook.cantripHint')}</span>
+        )
       ) : levels.length > 0 ? (
         <span className="flex items-center gap-1.5">
           <Button variant="primary" onClick={() => onCast(chosen)}>

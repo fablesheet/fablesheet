@@ -8,6 +8,8 @@ import { CharacterEditModal } from './components/CharacterEditModal'
 import { CharacterHeader } from './components/CharacterHeader'
 import { RestDialog } from './components/RestDialog'
 import { LevelUpDialog } from './components/levelup/LevelUpDialog'
+import { CombatBar } from './components/combat/CombatBar'
+import { StartCombatDialog } from './components/combat/StartCombatDialog'
 import { SheetView } from './components/sheet/SheetView'
 import { TableView, type TableObject } from './components/table/TableView'
 import { SpellbookView } from './components/spellbook/SpellbookView'
@@ -36,6 +38,7 @@ function Screens() {
   const [editing, setEditing] = useState(false)
   const [resting, setResting] = useState(false)
   const [levelling, setLevelling] = useState(false)
+  const [startingCombat, setStartingCombat] = useState(false)
   const saver = useCharacterSaver()
 
   // Single source of truth: update in memory right away, persist shortly after
@@ -77,9 +80,11 @@ function Screens() {
           onEdit={() => setEditing(true)}
           onRest={() => setResting(true)}
           onLevelUp={() => setLevelling(true)}
+          onStartCombat={() => setStartingCombat(true)}
         />
       }
     >
+      <CombatBar character={character} onUpdate={handleUpdate} />
       {onTable ? (
         <TableView character={character} onOpen={setView} onUpdate={handleUpdate} />
       ) : view === 'spellbook' ? (
@@ -107,6 +112,16 @@ function Screens() {
             setView('select')
           }}
           onClose={() => setEditing(false)}
+        />
+      )}
+      {startingCombat && (
+        <StartCombatDialog
+          character={character}
+          onStart={updated => {
+            handleUpdate(updated)
+            setStartingCombat(false)
+          }}
+          onClose={() => setStartingCombat(false)}
         />
       )}
       {levelling && (

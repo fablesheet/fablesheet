@@ -12,6 +12,7 @@ interface Props {
   onEdit: () => void
   onRest: () => void
   onLevelUp: () => void
+  onStartCombat: () => void
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -24,7 +25,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 /** Leather bar with the character's identity and the numbers needed at every moment. */
-export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest, onLevelUp }: Props) {
+export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest, onLevelUp, onStartCombat }: Props) {
   const { t } = useTranslation()
   const { current, max, temp } = character.hp
   const percent = Math.max(0, Math.min(100, (current / max) * 100))
@@ -72,6 +73,18 @@ export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest, 
             <div className={`h-full rounded-full transition-[width] ${hpColor}`} style={{ width: `${percent}%` }} />
           </div>
         </div>
+        {!character.combat && (
+          <Button
+            onBar
+            size="sm"
+            onClick={onStartCombat}
+            title={t('combat.start')}
+            aria-label={t('combat.start')}
+            className="mr-2"
+          >
+            ⚔<span className="hidden lg:inline"> {t('combat.short')}</span>
+          </Button>
+        )}
         {character.level < 20 && (
           <Button
             onBar
@@ -81,7 +94,7 @@ export function CharacterHeader({ character, backLabel, onBack, onEdit, onRest, 
             aria-label={t('levelUp.button')}
             className="mr-2"
           >
-            ▲<span className="hidden sm:inline"> {t('levelUp.short')}</span>
+            ▲<span className="hidden lg:inline"> {t('levelUp.short')}</span>
           </Button>
         )}
         <Button onBar variant="primary" size="sm" onClick={onRest}>

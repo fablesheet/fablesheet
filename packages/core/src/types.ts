@@ -221,6 +221,10 @@ export interface Character {
   spellSlotsUsed: number[]
 
   features: CharacterFeature[]
+  /** Spell the character is concentrating on */
+  concentration: string | null
+  /** Running combat, null outside of combat */
+  combat: CombatState | null
   currency: Currency
   languages: string[]
   otherProficiencies: string[]
@@ -230,6 +234,24 @@ export interface Character {
   backstory: string
   /** Free-form notes, Markdown */
   notes: string
+}
+
+export interface TimedEffect {
+  id: string
+  name: string
+  /** Rounds left, counted down at the start of each new round */
+  roundsLeft: number
+  /** The effect is one of the standard conditions and is shown as such */
+  condition: boolean
+}
+
+export interface CombatState {
+  round: number
+  initiative: number
+  actionUsed: boolean
+  bonusActionUsed: boolean
+  reactionUsed: boolean
+  effects: TimedEffect[]
 }
 
 export interface Personality {

@@ -1,0 +1,23 @@
+/** The standard conditions (stored in English, translated for display) */
+export const CONDITIONS = [
+  'Blinded',
+  'Charmed',
+  'Deafened',
+  'Exhaustion 1',
+  'Exhaustion 2',
+  'Exhaustion 3',
+  'Exhaustion 4',
+  'Exhaustion 5',
+  'Exhaustion 6',
+  'Frightened',
+  'Grappled',
+  'Incapacitated',
+  'Invisible',
+  'Paralyzed',
+  'Petrified',
+  'Poisoned',
+  'Prone',
+  'Restrained',
+  'Stunned',
+  'Unconscious',
+]
