@@ -15,6 +15,7 @@ import { gameLabel } from '../../i18n/game'
 import { CurrencyModal } from '../CurrencyModal'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
+import { FeaturesCard } from './FeaturesCard'
 import { Pips } from './Pips'
 
 const ABILITIES: AbilityName[] = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
@@ -58,6 +59,7 @@ export function SheetView({ character, onUpdate }: Props) {
         <div className="flex flex-col gap-3">
           <AbilitiesCard character={character} />
           <ConditionsCard character={character} update={update} />
+          <FeaturesCard character={character} onUpdate={onUpdate} />
         </div>
         <div className="flex flex-col gap-3">
           <HitPointsCard character={character} onUpdate={onUpdate} />
@@ -388,7 +390,7 @@ function SkillsCard({ character }: { character: Character }) {
   )
 }
 
-// ── Languages, currency, features ─────────────────────────────────────────────
+// ── Languages and currency ───────────────────────────────────────────────────
 
 function DetailsCard({ character, update }: { character: Character; update: (p: Partial<Character>) => void }) {
   const { t } = useTranslation()
@@ -412,12 +414,6 @@ function DetailsCard({ character, update }: { character: Character; update: (p: 
             {coins.join(' · ') || '—'}
           </button>
         </dd>
-        {character.features.length > 0 && (
-          <>
-            <dt className="fs-section-label">{t('sheet.features')}</dt>
-            <dd className="m-0">{character.features.map(f => f.name).join(' · ')}</dd>
-          </>
-        )}
       </dl>
       {currencyOpen && (
         <CurrencyModal

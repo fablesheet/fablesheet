@@ -2,3 +2,12 @@
 export { SPELL_CATALOG } from './spells'
 export { ITEM_CATALOG, withCatalogStats } from './items'
 export { parseArmor, parseWeapon } from './parse'
+export {
+  CLASS_CATALOG,
+  classFeaturesAt,
+  featuresGainedAt,
+  findClass,
+  hasMissingClassFeatures,
+  syncClassFeatures,
+} from './classes'
+export type { ClassDef, ClassFeatureDef, FeatureRecharge, SubclassDef } from './classes'

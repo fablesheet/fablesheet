@@ -10,9 +10,11 @@ import {
   spellAttackBonus,
   spellSaveDC,
 } from '@fablesheet/core'
+import { findClass, syncClassFeatures } from '@fablesheet/srd-data'
 import { createCharacter } from '../services/api'
 import { gameLabel } from '../i18n/game'
 import { Button } from './ui/Button'
+import { SubclassPicker } from './levelup/SubclassPicker'
 
 // ─── Static rules data ──────────────────────────────────────────────────────────
 
@@ -290,6 +292,8 @@ interface BuilderState {
   race: string
   alignment: string
   className: string
+  /** Only asked for classes that choose their subclass at 1st level */
+  subclass: string
   assignedScores: Partial<Record<AbilityName, number>>
   selectedScore: number | null
   background: string
@@ -311,6 +315,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
     race: '',
     alignment: '',
     className: '',
+    subclass: '',
     assignedScores: {},
     selectedScore: null,
     background: '',
@@ -325,6 +330,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
 
   const race = RACES.find(r => r.name === s.race)
   const cls = CLASSES.find(c => c.name === s.className)
+  const srdClass = findClass(s.className)
   const bg = BACKGROUNDS.find(b => b.name === s.background)
 
   // Computed final ability scores (base + race bonus)
@@ -377,7 +383,13 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
 
   // ── Class change: clear skills ──────────────────────────────────────────────
   function setClass(name: string) {
-    setS(prev => ({ ...prev, className: name, chosenSkills: [] }))
+    const srd = findClass(name)
+    setS(prev => ({
+      ...prev,
+      className: name,
+      chosenSkills: [],
+      subclass: srd?.subclassLevel === 1 ? srd.subclass.name : '',
+    }))
   }
 
   // ── Background change: clear skill choices ──────────────────────────────────
@@ -420,13 +432,13 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       proficiency: allProficientSkills.has(skill) ? 'proficient' : 'none',
     }))
 
-    const character: Omit<Character, 'id'> = {
+    const character: Omit<Character, 'id'> = syncClassFeatures({
       schemaVersion: CHARACTER_SCHEMA_VERSION,
       name: s.name.trim(),
       race: s.race,
       className: s.className,
       level: 1,
-      subclass: null,
+      subclass: s.subclass.trim() || null,
       background: s.background,
       alignment: s.alignment,
       experiencePoints: 0,
@@ -468,7 +480,7 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
       },
       backstory: '',
       notes: '',
-    }
+    })
 
     try {
       const created = await createCharacter(character)
@@ -586,6 +598,16 @@ export function CharacterBuilder({ onCreated, onCancel }: Props) {
             ))}
           </div>,
         )}
+        {srdClass?.subclassLevel === 1 &&
+          section(
+            t('levelUp.subclass'),
+            <SubclassPicker
+              srdName={srdClass.subclass.name}
+              value={s.subclass}
+              onChange={subclass => setS(prev => ({ ...prev, subclass }))}
+            />,
+            t('levelUp.subclassHint'),
+          )}
         {cls && (
           <p className="text-sm text-fs-ink-muted m-0">
             {t('builder.savingThrows')}{' '}

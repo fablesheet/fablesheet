@@ -163,9 +163,15 @@ export interface DeathSaves {
 
 export interface CharacterFeature {
   name: string
+  /** Class or subclass name for features from the rules, 'Custom' for your own */
   source: string
+  /** What the feature does, plain text */
+  description: string
+  /** Maximum uses; null if the feature is not limited */
   usesMax: number | null
+  /** Uses left */
   usesCurrent: number | null
+  /** When uses come back: 'short' or 'long' rest */
   recharge: string | null
 }
 

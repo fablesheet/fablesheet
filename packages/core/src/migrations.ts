@@ -6,7 +6,7 @@ import type { Character } from './types'
  * Bump this and add a step to MIGRATIONS whenever the shape of `Character`
  * changes in a way that old saved data or exported files would not satisfy.
  */
-export const CHARACTER_SCHEMA_VERSION = 3
+export const CHARACTER_SCHEMA_VERSION = 4
 
 type RawCharacter = Record<string, unknown>
 
@@ -40,6 +40,13 @@ const MIGRATIONS: Array<(doc: RawCharacter) => RawCharacter> = [
   doc => ({
     spellSlotsUsed: [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ...doc,
+  }),
+  // 3 → 4: feature descriptions
+  doc => ({
+    ...doc,
+    features: Array.isArray(doc.features)
+      ? doc.features.map(f => ({ description: '', ...(f as Record<string, unknown>) }))
+      : [],
   }),
 ]
 

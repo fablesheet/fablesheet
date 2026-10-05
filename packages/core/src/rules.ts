@@ -1,4 +1,4 @@
-import type { Character, ProficiencyLevel } from './types'
+import type { AbilityName, AbilityScores, Character, ProficiencyLevel } from './types'
 import { clampUsedSlots, spellSlotMaximums } from './spellcasting'
 
 // ── Ability scores ────────────────────────────────────────────────────────────
@@ -85,6 +85,24 @@ export function averageHitPointsPerLevel(dieSize: number): number {
   return dieSize / 2 + 1
 }
 
+/** Proficiency bonus, hit dice and spellcasting numbers for a level and ability scores. */
+function recalculate(character: Character, level: number, scores: AbilityScores): Character {
+  const proficiencyBonus = proficiencyBonusForLevel(level)
+  const casting = character.spellcastingAbility as AbilityName | null
+  const castingScore = casting ? scores[casting] : undefined
+  return {
+    ...character,
+    level,
+    scores,
+    proficiencyBonus,
+    hitDice: { ...character.hitDice, total: level, used: Math.min(character.hitDice.used, level) },
+    spellSlotsUsed: clampUsedSlots(character.spellSlotsUsed, spellSlotMaximums(character.className, level)),
+    spellSaveDC: castingScore !== undefined ? spellSaveDC(castingScore, proficiencyBonus) : character.spellSaveDC,
+    spellAttackBonus:
+      castingScore !== undefined ? spellAttackBonus(castingScore, proficiencyBonus) : character.spellAttackBonus,
+  }
+}
+
 /**
  * Returns the character at a new level: proficiency bonus, hit dice, maximum hit
  * points (average per level + Constitution modifier, at least 1 per level) and
@@ -101,20 +119,48 @@ export function changeLevel(character: Character, newLevel: number): Character {
   )
   const max = Math.max(1, character.hp.max + perLevel * delta)
   const current = Math.min(max, Math.max(0, character.hp.current + perLevel * delta))
-  const proficiencyBonus = proficiencyBonusForLevel(level)
-  const casting = character.spellcastingAbility as keyof Character['scores'] | null
-  const castingScore = casting ? character.scores[casting] : undefined
+
+  return { ...recalculate(character, level, character.scores), hp: { ...character.hp, max, current } }
+}
+
+export interface LevelUpChoice {
+  /** Hit die result for the new level: rolled, or the average */
+  hitDieResult: number
+  /** Ability Score Improvement, e.g. { strength: 2 } or { dexterity: 1, wisdom: 1 } */
+  abilityIncreases?: Partial<Record<AbilityName, number>>
+  /** Subclass chosen at this level (keeps the current one if omitted) */
+  subclass?: string | null
+}
+
+/** Highest score an Ability Score Improvement can reach. */
+export const ABILITY_SCORE_MAX = 20
+
+/**
+ * Advances the character by one level. Hit points grow by the hit die result plus the
+ * Constitution modifier (at least 1); a higher Constitution modifier also adds 1 HP for
+ * every earlier level. Initiative follows a changed Dexterity modifier.
+ */
+export function levelUp(character: Character, choice: LevelUpChoice): Character {
+  if (character.level >= 20) return character
+  const level = character.level + 1
+
+  const scores = { ...character.scores }
+  for (const [ability, increase] of Object.entries(choice.abilityIncreases ?? {}) as [AbilityName, number][]) {
+    scores[ability] = Math.min(ABILITY_SCORE_MAX, scores[ability] + Math.max(0, increase))
+  }
+
+  const conMod = abilityModifier(scores.constitution)
+  const conGain = conMod - abilityModifier(character.scores.constitution)
+  const gain = Math.max(1, Math.floor(choice.hitDieResult) + conMod) + conGain * character.level
+  const max = Math.max(1, character.hp.max + gain)
+  const current = Math.min(max, Math.max(0, character.hp.current + gain))
+  const dexGain = abilityModifier(scores.dexterity) - abilityModifier(character.scores.dexterity)
 
   return {
-    ...character,
-    level,
-    proficiencyBonus,
+    ...recalculate(character, level, scores),
     hp: { ...character.hp, max, current },
-    hitDice: { ...character.hitDice, total: level, used: Math.min(character.hitDice.used, level) },
-    spellSlotsUsed: clampUsedSlots(character.spellSlotsUsed, spellSlotMaximums(character.className, level)),
-    spellSaveDC: castingScore !== undefined ? spellSaveDC(castingScore, proficiencyBonus) : character.spellSaveDC,
-    spellAttackBonus:
-      castingScore !== undefined ? spellAttackBonus(castingScore, proficiencyBonus) : character.spellAttackBonus,
+    initiativeBonus: character.initiativeBonus + dexGain,
+    subclass: choice.subclass !== undefined ? choice.subclass : character.subclass,
   }
 }
 

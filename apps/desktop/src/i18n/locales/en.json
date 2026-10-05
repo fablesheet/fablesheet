@@ -535,5 +535,55 @@
   "web": {
     "installHint": "Tip: add Fablesheet to your home screen (Share → Add to Home Screen). It then works offline like an app and your characters are kept safely on this device.",
     "dismiss": "Got it"
+  },
+  "levelUp": {
+    "button": "Level up",
+    "short": "Level up",
+    "title": "Level {{from}} → {{to}}",
+    "confirm": "Advance to level {{level}}",
+    "hitPoints": "Hit points",
+    "average": "Average ({{value}})",
+    "roll": "Roll",
+    "rollDie": "Roll {{die}}",
+    "hpBreakdown": "{{die}}: {{value}}, Constitution {{con}}",
+    "subclass": "Subclass",
+    "subclassHint": "The SRD contains one subclass per class. For others, enter the name and add their features yourself.",
+    "srdSubclass": "Features included",
+    "otherSubclass": "Other",
+    "otherSubclassHint": "Enter the name",
+    "subclassName": "Name of the subclass",
+    "asi": "Ability Score Improvement",
+    "asiHint": "Raise one score by 2 or two scores by 1 (maximum 20).",
+    "asiTwo": "+2 to one",
+    "asiSplit": "+1 to two",
+    "asiLater": "Decide later",
+    "newAtLevel": "New at level {{level}}",
+    "spellsHint": "Learn or prepare new spells in the spellbook.",
+    "nothingNew": "No new features at this level.",
+    "unknownClass": "This class is not part of the SRD — add new features yourself on the character sheet.",
+    "hpRetro": "+{{value}} from the higher Constitution"
+  },
+  "features": {
+    "add": "Add feature",
+    "edit": "Edit",
+    "remove": "Remove",
+    "custom": "Custom",
+    "empty": "No features yet.",
+    "missing": "Features of the {{className}} up to this level can be added automatically.",
+    "addFromClass": "Add class features",
+    "spend": "Spend a use",
+    "regain": "Regain a use",
+    "name": "Name",
+    "description": "Description",
+    "limited": "Limited uses",
+    "uses": "Uses",
+    "rechargeLabel": "Recharges on",
+    "recharge": {
+      "short": "short rest",
+      "long": "long rest"
+    },
+    "tokens": "Features with limited uses",
+    "useOne": "Use {{name}}",
+    "tokenLabel": "Use {{name}} ({{current}} of {{max}} left)"
   }
 }

@@ -7,6 +7,7 @@ import { CharacterBuilder } from './components/CharacterBuilder'
 import { CharacterEditModal } from './components/CharacterEditModal'
 import { CharacterHeader } from './components/CharacterHeader'
 import { RestDialog } from './components/RestDialog'
+import { LevelUpDialog } from './components/levelup/LevelUpDialog'
 import { SheetView } from './components/sheet/SheetView'
 import { TableView, type TableObject } from './components/table/TableView'
 import { SpellbookView } from './components/spellbook/SpellbookView'
@@ -34,6 +35,7 @@ function Screens() {
   const [view, setView] = useState<View>('select')
   const [editing, setEditing] = useState(false)
   const [resting, setResting] = useState(false)
+  const [levelling, setLevelling] = useState(false)
   const saver = useCharacterSaver()
 
   // Single source of truth: update in memory right away, persist shortly after
@@ -74,11 +76,12 @@ function Screens() {
           onBack={onTable ? toList : () => setView('table')}
           onEdit={() => setEditing(true)}
           onRest={() => setResting(true)}
+          onLevelUp={() => setLevelling(true)}
         />
       }
     >
       {onTable ? (
-        <TableView character={character} onOpen={setView} />
+        <TableView character={character} onOpen={setView} onUpdate={handleUpdate} />
       ) : view === 'spellbook' ? (
         <SpellbookView character={character} onUpdate={handleUpdate} />
       ) : view === 'inventory' ? (
@@ -104,6 +107,16 @@ function Screens() {
             setView('select')
           }}
           onClose={() => setEditing(false)}
+        />
+      )}
+      {levelling && (
+        <LevelUpDialog
+          character={character}
+          onLevelUp={updated => {
+            handleUpdate(updated)
+            setLevelling(false)
+          }}
+          onClose={() => setLevelling(false)}
         />
       )}
       {resting && <RestDialog character={character} onRest={handleUpdate} onClose={() => setResting(false)} />}

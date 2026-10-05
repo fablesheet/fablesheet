@@ -535,5 +535,55 @@
   "web": {
     "installHint": "Tipp: Füge Fablesheet zum Home-Bildschirm hinzu (Teilen → Zum Home-Bildschirm). Dann läuft es offline wie eine App, und deine Charaktere bleiben sicher auf diesem Gerät.",
     "dismiss": "Verstanden"
+  },
+  "levelUp": {
+    "button": "Stufenaufstieg",
+    "short": "Aufstieg",
+    "title": "Stufe {{from}} → {{to}}",
+    "confirm": "Auf Stufe {{level}} aufsteigen",
+    "hitPoints": "Trefferpunkte",
+    "average": "Durchschnitt ({{value}})",
+    "roll": "Würfeln",
+    "rollDie": "{{die}} würfeln",
+    "hpBreakdown": "{{die}}: {{value}}, Konstitution {{con}}",
+    "subclass": "Unterklasse",
+    "subclassHint": "Das SRD enthält eine Unterklasse pro Klasse. Für andere gib den Namen ein und trage ihre Merkmale selbst ein.",
+    "srdSubclass": "Merkmale enthalten",
+    "otherSubclass": "Andere",
+    "otherSubclassHint": "Namen eingeben",
+    "subclassName": "Name der Unterklasse",
+    "asi": "Attributswerterhöhung",
+    "asiHint": "Erhöhe einen Wert um 2 oder zwei Werte um 1 (höchstens 20).",
+    "asiTwo": "+2 auf einen",
+    "asiSplit": "+1 auf zwei",
+    "asiLater": "Später entscheiden",
+    "newAtLevel": "Neu auf Stufe {{level}}",
+    "spellsHint": "Lerne oder bereite neue Zauber im Zauberbuch vor.",
+    "nothingNew": "Auf dieser Stufe gibt es keine neuen Merkmale.",
+    "unknownClass": "Diese Klasse ist nicht im SRD – trage neue Merkmale selbst im Charakterbogen ein.",
+    "hpRetro": "+{{value}} durch höhere Konstitution"
+  },
+  "features": {
+    "add": "Merkmal hinzufügen",
+    "edit": "Bearbeiten",
+    "remove": "Entfernen",
+    "custom": "Eigenes",
+    "empty": "Noch keine Merkmale.",
+    "missing": "Merkmale der Klasse {{className}} bis zu dieser Stufe können automatisch ergänzt werden.",
+    "addFromClass": "Klassenmerkmale ergänzen",
+    "spend": "Nutzung verbrauchen",
+    "regain": "Nutzung zurückholen",
+    "name": "Name",
+    "description": "Beschreibung",
+    "limited": "Begrenzte Nutzungen",
+    "uses": "Nutzungen",
+    "rechargeLabel": "Zurück nach",
+    "recharge": {
+      "short": "kurzer Rast",
+      "long": "langer Rast"
+    },
+    "tokens": "Merkmale mit begrenzten Nutzungen",
+    "useOne": "{{name}} nutzen",
+    "tokenLabel": "{{name}} nutzen ({{current}} von {{max}} übrig)"
   }
 }
