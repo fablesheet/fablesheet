@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://github.com/fablesheet/fablesheet/compare/v0.5.0...v0.6.0) (2026-10-05)
+
+
+### Features
+
+* play any game with sheet templates and the sheet builder ([#39](https://github.com/fablesheet/fablesheet/issues/39)) ([fd93351](https://github.com/fablesheet/fablesheet/commit/fd93351256746b9f28b6e2259fffc7f2097e830e))
+* roll dice for every game ([#37](https://github.com/fablesheet/fablesheet/issues/37)) ([baa19d8](https://github.com/fablesheet/fablesheet/commit/baa19d84e0b0978e5fe7330aaf975775d28b6408))
+
 ## [0.5.0](https://github.com/fablesheet/fablesheet/compare/v0.4.0...v0.5.0) (2026-10-05)
 
 
