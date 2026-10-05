@@ -4,9 +4,11 @@
 
 <h1 align="center">Fablesheet</h1>
 
-**A free, open-source, offline-first character manager for 5th edition tabletop roleplaying games.**
+**A free, open-source, offline-first character manager for pen & paper roleplaying games.**
 
 Create characters, track hit points, conditions, spells and inventory — everything is stored locally on your device. No account, no tracking, no internet required.
+
+Fablesheet is built for many game systems. Today it fully supports the **fifth edition rules of the SRD 5.1**; more systems are on the [roadmap](ROADMAP.md).
 
 > 🚧 Fablesheet is in early development (pre-1.0). Expect rough edges and breaking changes.
 
@@ -61,11 +63,13 @@ cargo test --workspace
 
 ```
 apps/
-  desktop/        Tauri 2 desktop app (React 19, TypeScript, Tailwind CSS 4, SQLite)
+  desktop/        Tauri 2 desktop app and web app (React 19, TypeScript, Tailwind CSS 4, SQLite)
+                  src/systems/  one folder per game system with its screens
   server/         Optional sync server (Rust, Axum) — work in progress
 packages/
-  core/           Shared TypeScript types for characters, spells and items
-  srd-data/       Game content from the SRD 5.1 (spells, equipment)
+  core/           System-independent core: characters, dice, combat, migrations, file format
+  dnd5e/          Fifth edition rules (SRD 5.1)
+  dnd5e-srd/      Fifth edition content from the SRD 5.1 (classes, races, spells, items)
 ```
 
 ## Contributing
@@ -76,6 +80,6 @@ Contributions are welcome — bug reports, feature ideas, code, translations and
 
 Fablesheet is licensed under the [GNU General Public License v3.0 or later](LICENSE).
 
-Game content in `packages/srd-data` is taken from the System Reference Document 5.1 and is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode). See [NOTICE](NOTICE) for attribution.
+Game content in `packages/dnd5e-srd` is taken from the System Reference Document 5.1 and is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode). See [NOTICE](NOTICE) for attribution.
 
 Fablesheet is an independent project. It is not affiliated with, endorsed, sponsored or approved by Wizards of the Coast LLC.

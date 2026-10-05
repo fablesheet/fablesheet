@@ -1,8 +1,8 @@
 // Routes to backend (online) or local storage (offline / disabled).
 // Components import only from here — they never touch local.ts or backend.ts directly.
-import type { Character } from '@fablesheet/core'
+import type { CharacterBase } from '@fablesheet/core'
 import { migrateCharacter } from '@fablesheet/core'
-import { withCatalogStats } from '@fablesheet/srd-data'
+import { SYSTEM_DEFINITIONS } from '../systems/definitions'
 import * as local from './local'
 import * as backend from './backend'
 
@@ -35,17 +35,17 @@ function shouldUseRemote(): boolean {
 
 // ── Public API (same signatures as before) ─────────────────────────────────
 
-export async function createCharacter(character: Omit<Character, 'id'>): Promise<Character> {
-  return shouldUseRemote() ? backend.backendCreate(character) : local.localCreate(character)
+export async function createCharacter<C extends CharacterBase>(character: Omit<C, 'id'>): Promise<C> {
+  // The storage keeps the document as it is, so the result has the same type
+  return (shouldUseRemote() ? backend.backendCreate(character) : local.localCreate(character)) as Promise<C>
 }
 
-/** Upgrades a stored character and fills in weapon/armor stats for catalog items saved without them. */
-function load(doc: unknown): Character {
-  const character = migrateCharacter(doc)
-  return { ...character, items: character.items.map(withCatalogStats) }
+/** Upgrades a stored character to the current format of its game system. */
+function load(doc: unknown): CharacterBase {
+  return migrateCharacter(doc, SYSTEM_DEFINITIONS)
 }
 
-export async function getCharacters(): Promise<Character[]> {
+export async function getCharacters(): Promise<CharacterBase[]> {
   const raw = shouldUseRemote() ? await backend.backendGetAll() : await local.localGetAll()
   // One unreadable document must not hide all other characters
   return raw.flatMap(doc => {
@@ -58,11 +58,11 @@ export async function getCharacters(): Promise<Character[]> {
   })
 }
 
-export async function getCharacter(id: string): Promise<Character> {
+export async function getCharacter(id: string): Promise<CharacterBase> {
   return load(shouldUseRemote() ? await backend.backendGetOne(id) : await local.localGetOne(id))
 }
 
-export async function updateCharacter(id: string, character: Character): Promise<Character> {
+export async function updateCharacter(id: string, character: CharacterBase): Promise<CharacterBase> {
   return shouldUseRemote() ? backend.backendUpdate(id, character) : local.localUpdate(id, character)
 }
 

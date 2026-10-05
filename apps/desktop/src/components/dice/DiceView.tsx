@@ -1,34 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { AbilityName, Character, RollMode, RollResult } from '@fablesheet/core'
-import {
-  DIE_SIZES,
-  equippedAttacks,
-  parseDice,
-  rollD20,
-  rollExpression,
-  savingThrowBonus,
-  skillBonus,
-  formatModifier,
-} from '@fablesheet/core'
-import { gameLabel } from '../../i18n/game'
+import type { RollMode, RollResult } from '@fablesheet/core'
+import { DIE_SIZES, formatModifier, parseDice, rollD20, rollExpression } from '@fablesheet/core'
+import type { QuickRollGroup } from '../../systems/types'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { Segmented } from '../ui/Segmented'
 import { DieShape } from './DieShape'
 
-const ABILITIES: AbilityName[] = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
 const MAX_HISTORY = 30
 const ROLL_MS = 650
 
 /** Roll history survives switching between table objects during a session */
 let sessionHistory: RollResult[] = []
-
-interface Props {
-  character: Character
+function rememberHistory(history: RollResult[]) {
+  sessionHistory = history
 }
 
-export function DiceView({ character }: Props) {
+interface Props {
+  /** Rolls for the character, e.g. saving throws and skills */
+  quickRolls: QuickRollGroup[]
+}
+
+/** The dice tray: works for every game system; quick rolls come from the system. */
+export function DiceView({ quickRolls }: Props) {
   const { t } = useTranslation()
   const [pool, setPool] = useState<Record<number, number>>({})
   const [modifier, setModifier] = useState(0)
@@ -45,7 +40,7 @@ export function DiceView({ character }: Props) {
 
   function show(result: RollResult) {
     const next = [result, ...history].slice(0, MAX_HISTORY)
-    sessionHistory = next
+    rememberHistory(next)
     setHistory(next)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     setRolling(true)
@@ -79,7 +74,6 @@ export function DiceView({ character }: Props) {
   const check = (label: string, mod: number) => show(rollD20(mod, mode, `${label} (${formatModifier(mod)})`))
 
   const poolEmpty = Object.values(pool).every(c => !c)
-  const attacks = equippedAttacks(character)
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto parchment-scroll">
@@ -213,55 +207,34 @@ export function DiceView({ character }: Props) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {/* Quick rolls from the character */}
-          <Card label={t('dice.fromCharacter')}>
-            <div className="flex flex-wrap gap-1.5">
-              <QuickRoll label={t('sheet.initiative')} value={character.initiativeBonus} onRoll={check} />
-              {attacks.map(a => (
-                <QuickRoll key={a.itemId} label={a.name} value={a.attackBonus} onRoll={check} />
+          {/* Quick rolls from the character, provided by the game system */}
+          {quickRolls.length > 0 && (
+            <Card label={t('dice.fromCharacter')}>
+              {quickRolls.map((group, gi) => (
+                <div key={group.title}>
+                  <div className={`text-xs text-fs-ink-muted mb-1.5 ${gi > 0 ? 'mt-3' : ''}`}>{group.title}</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.rolls.map(roll => (
+                      <button
+                        key={roll.label}
+                        onClick={() => {
+                          if (roll.modifier !== undefined) return check(roll.label, roll.modifier)
+                          const expr = roll.expression ? parseDice(roll.expression) : null
+                          if (expr) show(rollExpression(expr, roll.label))
+                        }}
+                        className={quickCls}
+                      >
+                        {roll.short ?? roll.label}{' '}
+                        <span className="font-display">
+                          {roll.modifier !== undefined ? formatModifier(roll.modifier) : roll.expression}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
-              {attacks
-                .filter(a => a.damage)
-                .map(a => (
-                  <button
-                    key={`dmg-${a.itemId}`}
-                    onClick={() => {
-                      const expr = parseDice(a.damage!.replace('−', '-'))
-                      if (expr) show(rollExpression(expr, `${a.name}: ${t('table.damage')}`))
-                    }}
-                    className={quickCls}
-                  >
-                    {a.name} · {a.damage}
-                  </button>
-                ))}
-            </div>
-            <div className="text-xs text-fs-ink-muted mt-3 mb-1.5">{t('sheet.savingThrows')}</div>
-            <div className="flex flex-wrap gap-1.5">
-              {ABILITIES.map(ab => (
-                <QuickRoll
-                  key={ab}
-                  label={gameLabel(t, 'abilityShort', ab)}
-                  value={savingThrowBonus(
-                    character.scores[ab],
-                    character.savingThrowProficiencies.includes(ab),
-                    character.proficiencyBonus,
-                  )}
-                  onRoll={(_, mod) => check(`${t('table.save')} ${gameLabel(t, 'abilityShort', ab)}`, mod)}
-                />
-              ))}
-            </div>
-            <div className="text-xs text-fs-ink-muted mt-3 mb-1.5">{t('sheet.skills')}</div>
-            <div className="flex flex-wrap gap-1.5">
-              {character.skills.map(skill => (
-                <QuickRoll
-                  key={skill.name}
-                  label={gameLabel(t, 'skill', skill.name)}
-                  value={skillBonus(character.scores[skill.ability], skill.proficiency, character.proficiencyBonus)}
-                  onRoll={check}
-                />
-              ))}
-            </div>
-          </Card>
+            </Card>
+          )}
 
           <Card
             label={t('dice.history')}
@@ -271,7 +244,7 @@ export function DiceView({ character }: Props) {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    sessionHistory = []
+                    rememberHistory([])
                     setHistory([])
                   }}
                 >
@@ -311,19 +284,3 @@ export function DiceView({ character }: Props) {
 
 const quickCls =
   'fs-focus min-h-9 px-2.5 text-sm rounded-md border border-fs-card-line bg-fs-tile text-fs-ink cursor-pointer hover:border-fs-brass'
-
-function QuickRoll({
-  label,
-  value,
-  onRoll,
-}: {
-  label: string
-  value: number
-  onRoll: (label: string, mod: number) => void
-}) {
-  return (
-    <button onClick={() => onRoll(label, value)} className={quickCls}>
-      {label} <span className="font-display">{formatModifier(value)}</span>
-    </button>
-  )
-}

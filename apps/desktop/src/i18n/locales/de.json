@@ -702,5 +702,12 @@
     "attunementCount": "Eingestimmt {{count}}/{{limit}}",
     "attunementFull": "Schon auf {{limit}} Gegenstände eingestimmt",
     "chargesShort": "{{current}}/{{max}} Ladungen"
+  },
+  "systems": {
+    "pick": "Für welches Spiel ist der Charakter?",
+    "dnd5e": {
+      "name": "5. Edition (SRD 5.1)",
+      "description": "Die Fantasy-Rollenspielregeln des System Reference Document 5.1: Klassen, Völker, Zauber und magische Gegenstände."
+    }
   }
 }

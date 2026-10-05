@@ -1,5 +1,10 @@
 // Dice rolling. The random source is injectable so rolls can be tested.
 
+/** Signed display string for a modifier, e.g. 2 → "+2", -1 → "-1". */
+export function formatModifier(modifier: number): string {
+  return modifier >= 0 ? `+${modifier}` : `${modifier}`
+}
+
 export type DieSize = 4 | 6 | 8 | 10 | 12 | 20 | 100
 export const DIE_SIZES: DieSize[] = [4, 6, 8, 10, 12, 20, 100]
 

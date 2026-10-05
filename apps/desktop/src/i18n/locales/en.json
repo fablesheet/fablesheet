@@ -702,5 +702,12 @@
     "attunementCount": "Attuned {{count}}/{{limit}}",
     "attunementFull": "Already attuned to {{limit}} items",
     "chargesShort": "{{current}}/{{max}} charges"
+  },
+  "systems": {
+    "pick": "Which game is the character for?",
+    "dnd5e": {
+      "name": "Fifth Edition (SRD 5.1)",
+      "description": "The fantasy roleplaying rules of the System Reference Document 5.1: classes, races, spells and magic items."
+    }
   }
 }
