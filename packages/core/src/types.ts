@@ -32,6 +32,30 @@ export interface Item {
   weapon?: WeaponStats | null
   /** Armor class stats for armor and shields (absent for other items) */
   armor?: ArmorStats | null
+  /** Magic bonuses, active while the item is equipped (and attuned, if required) */
+  bonuses?: ItemBonuses | null
+  /** Charges of wands, staffs and similar items */
+  charges?: ItemCharges | null
+}
+
+export interface ItemBonuses {
+  /** Added to armor class (magic armor, shields, rings and cloaks of protection) */
+  ac: number
+  /** Added to attack rolls with this weapon */
+  attack: number
+  /** Added to damage rolls with this weapon */
+  damage: number
+  /** Added to all saving throws */
+  savingThrows: number
+}
+
+export interface ItemCharges {
+  max: number
+  current: number
+  /** When charges come back: at dawn / after a long rest, after a short rest, or never */
+  recharge: 'long' | 'short' | null
+  /** Dice of charges regained, e.g. "1d6+1"; null = all charges */
+  regain: string | null
 }
 
 export type DamageType =

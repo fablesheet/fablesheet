@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character, Item } from '@fablesheet/core'
-import { armorClass, carryingLimits, weaponAttack } from '@fablesheet/core'
+import { ATTUNEMENT_LIMIT, armorClass, attunedCount, carryingLimits, weaponAttack } from '@fablesheet/core'
 import { gameLabel } from '../../i18n/game'
 import { openJsonFile, saveJsonFile } from '../../services/files'
 import { Button } from '../ui/Button'
@@ -107,6 +107,12 @@ export function BackpackView({ character, onUpdate }: Props) {
             {item.quantity > 1 && <span className="text-fs-ink-muted"> ×{item.quantity}</span>}
           </span>
           <span className="block text-xs text-fs-ink-muted truncate">
+            {item.requiresAttunement && (
+              <span className={item.isAttuned ? 'text-fs-brass' : ''}>
+                {item.isAttuned ? `✧ ${t('magic.attuned')} · ` : `${t('magic.notAttuned')} · `}
+              </span>
+            )}
+            {item.charges && `${t('magic.chargesShort', { current: item.charges.current, max: item.charges.max })} · `}
             {(item.equipped && statLine(item)) || gameLabel(t, 'itemCategory', item.category)}
             {item.weight > 0 && ` · ${+(item.weight * item.quantity).toFixed(1)} lb`}
           </span>
@@ -178,6 +184,8 @@ export function BackpackView({ character, onUpdate }: Props) {
           label={t('inventory.onBody')}
           action={
             <span className="text-sm text-fs-ink-muted">
+              {attunedCount(items) > 0 &&
+                `${t('magic.attunementCount', { count: attunedCount(items), limit: ATTUNEMENT_LIMIT })} · `}
               {t('sheet.ac')} {armorClass(character)}
             </span>
           }
@@ -217,6 +225,7 @@ export function BackpackView({ character, onUpdate }: Props) {
           key={editing === 'new' ? 'new' : editing.id}
           item={editing === 'new' ? BLANK : editing}
           isNew={editing === 'new'}
+          attunedElsewhere={attunedCount(items.filter(i => editing === 'new' || i.id !== editing.id))}
           onClose={() => setEditing(null)}
           onSave={draft => {
             saveItems(

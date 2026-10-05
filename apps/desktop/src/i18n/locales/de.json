@@ -43,7 +43,13 @@
     "deleting": "Wird gelöscht…"
   },
   "builder": {
-    "steps": ["Herkunft", "Berufung", "Gaben", "Weg", "Schicksal"],
+    "steps": [
+      "Herkunft",
+      "Berufung",
+      "Gaben",
+      "Weg",
+      "Schicksal"
+    ],
     "characterName": "Name des Charakters",
     "namePlaceholder": "Namen eingeben...",
     "race": "Volk",
@@ -153,8 +159,8 @@
     "shortRest": "☾ Kurze Rast",
     "longRest": "☀ Lange Rast",
     "confirmRest": "Zum Rasten erneut klicken",
-    "shortRestHint": "Kurze Rast: Paktmagie-Plätze und Merkmale mit kurzer Rast werden wiederhergestellt. Trefferwürfel über „Nutzen“ ausgeben.",
-    "longRestHint": "Lange Rast: volle TP, die Hälfte der Trefferwürfel, alle Zauberplätze und Merkmale, eine Stufe Erschöpfung weniger.",
+    "shortRestHint": "Kurze Rast: Paktmagie-Plätze, Merkmale mit kurzer Rast und Ladungen von Gegenständen werden wiederhergestellt. Trefferwürfel über „Nutzen“ ausgeben.",
+    "longRestHint": "Lange Rast: volle TP, die Hälfte der Trefferwürfel, alle Zauberplätze und Merkmale, Ladungen von Gegenständen, eine Stufe Erschöpfung weniger.",
     "notes": "❧ Notizen",
     "editCurrency": "Währung bearbeiten",
     "attacks": "Angriffe",
@@ -679,5 +685,28 @@
     "saveFailure": "Misslungen",
     "concentrationKept": "Konzentration halten",
     "concentrationLost": "Konzentration verloren"
+  },
+  "magic": {
+    "title": "Magie",
+    "enhancement": "Magische Waffe/Rüstung",
+    "attack": "Angriffsbonus",
+    "damage": "Schadensbonus",
+    "ac": "RK-Bonus",
+    "savingThrows": "Rettungswurfbonus",
+    "bonusHint": "Boni zählen, solange der Gegenstand angelegt (und, falls nötig, eingestimmt) ist.",
+    "hasCharges": "Hat Ladungen",
+    "chargesCurrent": "Ladungen übrig",
+    "chargesMax": "Höchstzahl Ladungen",
+    "recharge": "Lädt auf",
+    "rechargeLong": "Morgengrauen / lange Rast",
+    "rechargeShort": "Kurze Rast",
+    "rechargeNever": "Nie",
+    "regain": "Zurückgewonnene Ladungen",
+    "regainPlaceholder": "z. B. 1W6+1 – leer = alle",
+    "attuned": "eingestimmt",
+    "notAttuned": "nicht eingestimmt",
+    "attunementCount": "Eingestimmt {{count}}/{{limit}}",
+    "attunementFull": "Schon auf {{limit}} Gegenstände eingestimmt",
+    "chargesShort": "{{current}}/{{max}} Ladungen"
   }
 }

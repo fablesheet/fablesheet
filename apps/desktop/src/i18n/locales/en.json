@@ -43,7 +43,13 @@
     "deleting": "Deleting…"
   },
   "builder": {
-    "steps": ["Heritage", "Calling", "Gifts", "Path", "Destiny"],
+    "steps": [
+      "Heritage",
+      "Calling",
+      "Gifts",
+      "Path",
+      "Destiny"
+    ],
     "characterName": "Character Name",
     "namePlaceholder": "Enter a name...",
     "race": "Race",
@@ -153,8 +159,8 @@
     "shortRest": "☾ Short Rest",
     "longRest": "☀ Long Rest",
     "confirmRest": "Click again to rest",
-    "shortRestHint": "Short rest: Warlock pact slots and short-rest features recover. Spend hit dice with “Use”.",
-    "longRestHint": "Long rest: full HP, half your hit dice, all spell slots and features, one level of exhaustion removed.",
+    "shortRestHint": "Short rest: Warlock pact slots, short-rest features and item charges recover. Spend hit dice with “Use”.",
+    "longRestHint": "Long rest: full HP, half your hit dice, all spell slots and features, item charges, one level of exhaustion removed.",
     "notes": "❧ Notes",
     "editCurrency": "Edit currency",
     "attacks": "Attacks",
@@ -679,5 +685,28 @@
     "saveFailure": "Failed",
     "concentrationKept": "Keep concentration",
     "concentrationLost": "Concentration lost"
+  },
+  "magic": {
+    "title": "Magic",
+    "enhancement": "Magic weapon/armor",
+    "attack": "Attack bonus",
+    "damage": "Damage bonus",
+    "ac": "AC bonus",
+    "savingThrows": "Saving throw bonus",
+    "bonusHint": "Bonuses count while the item is equipped (and attuned, if needed).",
+    "hasCharges": "Has charges",
+    "chargesCurrent": "Charges left",
+    "chargesMax": "Maximum charges",
+    "recharge": "Recharges",
+    "rechargeLong": "At dawn / long rest",
+    "rechargeShort": "Short rest",
+    "rechargeNever": "Never",
+    "regain": "Charges regained",
+    "regainPlaceholder": "e.g. 1d6+1 — empty = all",
+    "attuned": "attuned",
+    "notAttuned": "not attuned",
+    "attunementCount": "Attuned {{count}}/{{limit}}",
+    "attunementFull": "Already attuned to {{limit}} items",
+    "chargesShort": "{{current}}/{{max}} charges"
   }
 }

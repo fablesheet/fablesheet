@@ -5,7 +5,7 @@ import { ITEM_CATALOG } from '@fablesheet/srd-data'
 import { gameLabel } from '../../i18n/game'
 import { Drawer } from '../ui/Drawer'
 import { inputCls } from './styles'
-import { CATEGORY_ICON } from './rarity'
+import { CATEGORY_ICON, RARITY_COLOR } from './rarity'
 
 const FILTERS: Array<ItemCategory | 'all'> = [
   'all',
@@ -16,6 +16,7 @@ const FILTERS: Array<ItemCategory | 'all'> = [
   'Potion',
   'Container',
   'Ammunition',
+  'Magic Item',
 ]
 
 interface Props {
@@ -75,14 +76,22 @@ export function CatalogPanel({ onAdd, onClose }: Props) {
                 <span className="w-5 text-center text-fs-brass" aria-hidden="true">
                   {CATEGORY_ICON[item.category]}
                 </span>
-                <span className="flex-1 min-w-0 truncate">{item.name}</span>
+                <span
+                  className="flex-1 min-w-0 truncate"
+                  style={item.rarity && item.rarity !== 'Common' ? { color: RARITY_COLOR[item.rarity] } : undefined}
+                >
+                  {item.name}
+                  {item.requiresAttunement && <span className="text-xs text-fs-ink-muted"> ✧</span>}
+                </span>
                 <span className="text-xs text-fs-ink-muted w-12 text-right">
                   {item.weight > 0 ? `${item.weight} lb` : '—'}
                 </span>
                 <span className="text-xs text-fs-ink-muted w-16 text-right">
-                  {item.value >= 1
-                    ? `${item.value} ${gameLabel(t, 'currency', 'gp')}`
-                    : `${Math.round(item.value * 100)} ${gameLabel(t, 'currency', 'cp')}`}
+                  {item.rarity && item.value === 0
+                    ? gameLabel(t, 'rarity', item.rarity)
+                    : item.value >= 1
+                      ? `${item.value} ${gameLabel(t, 'currency', 'gp')}`
+                      : `${Math.round(item.value * 100)} ${gameLabel(t, 'currency', 'cp')}`}
                 </span>
                 <span className={`w-6 text-center ${added === item.name ? 'text-fs-good' : 'text-fs-brass'}`}>
                   {added === item.name ? '✓' : '+'}
