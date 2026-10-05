@@ -22,6 +22,7 @@ Fablesheet is built for many game systems. Today it fully supports the **fifth e
 - **Spellbook** — browse SRD spells by level and school, learn, forget and prepare spells
 - **Inventory** — add items manually or from the SRD equipment catalog, carrying capacity, JSON import/export
 - **Magic items** — SRD magic items, +1 to +3 weapons and armor, attunement (max. 3), bonuses to AC, attacks and saving throws, charges that recharge on rests
+- **Dice for every game** — dice tray with keep highest/lowest, exploding dice, success pools and Fudge dice, plus percentile, 3d20, Hope & Fear, d6 action rolls and 2d6 moves
 - **Offline-first** — local SQLite database on desktop, works without a connection
 - **Cross-platform** — Linux, Windows and macOS, plus a web app for iPad and other tablets
 - **Multilingual** — English and German (game texts from the SRD are English only)

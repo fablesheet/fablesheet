@@ -572,7 +572,7 @@
     "normal": "Normal",
     "advantage": "Advantage",
     "disadvantage": "Disadvantage",
-    "modeHint": "Advantage and disadvantage apply to single d20 rolls.",
+    "modeHint": "Advantage and disadvantage apply to single d20 rolls, percentile rolls (bonus/penalty die) and Hope & Fear (±d6).",
     "clear": "Clear",
     "rollButton": "Roll",
     "custom": "Dice expression",
@@ -581,7 +581,55 @@
     "history": "History",
     "noHistory": "No rolls yet.",
     "natural20": "Natural 20!",
-    "natural1": "Natural 1"
+    "natural1": "Natural 1",
+    "explode": "Exploding",
+    "countSuccesses": "Count successes from",
+    "syntax": "Dice notation",
+    "example": [
+      "sum with a bonus",
+      "keep the highest 3",
+      "keep the lowest",
+      "exploding dice",
+      "count successes (5 or 6)",
+      "Fudge dice"
+    ],
+    "successes_one": "{{count}} success",
+    "successes_other": "{{count}} successes",
+    "checks": "Checks",
+    "target": "Target value",
+    "attribute": "Attribute {{n}}",
+    "skillPoints": "Skill points",
+    "difficulty": "Difficulty",
+    "poolSize": "Dice",
+    "check": {
+      "under": "Percentile",
+      "3d20": "3d20 check",
+      "duality": "Hope & Fear",
+      "highest": "Action roll",
+      "2d6": "2d6 move"
+    },
+    "checkHint": {
+      "under": "d100 at or under the target value. Advantage and disadvantage roll a bonus or penalty die.",
+      "3d20": "Three d20, each against one attribute; skill points pay for every point above it.",
+      "duality": "Two d12 for Hope and Fear plus your modifier; advantage adds a d6, disadvantage subtracts one.",
+      "highest": "A pool of d6: the highest die counts. 6 is a success, 4–5 a partial success.",
+      "2d6": "2d6 plus a stat: 10+ is a full success, 7–9 a partial success."
+    },
+    "outcome": {
+      "critical": "Critical success",
+      "success": "Success",
+      "partial": "Partial success",
+      "failure": "Failure",
+      "fumble": "Fumble",
+      "hard": "Hard success (half)",
+      "extreme": "Extreme success (a fifth)",
+      "quality": "Success · quality level {{quality}}",
+      "qualityCritical": "Critical success · quality level {{quality}}",
+      "pointsMissing": "Failure · {{points}} points short",
+      "withHope": "With Hope",
+      "withFear": "With Fear",
+      "dualityCritical": "Critical success · gain Hope"
+    }
   },
   "web": {
     "installHint": "Tip: add Fablesheet to your home screen (Share → Add to Home Screen). It then works offline like an app and your characters are kept safely on this device.",

@@ -572,7 +572,7 @@
     "normal": "Normal",
     "advantage": "Vorteil",
     "disadvantage": "Nachteil",
-    "modeHint": "Vorteil und Nachteil gelten für einzelne W20-Würfe.",
+    "modeHint": "Vorteil und Nachteil gelten für einzelne W20-Würfe, Prozentwürfe (Bonus-/Strafwürfel) und Hoffnung & Furcht (±W6).",
     "clear": "Leeren",
     "rollButton": "Würfeln",
     "custom": "Würfelausdruck",
@@ -581,7 +581,55 @@
     "history": "Verlauf",
     "noHistory": "Noch nicht gewürfelt.",
     "natural20": "Natürliche 20!",
-    "natural1": "Natürliche 1"
+    "natural1": "Natürliche 1",
+    "explode": "Explodierend",
+    "countSuccesses": "Erfolge zählen ab",
+    "syntax": "Würfelschreibweise",
+    "example": [
+      "Summe mit Bonus",
+      "die höchsten 3 behalten",
+      "den niedrigsten behalten",
+      "explodierende Würfel",
+      "Erfolge zählen (5 oder 6)",
+      "Fudge-Würfel"
+    ],
+    "successes_one": "{{count}} Erfolg",
+    "successes_other": "{{count}} Erfolge",
+    "checks": "Proben",
+    "target": "Zielwert",
+    "attribute": "Eigenschaft {{n}}",
+    "skillPoints": "Fertigkeitspunkte",
+    "difficulty": "Schwierigkeit",
+    "poolSize": "Würfel",
+    "check": {
+      "under": "Prozentwurf",
+      "3d20": "3W20-Probe",
+      "duality": "Hoffnung & Furcht",
+      "highest": "Aktionswurf",
+      "2d6": "2W6-Wurf"
+    },
+    "checkHint": {
+      "under": "W100 auf oder unter den Zielwert. Vorteil und Nachteil würfeln einen Bonus- oder Strafwürfel.",
+      "3d20": "Drei W20, jeder gegen eine Eigenschaft; jeder Punkt darüber kostet Fertigkeitspunkte.",
+      "duality": "Zwei W12 für Hoffnung und Furcht plus Modifikator; Vorteil addiert einen W6, Nachteil zieht ihn ab.",
+      "highest": "Ein Pool aus W6: der höchste Würfel zählt. 6 ist ein Erfolg, 4–5 ein Teilerfolg.",
+      "2d6": "2W6 plus Wert: ab 10 voller Erfolg, 7–9 Teilerfolg."
+    },
+    "outcome": {
+      "critical": "Kritischer Erfolg",
+      "success": "Erfolg",
+      "partial": "Teilerfolg",
+      "failure": "Misserfolg",
+      "fumble": "Patzer",
+      "hard": "Schwieriger Erfolg (Hälfte)",
+      "extreme": "Extremer Erfolg (Fünftel)",
+      "quality": "Erfolg · Qualitätsstufe {{quality}}",
+      "qualityCritical": "Kritischer Erfolg · Qualitätsstufe {{quality}}",
+      "pointsMissing": "Misserfolg · {{points}} Punkte zu wenig",
+      "withHope": "Mit Hoffnung",
+      "withFear": "Mit Furcht",
+      "dualityCritical": "Kritischer Erfolg · Hoffnung gewinnen"
+    }
   },
   "web": {
     "installHint": "Tipp: Füge Fablesheet zum Home-Bildschirm hinzu (Teilen → Zum Home-Bildschirm). Dann läuft es offline wie eine App, und deine Charaktere bleiben sicher auf diesem Gerät.",

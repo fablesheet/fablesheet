@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from 'react'
 import type { TFunction } from 'i18next'
-import type { CharacterBase, GameSystemDefinition } from '@fablesheet/core'
+import type { CharacterBase, GameSystemDefinition, RollSpec } from '@fablesheet/core'
 
 /** Props of views that show and change a character */
 export interface CharacterViewProps<C extends CharacterBase = CharacterBase> {
@@ -38,15 +38,13 @@ export interface TableToken<C extends CharacterBase = CharacterBase> {
   spend: () => C
 }
 
-/** A roll for the character in the dice tray: a d20 check with a modifier, or a dice expression */
+/** A roll for the character in the dice tray */
 export interface QuickRoll {
   /** Name in the roll history, e.g. "Saving throw STR" */
   label: string
   /** Shorter name on the button, if different */
   short?: string
-  modifier?: number
-  /** Dice expression such as "1d8 + 3" */
-  expression?: string
+  roll: RollSpec
 }
 
 export interface QuickRollGroup {
