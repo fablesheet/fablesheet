@@ -14,7 +14,7 @@ import {
 } from '@fablesheet/dnd5e'
 import { gameLabel } from '../../i18n/game'
 import { BackpackArt, BookArt, JournalArt, SheetArt } from '../../components/table/TableObjects'
-import type { GameSystemUI } from '../types'
+import type { GameSystemUI, QuickRollGroup } from '../types'
 import { dnd5eSystemDefinition } from './definition'
 import { BackpackView } from './backpack/BackpackView'
 import { CharacterBuilder } from './builder/CharacterBuilder'
@@ -109,18 +109,21 @@ export const dnd5e: GameSystemUI<Dnd5eCharacter> = {
         spend: () => spendCharge(c, i.id),
       })),
 
-  quickRolls: (c, t) => {
+  quickRolls: (c, t): QuickRollGroup[] => {
     const attacks = equippedAttacks(c)
     const saveBonus = itemBonus(c, 'savingThrows')
     return [
       {
         title: t('combat.title'),
         rolls: [
-          { label: t('sheet.initiative'), modifier: c.initiativeBonus },
-          ...attacks.map(a => ({ label: a.name, modifier: a.attackBonus })),
+          { label: t('sheet.initiative'), roll: { kind: 'd20', modifier: c.initiativeBonus } },
+          ...attacks.map(a => ({ label: a.name, roll: { kind: 'd20' as const, modifier: a.attackBonus } })),
           ...attacks
             .filter(a => a.damage)
-            .map(a => ({ label: `${a.name}: ${t('table.damage')}`, expression: a.damage!.replace('−', '-') })),
+            .map(a => ({
+              label: `${a.name}: ${t('table.damage')}`,
+              roll: { kind: 'dice' as const, expression: a.damage!.replace('−', '-') },
+            })),
         ],
       },
       {
@@ -128,15 +131,18 @@ export const dnd5e: GameSystemUI<Dnd5eCharacter> = {
         rolls: ABILITY_NAMES.map(ab => ({
           label: `${t('table.save')} ${gameLabel(t, 'abilityShort', ab)}`,
           short: gameLabel(t, 'abilityShort', ab),
-          modifier:
-            savingThrowBonus(c.scores[ab], c.savingThrowProficiencies.includes(ab), c.proficiencyBonus) + saveBonus,
+          roll: {
+            kind: 'd20',
+            modifier:
+              savingThrowBonus(c.scores[ab], c.savingThrowProficiencies.includes(ab), c.proficiencyBonus) + saveBonus,
+          },
         })),
       },
       {
         title: t('sheet.skills'),
         rolls: c.skills.map(skill => ({
           label: gameLabel(t, 'skill', skill.name),
-          modifier: skillBonus(c.scores[skill.ability], skill.proficiency, c.proficiencyBonus),
+          roll: { kind: 'd20', modifier: skillBonus(c.scores[skill.ability], skill.proficiency, c.proficiencyBonus) },
         })),
       },
     ]
