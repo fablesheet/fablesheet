@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Item, ItemCategory } from '@fablesheet/core'
+import { ATTUNEMENT_LIMIT } from '@fablesheet/core'
 import { gameLabel } from '../../i18n/game'
 import { Button } from '../ui/Button'
 import { Drawer } from '../ui/Drawer'
 import { DEFAULT_ARMOR, DEFAULT_WEAPON } from './itemDefaults'
 import { CATEGORIES, RARITIES } from './itemImport'
 import { ArmorFields, WeaponFields } from './ItemStatsFields'
+import { MagicFields } from './MagicFields'
 import { RARITY_COLOR } from './rarity'
 import { inputCls, labelCls } from './styles'
 
@@ -15,17 +17,20 @@ type Draft = Omit<Item, 'id'>
 interface Props {
   item: Draft
   isNew: boolean
+  /** Number of other items the character is attuned to */
+  attunedElsewhere: number
   onSave: (item: Draft) => void
   onRemove: () => void
   onClose: () => void
 }
 
-export function ItemEditor({ item, isNew, onSave, onRemove, onClose }: Props) {
+export function ItemEditor({ item, isNew, attunedElsewhere, onSave, onRemove, onClose }: Props) {
   const { t } = useTranslation()
   const [form, setForm] = useState<Draft>(item)
   const [confirmRemove, setConfirmRemove] = useState(false)
   const set = (patch: Partial<Draft>) => setForm(prev => ({ ...prev, ...patch }))
-  const showMagic = form.rarity !== null || form.category === 'Magic Item'
+  const showMagic = form.rarity !== null || form.category === 'Magic Item' || !!form.bonuses || !!form.charges
+  const attunementFull = attunedElsewhere >= ATTUNEMENT_LIMIT
 
   function save() {
     if (!form.name.trim()) return
@@ -193,11 +198,36 @@ export function ItemEditor({ item, isNew, onSave, onRemove, onClose }: Props) {
             </label>
             {form.requiresAttunement && (
               <label className="flex items-center gap-2 pl-6">
-                <input type="checkbox" checked={form.isAttuned} onChange={e => set({ isAttuned: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={form.isAttuned}
+                  disabled={!form.isAttuned && attunementFull}
+                  onChange={e => set({ isAttuned: e.target.checked })}
+                />
                 {t('inventory.attunedLabel')}
+                <span className="text-xs text-fs-ink-muted">
+                  {!form.isAttuned && attunementFull
+                    ? t('magic.attunementFull', { limit: ATTUNEMENT_LIMIT })
+                    : t('magic.attunementCount', {
+                        count: attunedElsewhere + (form.isAttuned ? 1 : 0),
+                        limit: ATTUNEMENT_LIMIT,
+                      })}
+                </span>
               </label>
             )}
           </div>
+        )}
+
+        {(showMagic || form.category === 'Weapon' || form.category === 'Armor') && (
+          <MagicFields
+            kind={form.category === 'Weapon' ? 'weapon' : form.category === 'Armor' ? 'armor' : 'other'}
+            bonuses={form.bonuses ?? null}
+            charges={form.charges ?? null}
+            rarity={form.rarity}
+            onChange={set}
+            inputCls={inputCls}
+            labelCls={labelCls}
+          />
         )}
 
         <label>

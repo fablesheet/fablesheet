@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Character, RollResult } from '@fablesheet/core'
-import { endConcentration, formatModifier, rollD20, savingThrowBonus } from '@fablesheet/core'
+import { endConcentration, formatModifier, itemBonus, rollD20, savingThrowBonus } from '@fablesheet/core'
 import { Button } from '../ui/Button'
 import { Dialog } from '../ui/Dialog'
 
@@ -15,11 +15,12 @@ interface Props {
 export function ConcentrationCheckDialog({ character, dc, onResolve }: Props) {
   const { t } = useTranslation()
   const [roll, setRoll] = useState<RollResult | null>(null)
-  const bonus = savingThrowBonus(
-    character.scores.constitution,
-    character.savingThrowProficiencies.includes('constitution'),
-    character.proficiencyBonus,
-  )
+  const bonus =
+    savingThrowBonus(
+      character.scores.constitution,
+      character.savingThrowProficiencies.includes('constitution'),
+      character.proficiencyBonus,
+    ) + itemBonus(character, 'savingThrows')
   const success = roll ? roll.total >= dc : null
   const keep = () => onResolve(character)
   const lose = () => onResolve(endConcentration(character))

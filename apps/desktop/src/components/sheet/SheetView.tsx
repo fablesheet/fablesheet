@@ -6,6 +6,7 @@ import {
   applyHealing,
   equippedAttacks,
   formatModifier,
+  itemBonus,
   savingThrowBonus,
   skillBonus,
   spellSlotMaximums,
@@ -63,7 +64,9 @@ function AbilitiesCard({ character }: { character: Character }) {
       <div className="grid grid-cols-3 gap-2">
         {ABILITIES.map(ab => {
           const proficient = character.savingThrowProficiencies.includes(ab)
-          const save = savingThrowBonus(character.scores[ab], proficient, character.proficiencyBonus)
+          const save =
+            savingThrowBonus(character.scores[ab], proficient, character.proficiencyBonus) +
+            itemBonus(character, 'savingThrows')
           return (
             <div key={ab} className="bg-fs-tile border border-fs-card-line rounded-lg py-2 text-center">
               <div className="text-xs text-fs-ink-muted" title={gameLabel(t, 'ability', ab)}>

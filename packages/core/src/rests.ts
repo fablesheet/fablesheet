@@ -1,15 +1,18 @@
 import type { Character } from './types'
 import { SPELL_LEVELS, slotsRecoverOnShortRest } from './spellcasting'
+import { rechargeItems } from './magic'
+import { secureRandom, type RandomSource } from './dice'
 
 const EXHAUSTION = /^Exhaustion (\d)$/
 
 /**
  * Short rest. Hit dice are spent separately (healing is rolled at the table);
- * Warlock pact slots and short-rest features come back.
+ * Warlock pact slots, short-rest features and short-rest item charges come back.
  */
-export function shortRest(character: Character): Character {
+export function shortRest(character: Character, random: RandomSource = secureRandom): Character {
   return {
     ...character,
+    items: rechargeItems(character.items, 'short', random),
     spellSlotsUsed: slotsRecoverOnShortRest(character.className)
       ? new Array<number>(SPELL_LEVELS).fill(0)
       : character.spellSlotsUsed,
@@ -22,9 +25,9 @@ export function shortRest(character: Character): Character {
 /**
  * Long rest: full hit points, temporary HP gone, half of the total hit dice
  * regained (at least one), all spell slots and features restored, death saves
- * reset and exhaustion reduced by one level.
+ * reset and exhaustion reduced by one level. Items with charges recharge.
  */
-export function longRest(character: Character): Character {
+export function longRest(character: Character, random: RandomSource = secureRandom): Character {
   const regainedDice = Math.max(1, Math.floor(character.hitDice.total / 2))
 
   const conditions = character.conditions.flatMap(c => {
@@ -35,7 +38,8 @@ export function longRest(character: Character): Character {
   })
 
   return {
-    ...shortRest(character),
+    ...shortRest(character, random),
+    items: rechargeItems(character.items, 'long', random),
     hp: { ...character.hp, current: character.hp.max, temp: 0 },
     hitDice: { ...character.hitDice, used: Math.max(0, character.hitDice.used - regainedDice) },
     spellSlotsUsed: new Array<number>(SPELL_LEVELS).fill(0),

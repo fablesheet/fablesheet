@@ -1,5 +1,6 @@
 import type { Item, ItemCategory } from '@fablesheet/core'
 import { parseArmor, parseWeapon } from './parse'
+import { MAGIC_ITEM_CATALOG } from './magicItems'
 
 type CatalogItem = Omit<Item, 'id'>
 
@@ -184,6 +185,9 @@ export const ITEM_CATALOG: CatalogItem[] = [
   entry('Blowgun Needles (50)', 'Ammunition', '50 needles for a blowgun.',                              1,   1),
   entry('Crossbow Bolts (20)',  'Ammunition', '20 bolts for light, hand, or heavy crossbows.',          1.5, 1),
   entry('Sling Bullets (20)',   'Ammunition', '20 lead bullets for a sling.',                           1.5, 0.04),
+
+  // ── Magic items ─────────────────────────────────────────────────────────────
+  ...MAGIC_ITEM_CATALOG,
 ]
 
 /**

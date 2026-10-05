@@ -1,10 +1,11 @@
 import type { Character, DamageType, Item, WeaponStats } from './types'
 import { abilityModifier } from './rules'
+import { isItemUsable, itemBonus } from './magic'
 
 // ── Armor class ───────────────────────────────────────────────────────────────
 
 /**
- * Armor class from equipped armor and shield. Without body armor, Barbarians and
+ * Armor class from equipped armor and shield, plus bonuses of active magic items. Without body armor, Barbarians and
  * Monks use Unarmored Defense (Monks only without a shield); everyone else 10 + DEX.
  */
 export function armorClass(character: Pick<Character, 'className' | 'scores' | 'items'>): number {
@@ -29,7 +30,7 @@ export function armorClass(character: Pick<Character, 'className' | 'scores' | '
   } else {
     base = 10 + dex
   }
-  return base + shieldBonus
+  return base + shieldBonus + itemBonus(character, 'ac')
 }
 
 // ── Weapons ───────────────────────────────────────────────────────────────────
@@ -101,13 +102,16 @@ export function weaponAttack(
       : 'strength'
   const mod = ability === 'dexterity' ? dex : str
   const proficient = isProficientWithWeapon(character.className, item.name, weapon, character.otherProficiencies)
+  // A magic weapon's own bonus (e.g. +1), if it doesn't need attunement or is attuned
+  const magic = isItemUsable(item) ? (item.bonuses ?? null) : null
+  const damageMod = mod + (magic?.damage ?? 0)
 
   return {
     itemId: item.id,
     name: item.name,
-    attackBonus: mod + (proficient ? character.proficiencyBonus : 0),
-    damage: weapon.damage ? formatDamage(weapon.damage, mod) : null,
-    versatileDamage: weapon.versatileDamage ? formatDamage(weapon.versatileDamage, mod) : null,
+    attackBonus: mod + (proficient ? character.proficiencyBonus : 0) + (magic?.attack ?? 0),
+    damage: weapon.damage ? formatDamage(weapon.damage, damageMod) : null,
+    versatileDamage: weapon.versatileDamage ? formatDamage(weapon.versatileDamage, damageMod) : null,
     damageType: weapon.damageType,
     range: weapon.range,
     proficient,
